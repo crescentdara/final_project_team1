@@ -5,7 +5,7 @@ export default defineConfig({
     plugins: [react()],
     server: {
         proxy: {
-            '/land-survey': {
+            '/building': {
                 target: 'http://localhost:8080', // Spring Boot 서버 주소
                 changeOrigin: true,
             },

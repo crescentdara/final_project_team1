@@ -1,68 +1,135 @@
-//package bitc.full502.final_project_team1.web.loader;
-//
-//@Component
-//@RequiredArgsConstructor
-//public class CsvDataLoader implements CommandLineRunner {
-//
-//    private final LandSurveyRepository landSurveyRepository;
-//
-//    @Override
-//    public void run(String... args) throws Exception {
-//        // resources/data 밑 파일 불러오기
-//        ClassPathResource resource =
-//                new ClassPathResource("data/국토교통부_지적재조사 일필지 조사 정보_20250711.csv");
-//
-//        try (CSVReader reader = new CSVReader(
-//                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-//
-//            List<String[]> rows = reader.readAll();
-//
-//            // 첫 줄(헤더) 스킵
-//            for (int i = 1; i < rows.size(); i++) {
-//                String[] row = rows.get(i);
-//
-//                LandSurveyEntity land = LandSurveyEntity.builder()
-//                        .projectId(row[0])                     // 사업지구번호
-//                        .standardYear(Integer.parseInt(row[1])) // 기준년도
-//                        .regionCode(row[2])                    // 시군구코드
-//                        .regionName(row[3])                    // 시군구명
-//                        .projectName(row[4])                   // 사업지구명
-//                        .landUniqueCode(row[5])                // 토지고유코드
-//                        .landTypeCode(row[6])                  // 토지임야대장 지목코드
-//                        .landArea(Double.parseDouble(row[7]))  // 토지임야대장 면적
-//                        // row[8] = 조사자 의견내용 (제외)
-//                        .buildingSerial(row[9])                // 건축물 일련번호
-//                        .floorAbove(parseIntSafe(row[10]))     // 지상층수
-//                        .floorBelow(parseIntSafe(row[11]))     // 지하층수
-//                        .buildingArea(parseDoubleSafe(row[12]))// 건축면적
-//                        .buildingCoverage(parseDoubleSafe(row[13])) // 건폐율
-//                        .floorAreaRatio(parseDoubleSafe(row[14]))   // 용적률
-//                        .structureCode(row[15])                // 건축물구조코드
-//                        .structureName(row[16])                // 건축물구조코드명
-//                        .usageCode(row[17])                    // 건축물용도코드
-//                        .usageName(row[18])                    // 건축물용도코드명
-//                        .build();
-//
-//                landSurveyRepository.save(land);
-//            }
-//        }
-//    }
-//
-//    // 안전한 Integer 파싱 (빈칸일 경우 null)
-//    private Integer parseIntSafe(String value) {
-//        try {
-//            return (value == null || value.isBlank()) ? null : Integer.parseInt(value);
-//        } catch (NumberFormatException e) {
-//            return null;
-//        }
-//    }
-//
-//    // 안전한 Double 파싱 (빈칸일 경우 null)
-//    private Double parseDoubleSafe(String value) {
-//        try {
-//            return (value == null || value.isBlank()) ? null : Double.parseDouble(value);
-//        } catch (NumberFormatException e) {
-//            return null;
-//        }
-//    }
-//}
+package bitc.full502.final_project_team1.web.loader;
+
+import bitc.full502.final_project_team1.web.domain.entity.BuildingEntity;
+import bitc.full502.final_project_team1.web.domain.repository.BuildingRepository;
+import com.opencsv.CSVReader;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Component
+@RequiredArgsConstructor
+public class CsvDataLoader implements CommandLineRunner {
+
+    private final BuildingRepository buildingRepository;
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (buildingRepository.count() > 0) {
+            System.out.println("✅ Building 데이터가 이미 존재합니다. CSV 로드를 건너뜁니다.");
+            return;
+        }
+
+        ClassPathResource resource =
+                new ClassPathResource("data/경상남도 김해시_건축물 현황_20240731.csv");
+
+        try (CSVReader reader = new CSVReader(
+                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+
+            List<String[]> rows = reader.readAll();
+
+            // 동별 카운트 관리 (lotAddress 기준)
+            Map<String, Integer> dongCounter = new HashMap<>();
+            int inserted = 0; // 전체 insert 건수 카운트
+
+            for (int i = 1; i < rows.size(); i++) {
+                String[] row = rows.get(i);
+
+                String lotAddress = row[1]; // 번지주소
+                if (lotAddress == null || lotAddress.isBlank()) {
+                    continue; // 주소 없는 데이터는 건너뜀
+                }
+
+                // ⚠️ 번, 지 값이 모두 0이거나 비어 있으면 skip
+                boolean noMain = (row[2] == null || row[2].isBlank() || "0".equals(row[2].trim()));
+                boolean noSub  = (row[3] == null || row[3].isBlank() || "0".equals(row[3].trim()));
+                if (noMain && noSub) {
+                    continue;
+                }
+
+                // "경상남도 김해시 강동 ..." → 세 번째 토큰을 동 이름으로 사용
+                String[] parts = lotAddress.split(" ");
+                String dongName = parts.length >= 3 ? parts[2] : lotAddress;
+
+                int count = dongCounter.getOrDefault(dongName, 0);
+                if (count >= 10) {
+                    continue; // 이미 10개 넣었으면 skip
+                }
+
+                BuildingEntity building = BuildingEntity.builder()
+                        .lotAddress(row[1])
+                        .lotMainNo(row[2])
+                        .lotSubNo(row[3])
+                        .roadAddress(row[4])
+                        .ledgerDivisionName(row[5])
+                        .ledgerTypeName(row[6])
+                        .buildingName(row[7])
+                        .extraLotCount(parseIntSafe(row[8]))
+                        .newRoadCode(row[9])
+                        .newLegalDongCode(row[10])
+                        .newMainNo(row[11])
+                        .newSubNo(row[12])
+                        .mainSubCode(row[13])
+                        .mainSubName(row[14])
+                        .landArea(parseDoubleSafe(row[15]))
+                        .buildingArea(parseDoubleSafe(row[16]))
+                        .buildingCoverage(parseDoubleSafe(row[17]))
+                        .totalFloorArea(parseDoubleSafe(row[18]))
+                        .floorAreaForRatio(parseDoubleSafe(row[19]))
+                        .floorAreaRatio(parseDoubleSafe(row[20]))
+                        .structureCode(row[21])
+                        .structureName(row[22])
+                        .etcStructure(row[23])
+                        .mainUseCode(row[24])
+                        .mainUseName(row[25])
+                        .etcUse(row[26])
+                        .roofCode(row[27])
+                        .roofName(row[28])
+                        .etcRoof(row[29])
+                        .height(parseDoubleSafe(row[30]))
+                        .groundFloors(parseIntSafe(row[31]))
+                        .basementFloors(parseIntSafe(row[32]))
+                        .passengerElevators(parseIntSafe(row[33]))
+                        .emergencyElevators(parseIntSafe(row[34]))
+                        .annexCount(parseIntSafe(row[35]))
+                        .annexArea(parseDoubleSafe(row[36]))
+                        .totalBuildingArea(parseDoubleSafe(row[37]))
+                        .latitude(parseDoubleSafe(row[38]))
+                        .longitude(parseDoubleSafe(row[39]))
+                        .build();
+
+                buildingRepository.save(building);
+
+                dongCounter.put(dongName, count + 1);
+                inserted++;
+            }
+
+            System.out.println("✅ CSV 데이터 적재 완료 (총 " + inserted + "건 저장됨)");
+        }
+    }
+
+    // 안전한 Integer 파싱
+    private Integer parseIntSafe(String value) {
+        try {
+            return (value == null || value.isBlank()) ? null : Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    // 안전한 Double 파싱
+    private Double parseDoubleSafe(String value) {
+        try {
+            return (value == null || value.isBlank()) ? null : Double.parseDouble(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+}

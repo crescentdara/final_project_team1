@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 function SurveyList() {
-    const [regions, setRegions] = useState([]);
+    const [addresses, setAddresses] = useState([]);
 
     useEffect(() => {
-        axios.get("/land-survey/regions")
-            .then(res => setRegions(res.data))
+        axios.get("/building/address-details")
+            .then(res => setAddresses(res.data))
             .catch(err => console.error(err));
     }, []);
 
@@ -19,6 +19,23 @@ function SurveyList() {
 
             <div className="row">
                 {/* 왼쪽 */}
+
+                <div className="col-md-8">
+                    <div className="p-3 border bg-light">
+                        <h5>미배정 조사지 목록</h5>
+                        <p>총 {addresses.length}건</p>
+                        <ul className="list-group" style={{ maxHeight: "400px", overflowY: "auto" }}>
+                            {addresses.map((addr, index) => (
+                                <li key={index} className="list-group-item">
+                                    <input type="checkbox" className="form-check-input me-2" />
+                                    {addr}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+
+                {/* 오른쪽 */}
                 <div className="col-md-4 d-flex flex-column gap-3">
                     {/* 지도 */}
                     <div className="border" style={{ height: "200px", background: "#f5f5f5" }}>
@@ -33,21 +50,6 @@ function SurveyList() {
                     </div>
                 </div>
 
-                {/* 오른쪽 */}
-                <div className="col-md-8">
-                    <div className="p-3 border bg-light">
-                        <h5>미배정 조사지 목록</h5>
-                        <p>총 {regions.length}건</p>
-                        <ul className="list-group" style={{ maxHeight: "400px", overflowY: "auto" }}>
-                            {regions.map((region, index) => (
-                                <li key={index} className="list-group-item">
-                                    <input type="checkbox" className="form-check-input me-2" />
-                                    {region}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
     );

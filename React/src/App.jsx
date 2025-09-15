@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { getTest } from "./api";
-
 function App() {
-    const [msg, setMsg] = useState("");
 
-    useEffect(() => {
-        getTest().then(setMsg);
-    }, []);
+    return (
+        <div className={'container mt-5'}>
+            <h2>미배정 조사목록</h2>
 
-    return <h1>{msg}</h1>;
+        </div>
+    );
 }
 
 export default App;

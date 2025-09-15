@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:mysql://58.239.58.243:3306/java502_team1_final_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: java502_team1_final
+    password: java502_team1_final_1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+server:
+  port: 8080

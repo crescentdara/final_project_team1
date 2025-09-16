@@ -12,9 +12,3 @@ export default function ShimmerRow({ height = 18, className = "" }) {
       />
   );
 }
-
-// 전역 CSS에 아래 keyframes 추가(없으면 index.css에 추가)
-// @keyframes shimmer {
-//   0% { background-position: 100% 0; }
-//   100% { background-position: 0 0; }
-// }

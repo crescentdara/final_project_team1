@@ -1,11 +1,48 @@
 import axios from "axios";
 
-// 서버에 context-path가 있으면 '/land-survey/api' 로 바꾸세요.
 const api = axios.create({ baseURL: "/api", timeout: 10000 });
 
-export async function fetchUsers(keyword = '') {
-  const res = await api.get('/users', { params: { keyword } })
-  return Array.isArray(res.data) ? res.data : []
+export async function fetchUsersAdvanced({ field = "all", keyword = "" } = {}) {
+  // 백엔드 파라미터 매핑
+  const backendField = field === "role" ? "role" : "name";
+  const res = await api.get("/users", { params: { field: backendField, keyword } });
+
+  const d = res?.data;
+  const arr =
+      Array.isArray(d) ? d :
+          Array.isArray(d?.items) ? d.items :
+              Array.isArray(d?.data) ? d.data :
+                  Array.isArray(d?.users) ? d.users : [];
+
+  const normalized = arr.map(u => ({
+    userId: u.userId ?? u.user_id ?? u.id,
+    username: u.username ?? u.user_name ?? "",
+    name: u.name ?? "",
+    role: typeof u.role === "string" ? u.role : (u.role?.name ?? ""),
+    status: u.status,
+    createdAt: u.createdAt,
+  }));
+
+  // 프론트 추가 필터 (username 전용 등)
+  const kw = String(keyword ?? "").trim();
+  if (!kw) return normalized;
+
+  if (field === "username") {
+    const low = kw.toLowerCase();
+    return normalized.filter(u => (u.username ?? "").toLowerCase().includes(low));
+  }
+
+  if (field === "all") {
+    const low = kw.toLowerCase();
+    const up = kw.toUpperCase();
+    return normalized.filter(u =>
+        (u.name ?? "").toLowerCase().includes(low) ||
+        (u.username ?? "").toLowerCase().includes(low) ||
+        (u.role ?? "").toUpperCase() === up
+    );
+  }
+
+  return normalized;
 }
 
 export async function fetchUserDetail(userId) {

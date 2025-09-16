@@ -10,9 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -35,8 +33,11 @@ public class CsvDataLoader implements CommandLineRunner {
 
             List<String[]> rows = reader.readAll();
 
-            // 동별 카운트 관리 (lotAddress 기준)
+            // 동별 카운트 관리
             Map<String, Integer> dongCounter = new HashMap<>();
+            // 동별 lotAddress 중복 방지
+            Map<String, Set<String>> dongLotAddressSet = new HashMap<>();
+
             int inserted = 0; // 전체 insert 건수 카운트
 
             for (int i = 1; i < rows.size(); i++) {
@@ -57,6 +58,14 @@ public class CsvDataLoader implements CommandLineRunner {
                 // "경상남도 김해시 강동 ..." → 세 번째 토큰을 동 이름으로 사용
                 String[] parts = lotAddress.split(" ");
                 String dongName = parts.length >= 3 ? parts[2] : lotAddress;
+
+                // 동별 set 초기화
+                dongLotAddressSet.putIfAbsent(dongName, new HashSet<>());
+
+                // ✅ 이미 같은 lotAddress가 이 동에 들어가 있으면 skip
+                if (dongLotAddressSet.get(dongName).contains(lotAddress)) {
+                    continue;
+                }
 
                 int count = dongCounter.getOrDefault(dongName, 0);
                 if (count >= 10) {
@@ -106,6 +115,9 @@ public class CsvDataLoader implements CommandLineRunner {
                         .build();
 
                 buildingRepository.save(building);
+
+                // ✅ 저장된 lotAddress 기록
+                dongLotAddressSet.get(dongName).add(lotAddress);
 
                 dongCounter.put(dongName, count + 1);
                 inserted++;

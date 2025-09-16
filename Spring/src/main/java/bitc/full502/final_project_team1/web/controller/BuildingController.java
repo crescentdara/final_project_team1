@@ -3,9 +3,11 @@ package bitc.full502.final_project_team1.web.controller;
 import bitc.full502.final_project_team1.web.domain.entity.BuildingEntity;
 import bitc.full502.final_project_team1.web.domain.repository.BuildingRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/building")
@@ -32,8 +34,8 @@ public class BuildingController {
         return repository.findAll()
                 .stream()
                 .map(BuildingEntity::getBuildingName)
-                .filter(name -> name != null && !name.isBlank()) // 빈 값 제외
-                .distinct() // ✅ 중복 제거
+                .filter(name -> name != null && !name.isBlank())
+                .distinct()
                 .toList();
     }
 
@@ -43,8 +45,8 @@ public class BuildingController {
         return repository.findAll()
                 .stream()
                 .map(BuildingEntity::getLotAddress)
-                .filter(addr -> addr != null && !addr.isBlank()) // 빈 값 제외
-                .distinct() // ✅ 중복 제거
+                .filter(addr -> addr != null && !addr.isBlank())
+                .distinct()
                 .toList();
     }
 
@@ -56,7 +58,6 @@ public class BuildingController {
                 .map(b -> {
                     StringBuilder sb = new StringBuilder();
 
-                    // 기본 주소
                     if (b.getLotAddress() != null && !b.getLotAddress().isBlank()) {
                         sb.append(b.getLotAddress());
                     }
@@ -64,20 +65,20 @@ public class BuildingController {
                     boolean hasMain = b.getLotMainNo() != null && !b.getLotMainNo().isBlank() && !"0".equals(b.getLotMainNo());
                     boolean hasSub = b.getLotSubNo() != null && !b.getLotSubNo().isBlank() && !"0".equals(b.getLotSubNo());
 
-                    // 번-지 붙이기 (0은 무시)
                     if (hasMain) {
-                        sb.append(" ").append(b.getLotMainNo());
+                        int mainNo = Integer.parseInt(b.getLotMainNo());
+                        sb.append(" ").append(mainNo);
+
                         if (hasSub) {
-                            sb.append("-").append(b.getLotSubNo());
+                            int subNo = Integer.parseInt(b.getLotSubNo());
+                            sb.append("-").append(subNo);
                         }
                         sb.append("번지");
                     }
                     else {
-                        // 번지가 없으면 → 도로명주소 우선 표시
                         if (b.getRoadAddress() != null && !b.getRoadAddress().isBlank()) {
                             sb.append(" (").append(b.getRoadAddress()).append(")");
                         }
-                        // 도로명주소도 없으면 → 건물명 표시
                         else if (b.getBuildingName() != null && !b.getBuildingName().isBlank()) {
                             sb.append(" - ").append(b.getBuildingName());
                         }
@@ -85,8 +86,32 @@ public class BuildingController {
 
                     return sb.toString();
                 })
-                .filter(addr -> addr != null && !addr.isBlank()) // 빈 값 제외
-                .distinct() // ✅ 중복 제거
+                .filter(addr -> addr != null && !addr.isBlank())
+                .distinct()
                 .toList();
+    }
+
+    // 📌 읍면동 목록 조회 (경상남도 김해시 기준)
+    @GetMapping("/eupmyeondong")
+    public List<String> getEupMyeonDong(@RequestParam(defaultValue = "김해시") String city) {
+        return repository.findDistinctEupMyeonDong(city);
+    }
+
+    // 📌 읍면동 기준 검색
+    @GetMapping("/search")
+    public List<BuildingEntity> searchByEupMyeonDong(@RequestParam(required = false) String eupMyeonDong) {
+        return repository.searchByEupMyeonDong(eupMyeonDong);
+    }
+
+    // 📌 [추가] 주소(lotAddress)로 위도/경도 조회
+    @GetMapping("/coords")
+    public ResponseEntity<?> getCoordsByAddress(@RequestParam String address) {
+        return repository.findByLotAddress(address)
+                .map(b -> Map.of(
+                        "latitude", b.getLatitude(),
+                        "longitude", b.getLongitude()
+                ))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

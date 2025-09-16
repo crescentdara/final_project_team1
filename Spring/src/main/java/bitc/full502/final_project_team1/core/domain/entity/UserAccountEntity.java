@@ -40,4 +40,8 @@ public class UserAccountEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;            // DATETIME 매핑
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/web/jgy/SurveyList
 }

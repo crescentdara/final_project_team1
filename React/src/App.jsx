@@ -1,14 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { getTest } from "./api";
+import { Routes, Route, Link } from 'react-router-dom';
+import SurveyList from './pages/SurveyList.jsx';
 
 function App() {
-    const [msg, setMsg] = useState("");
+    return (
+        <div className="container mt-5">
+            <Routes>
+                {/* 메인 페이지 */}
+                <Route
+                    path="/"
+                    element={
+                        <div>
+                            <h2>메인 페이지</h2>
+                            <Link to="/surveyList" className="btn btn-primary mt-3">
+                                SurveyList 페이지로 이동
+                            </Link>
+                        </div>
+                    }
+                />
 
-    useEffect(() => {
-        getTest().then(setMsg);
-    }, []);
-
-    return <h1>{msg}</h1>;
+                {/* SurveyList 페이지 */}
+                <Route path="/surveyList" element={<SurveyList />} />
+            </Routes>
+        </div>
+    );
 }
 
 export default App;

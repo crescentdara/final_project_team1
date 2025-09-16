@@ -3,31 +3,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 지도 (예시 이미지) -->
-    <FrameLayout
+    <!-- 지도 컨테이너 (여기에 SupportMapFragment를 넣을거예요) -->
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:name="com.naver.maps.map.MapFragment" />
+
 
     <!-- 반경 버튼 -->
     <LinearLayout
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="16dp"
+        android:padding="8dp"
+        android:background="#CCFFFFFF"
+        android:elevation="6dp">
 
         <Button
             android:id="@+id/btnRadius1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="반경 1km"/>
+
         <Button
             android:id="@+id/btnRadius2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="반경 2km"
             android:layout_marginStart="8dp"/>
+
         <Button
             android:id="@+id/btnRadius3"
             android:layout_width="wrap_content"

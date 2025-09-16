@@ -55,6 +55,8 @@ dependencies {
 
     implementation(libs.naver.map.sdk)
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation(libs.play.services.maps)
+    implementation("com.naver.maps:map-sdk:3.22.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

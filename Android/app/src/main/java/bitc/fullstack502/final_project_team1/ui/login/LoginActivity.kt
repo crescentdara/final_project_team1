@@ -59,22 +59,39 @@ class LoginActivity : AppCompatActivity() {
 
         setLoading(true)
 
+        // 테스트용 로그인 (admin / 1234)
+        if (id == "admin" && pw == "1234") {
+            // 테스트용 사용자 정보 저장
+            getSharedPreferences("auth", MODE_PRIVATE)
+                .edit()
+                .putString("token", "test_token_12345")
+                .putLong("user_id", 1)
+                .putString("username", "admin")
+                .putString("name", "관리자")
+                .putString("role", "admin")
+                .putString("email", "admin@example.com")
+                .putString("phone", "010-1234-5678")
+                .putLong("login_time", System.currentTimeMillis())
+                .apply()
+
+            Toast.makeText(this@LoginActivity, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+            finish()
+            return
+        }
+
         lifecycleScope.launch {
             try {
                 val res = ApiClient.service.login(LoginRequest(id, pw))
                 if (res.isSuccessful) {
                     val body = res.body()
-                    if (body != null && body.success && body.token != null && body.user != null) {
+                    if (body != null) {
                         // 토큰 및 사용자 정보 저장 (SharedPreferences)
                         getSharedPreferences("auth", MODE_PRIVATE)
                             .edit()
                             .putString("token", body.token)
-                            .putLong("user_id", body.user.id)
-                            .putString("username", body.user.username)
-                            .putString("name", body.user.name)
-                            .putString("role", body.user.role)
-                            .putString("email", body.user.email ?: "")
-                            .putString("phone", body.user.phone ?: "")
+                            .putString("name", body.name)
+                            .putString("role", body.role)
                             .putLong("login_time", System.currentTimeMillis())
                             .apply()
 
@@ -82,7 +99,7 @@ class LoginActivity : AppCompatActivity() {
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
                     } else {
-                        showError(body?.message ?: "서버에서 유효하지 않은 응답을 받았습니다.")
+                        showError("서버에서 유효하지 않은 응답을 받았습니다.")
                     }
                 } else {
                     when (res.code()) {

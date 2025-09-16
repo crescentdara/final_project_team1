@@ -1,44 +1,42 @@
+// src/pages/UserDetail.jsx
 import { useEffect, useState } from "react";
-import { fetchUserAssignments, fetchUserDetail } from "../api/users";
+import { fetchUserDetail, fetchUserAssignments } from "../api/users";
 import UserSearchBar from "../components/users/UserSearchBar";
 import UserDetailCard from "../components/users/UserDetailCard";
 import AssignmentList from "../components/users/AssignmentList";
 
 export default function UserDetail() {
   const [selectedUserId, setSelectedUserId] = useState(null);
-
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [assignLoading, setAssignLoading] = useState(false);
-
   const [detail, setDetail] = useState(null);
   const [assignments, setAssignments] = useState([]);
 
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [loadingAssign, setLoadingAssign] = useState(false);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    if (!selectedUserId) {
-      setDetail(null);
-      setAssignments([]);
-      return;
-    }
+    if (!selectedUserId) { setDetail(null); setAssignments([]); return; }
 
     let alive = true;
-
     (async () => {
       try {
-        setDetailLoading(true);
+        setLoadingDetail(true); setError(null);
         const d = await fetchUserDetail(selectedUserId);
         if (alive) setDetail(d);
+      } catch (e) {
+        if (alive) setError(e);
       } finally {
-        if (alive) setDetailLoading(false);
+        if (alive) setLoadingDetail(false);
       }
     })();
 
     (async () => {
       try {
-        setAssignLoading(true);
+        setLoadingAssign(true);
         const list = await fetchUserAssignments(selectedUserId);
-        if (alive) setAssignments(list || []);
+        if (alive) setAssignments(list);
       } finally {
-        if (alive) setAssignLoading(false);
+        if (alive) setLoadingAssign(false);
       }
     })();
 
@@ -51,9 +49,14 @@ export default function UserDetail() {
 
         <UserSearchBar value={selectedUserId} onChange={setSelectedUserId} />
 
-        <UserDetailCard loading={detailLoading} detail={detail} />
+        {error && (
+            <div className="alert alert-danger mt-3">
+              데이터를 불러오지 못했습니다. {String(error.message || error)}
+            </div>
+        )}
 
-        <AssignmentList loading={assignLoading} items={assignments} />
+        <UserDetailCard loading={loadingDetail} detail={detail} />
+        <AssignmentList loading={loadingAssign} items={assignments} />
       </div>
   );
 }

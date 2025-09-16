@@ -1,4 +1,4 @@
-package bitc.full502.final_project_team1.web.domain.entity;
+package bitc.full502.final_project_team1.core.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserAccount {
+public class UserAccountEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

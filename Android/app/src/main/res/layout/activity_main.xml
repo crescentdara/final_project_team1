@@ -5,15 +5,211 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/main_background"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- 상단 앱바 -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/toolbar_background"
+            app:title="@string/login_title"
+            app:titleTextColor="@android:color/white"
+            app:navigationIcon="@drawable/ic_menu_white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- 메인 콘텐츠 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- 환영 메시지 카드 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="32dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="32dp"
+                    android:gravity="center">
+
+                    <!-- 사용자 아바타 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_marginBottom="20dp"
+                        app:cardCornerRadius="50dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="#F3F4F6">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center"
+                            android:src="@mipmap/ic_launcher"
+                            android:contentDescription="사용자 아바타" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/main_welcome"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="#1F2937" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/main_description"
+                        android:textSize="16sp"
+                        android:textColor="#6B7280"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 기능 버튼들 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- 조사 시작 버튼 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:text="@string/main_survey_start"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        app:backgroundTint="#6366F1"
+                        app:cornerRadius="16dp"
+                        app:icon="@drawable/ic_survey"
+                        app:iconGravity="textStart"
+                        app:iconPadding="16dp"
+                        app:iconTint="@android:color/white" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 조사 현황 버튼 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:text="@string/main_survey_status"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        app:backgroundTint="#10B981"
+                        app:cornerRadius="16dp"
+                        app:icon="@drawable/ic_chart"
+                        app:iconGravity="textStart"
+                        app:iconPadding="16dp"
+                        app:iconTint="@android:color/white" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 설정 버튼 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:text="@string/main_settings"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        app:backgroundTint="#F59E0B"
+                        app:cornerRadius="16dp"
+                        app:icon="@drawable/ic_settings"
+                        app:iconGravity="textStart"
+                        app:iconPadding="16dp"
+                        app:iconTint="@android:color/white" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 로그아웃 버튼 -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/logoutButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:text="@string/main_logout"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        app:backgroundTint="#EF4444"
+                        app:cornerRadius="16dp"
+                        app:icon="@drawable/ic_logout"
+                        app:iconGravity="textStart"
+                        app:iconPadding="16dp"
+                        app:iconTint="@android:color/white" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

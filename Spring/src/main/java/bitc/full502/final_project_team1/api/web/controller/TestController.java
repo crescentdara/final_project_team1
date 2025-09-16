@@ -1,4 +1,4 @@
-package bitc.full502.final_project_team1.web.controller;
+package bitc.full502.final_project_team1.api.web.controller;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

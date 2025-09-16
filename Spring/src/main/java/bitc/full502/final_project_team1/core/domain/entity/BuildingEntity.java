@@ -1,4 +1,4 @@
-package bitc.full502.final_project_team1.web.domain.entity;
+package bitc.full502.final_project_team1.core.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -67,4 +67,8 @@ public class BuildingEntity {
 
     private Double latitude;            // 위도
     private Double longitude;           // 경도
+
+    @Column(nullable = false)
+    private Integer status;  // 0 = 미배정, 1 = 배정됨
+
 }

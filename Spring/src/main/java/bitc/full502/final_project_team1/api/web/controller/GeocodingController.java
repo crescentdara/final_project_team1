@@ -1,4 +1,4 @@
-package bitc.full502.final_project_team1.web.controller;
+package bitc.full502.final_project_team1.api.web.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

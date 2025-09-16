@@ -1,63 +1,90 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import NaverMap from "../components/NaverMap"; // 새로 만든 지도 컴포넌트 import
+import NaverMap from "../components/NaverMap"; // 지도 컴포넌트
 
 function SurveyList() {
     const [addresses, setAddresses] = useState([]);
-    const [emdList, setEmdList] = useState([]);   // 읍면동 목록
+
+    const [emdList, setEmdList] = useState([]); // 읍면동 목록
+
     const [selectedEmd, setSelectedEmd] = useState(""); // 선택된 읍면동
+
     const [selectedLocation, setSelectedLocation] = useState({
-        latitude: 35.228,   // 기본 좌표 (김해 중심 정도)
+        latitude: 35.228, // 기본 좌표 (김해 중심)
         longitude: 128.889,
     });
+
     const [errorMessage, setErrorMessage] = useState(""); // 안내문 메시지
 
+    // ✅ 조사자 관련 상태
+    const [users, setUsers] = useState([]); // 조사자 목록
+    const [selectedUser, setSelectedUser] = useState(null); // 선택된 조사자
+
+    // ✅ 건물 선택 상태 (체크박스 다중 선택)
+    const [selectedBuildings, setSelectedBuildings] = useState([]);
+
+    // =============================
+    // 초기 로딩: 읍면동 + 조사자 목록 + 전체 조사지
+    // =============================
     useEffect(() => {
         // 읍면동 옵션 불러오기
-        axios.get("/building/eupmyeondong?city=김해시")
-            .then(res => setEmdList(res.data))
-            .catch(err => console.error(err));
+        axios
+            .get("/web/building/eupmyeondong?city=김해시")
+            .then((res) => setEmdList(res.data))
+            .catch((err) => console.error(err));
 
-        // 페이지 진입 시 전체 목록 불러오기
-        handleSearch();  // 전체 호출
+        // 전체 조사지 불러오기
+        handleSearch();
+
+        // 조사자 목록 불러오기
+        axios
+            .get("/web/api/users")
+            .then((res) => setUsers(res.data))
+            .catch((err) => console.error("❌ 조사자 목록 불러오기 실패:", err));
     }, []);
 
-    // 검색 버튼 클릭 (재사용 가능)
+    // =============================
+    // 조사지 검색
+    // =============================
     const handleSearch = () => {
-        axios.get("/building/search", {
-            params: { eupMyeonDong: selectedEmd || "" }
-        })
-            .then(res => setAddresses(res.data))
-            .catch(err => console.error(err));
+        axios
+            .get("/web/building/search", {
+                params: { eupMyeonDong: selectedEmd || "" },
+            })
+            .then((res) => setAddresses(res.data))
+            .catch((err) => console.error(err));
     };
 
-    // 주소 전처리 함수
-    const normalizeAddress = (query) => {
-        if (!query) return "";
+    // =============================
+    // 건물 체크박스 선택 핸들러
+    // =============================
+    const handleBuildingCheck = (addr) => {
+        const id = addr.id;
+        const isChecked = selectedBuildings.includes(id);
 
-        let normalized = query.trim();
-
-        // ✅ 0001-0031 → 1-31 형태로 변환
-        normalized = normalized.replace(/(\d+)-0+(\d+)/, (_, 앞, 뒤) => `${parseInt(앞)}-${parseInt(뒤)}`);
-
-        // ✅ 0094 → 94 형태 변환 (단독 숫자만)
-        normalized = normalized.replace(/\b0+(\d+)/g, "$1");
-
-        return normalized;
+        let updated;
+        if (isChecked) {
+            updated = selectedBuildings.filter((bid) => bid !== id);
+        } else {
+            updated = [...selectedBuildings, id];
+            // 마지막 선택된 건물 좌표로 지도 이동
+            handleSelect(addr);
+        }
+        setSelectedBuildings(updated);
     };
 
-    // 체크 시 → 주소 문자열을 네이버 지오코딩 API로 보냄
-// ... 기존 import 유지
-
-// 주소 선택 시 → DB에서 좌표 가져오기
+    // =============================
+    // 지도에 핑 찍기
+    // =============================
     const handleSelect = (addr) => {
         let query = addr.lotAddress || addr.buildingName;
         if (!query) return;
 
         console.log("📍 DB 좌표 조회 요청:", query);
 
-        axios.get("/building/coords", { params: { address: query } })
-            .then(res => {
+        axios
+            .get("/web/building/coords", { params: { address: query } })
+            .then((res) => {
                 if (res.data && res.data.latitude && res.data.longitude) {
                     setSelectedLocation({
                         latitude: res.data.latitude,
@@ -68,12 +95,45 @@ function SurveyList() {
                     setErrorMessage(`좌표를 찾을 수 없습니다.\n요청한 주소: ${query}`);
                 }
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error("DB coords API error:", err);
                 setErrorMessage("DB에서 좌표를 가져오는 중 오류가 발생했습니다.");
             });
     };
 
+    // =============================
+    // 배정 버튼 클릭
+    // =============================
+    const handleAssign = async () => {
+        if (!selectedUser) {
+            alert("조사자를 선택하세요!");
+            return;
+        }
+        if (selectedBuildings.length === 0) {
+            alert("건물을 하나 이상 선택하세요!");
+            return;
+        }
+
+        try {
+            const res = await axios.post("/web/building/assign", {
+                userId: selectedUser.userId,
+                buildingIds: selectedBuildings,
+            });
+            console.log("✅ 배정 완료:", res.data);
+
+            // 성공 후 목록 갱신
+            handleSearch();
+            setSelectedBuildings([]);
+            alert(`총 ${res.data.assignedCount}건이 배정되었습니다.`);
+        } catch (err) {
+            console.error("❌ 배정 실패:", err);
+            alert("배정 중 오류가 발생했습니다.");
+        }
+    };
+
+    // =============================
+    // JSX
+    // =============================
     return (
         <div className="container mt-4">
             <h2 className="mb-4">미배정 조사목록</h2>
@@ -81,7 +141,7 @@ function SurveyList() {
             {/* 🔎 검색 박스 */}
             <div className="border rounded p-3 mb-4 bg-light shadow-sm">
                 <div className="row g-3 align-items-end">
-                    {/* 시/도 구분 */}
+                    {/* 시/도 */}
                     <div className="col-md-4">
                         <label className="form-label fw-bold">시/도 구분</label>
                         <select className="form-select" disabled>
@@ -89,7 +149,7 @@ function SurveyList() {
                         </select>
                     </div>
 
-                    {/* 읍면동 구분 */}
+                    {/* 읍면동 */}
                     <div className="col-md-4">
                         <label className="form-label fw-bold">읍/면/동 구분</label>
                         <select
@@ -99,7 +159,9 @@ function SurveyList() {
                         >
                             <option value="">전체</option>
                             {emdList.map((emd, idx) => (
-                                <option key={idx} value={emd}>{emd}</option>
+                                <option key={idx} value={emd}>
+                                    {emd}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -118,7 +180,7 @@ function SurveyList() {
             </div>
 
             <div className="row">
-                {/* 왼쪽: 목록 */}
+                {/* 왼쪽: 미배정 조사지 목록 */}
                 <div className="col-md-8">
                     <div className="p-3 border rounded bg-white shadow-sm">
                         <div className="d-flex justify-content-between align-items-center mb-2">
@@ -129,17 +191,17 @@ function SurveyList() {
                             className="list-group"
                             style={{ maxHeight: "400px", overflowY: "auto" }}
                         >
-                            {addresses.map((addr, index) => (
+                            {addresses.map((addr) => (
                                 <li
-                                    key={index}
+                                    key={addr.id}
                                     className="list-group-item d-flex align-items-center"
                                     style={{ cursor: "pointer" }}
                                 >
                                     <input
-                                        type="radio" // ✅ 단일 선택만 가능
-                                        name="addressSelect"
+                                        type="checkbox"
                                         className="form-check-input me-2"
-                                        onChange={() => handleSelect(addr)}
+                                        checked={selectedBuildings.includes(addr.id)}
+                                        onChange={() => handleBuildingCheck(addr)}
                                     />
                                     {addr.lotAddress || addr.buildingName}
                                 </li>
@@ -158,24 +220,38 @@ function SurveyList() {
 
                     {/* 안내문 */}
                     {errorMessage && (
-                        <div className="alert alert-warning mt-2">
-                            {errorMessage}
-                        </div>
+                        <div className="alert alert-warning mt-2">{errorMessage}</div>
                     )}
 
                     {/* 대상자 조회 */}
                     <div className="p-3 border rounded bg-white shadow-sm">
                         <h5 className="mb-3">대상자 조회</h5>
-                        <button
-                            className="btn btn-outline-primary w-100 mb-2"
-                            style={{ borderColor: "#289eff", color: "#289eff" }}
+
+                        <ul
+                            className="list-group mb-3"
+                            style={{ maxHeight: "200px", overflowY: "auto" }}
                         >
-                            배정
-                        </button>
+                            {users.map((user) => (
+                                <li
+                                    key={user.userId}
+                                    className="list-group-item d-flex align-items-center"
+                                >
+                                    <input
+                                        type="radio"
+                                        name="userSelect"
+                                        className="form-check-input me-2"
+                                        onChange={() => setSelectedUser(user)}
+                                    />
+                                    {user.name} ({user.username})
+                                </li>
+                            ))}
+                        </ul>
 
                         <button
                             className="btn btn-outline-primary w-100"
                             style={{ borderColor: "#289eff", color: "#289eff" }}
+                            disabled={!selectedUser || selectedBuildings.length === 0}
+                            onClick={handleAssign}
                         >
                             배정
                         </button>

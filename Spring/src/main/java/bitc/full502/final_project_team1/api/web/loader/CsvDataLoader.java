@@ -1,7 +1,7 @@
-package bitc.full502.final_project_team1.web.loader;
+package bitc.full502.final_project_team1.api.web.loader;
 
-import bitc.full502.final_project_team1.web.domain.entity.BuildingEntity;
-import bitc.full502.final_project_team1.web.domain.repository.BuildingRepository;
+import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
+import bitc.full502.final_project_team1.core.domain.repository.BuildingRepository;
 import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

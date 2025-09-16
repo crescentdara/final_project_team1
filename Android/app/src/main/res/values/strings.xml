@@ -16,7 +16,9 @@
     <string name="main_survey_status">조사 현황</string>
     <string name="main_settings">설정</string>
     <string name="main_logout">로그아웃</string>
-    
+    <string name="main_welcome_user">%1$s님, 환영합니다!</string>
+
+
     <!-- 카테고리 메뉴 -->
     <string name="category_survey_status">조사현황</string>
     <string name="category_survey_list">조사목록 관리</string>

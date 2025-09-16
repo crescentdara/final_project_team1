@@ -6,7 +6,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 
 object ApiClient {
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:8080/api/")
+        .baseUrl("http://10.0.2.2:8080/app/")
         .addConverterFactory(ScalarsConverterFactory.create()) // String 응답 처리
         .addConverterFactory(GsonConverterFactory.create()) // JSON 응답 처리
         .build()

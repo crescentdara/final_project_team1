@@ -1,1 +1,12 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()   // Spring Boot / dep-mgmt 플러그인 받는 곳
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()         // 라이브러리 받는 곳
+    }
+}
 rootProject.name = 'final_project_team1'

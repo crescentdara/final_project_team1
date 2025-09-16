@@ -1,4 +1,4 @@
-package bitc.full502.final_project_team1.web.config;
+package bitc.full502.final_project_team1.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

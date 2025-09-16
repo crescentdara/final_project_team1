@@ -21,9 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@drawable/toolbar_background"
+            app:navigationIcon="@drawable/ic_menu_white"
             app:title="@string/login_title"
-            app:titleTextColor="@android:color/white"
-            app:navigationIcon="@drawable/ic_menu_white" />
+            app:titleTextColor="@android:color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -32,10 +32,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,51 +49,55 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="32dp"
+                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/white">
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="32dp"
-                    android:gravity="center">
+                    android:padding="32dp">
 
                     <!-- 사용자 아바타 -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:layout_marginBottom="20dp"
+                        app:cardBackgroundColor="#F3F4F6"
                         app:cardCornerRadius="50dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="#F3F4F6">
+                        app:cardElevation="4dp">
 
                         <ImageView
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             android:layout_gravity="center"
-                            android:src="@mipmap/ic_launcher"
-                            android:contentDescription="사용자 아바타" />
+                            android:contentDescription="사용자 아바타"
+                            android:src="@mipmap/ic_launcher" />
 
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- 환영 메시지 -->
                     <TextView
+                        android:id="@+id/tvWelcomeTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/main_welcome"
+                        android:textColor="#1F2937"
                         android:textSize="28sp"
-                        android:textStyle="bold"
-                        android:textColor="#1F2937" />
+                        android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tvWelcomeDesc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:gravity="center"
                         android:text="@string/main_description"
-                        android:textSize="16sp"
                         android:textColor="#6B7280"
-                        android:gravity="center" />
+                        android:textSize="16sp" />
+
 
                 </LinearLayout>
 
@@ -110,17 +114,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    app:cardBackgroundColor="@android:color/white"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@android:color/white">
+                    app:cardElevation="4dp">
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSurveyStart"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:text="@string/main_survey_start"
+                        android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="@android:color/white"
                         app:backgroundTint="#6366F1"
                         app:cornerRadius="16dp"
                         app:icon="@drawable/ic_survey"
@@ -135,17 +140,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    app:cardBackgroundColor="@android:color/white"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@android:color/white">
+                    app:cardElevation="4dp">
 
                     <com.google.android.material.button.MaterialButton
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:text="@string/main_survey_status"
+                        android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="@android:color/white"
                         app:backgroundTint="#10B981"
                         app:cornerRadius="16dp"
                         app:icon="@drawable/ic_chart"
@@ -160,17 +165,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    app:cardBackgroundColor="@android:color/white"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@android:color/white">
+                    app:cardElevation="4dp">
 
                     <com.google.android.material.button.MaterialButton
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:text="@string/main_settings"
+                        android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="@android:color/white"
                         app:backgroundTint="#F59E0B"
                         app:cornerRadius="16dp"
                         app:icon="@drawable/ic_settings"
@@ -185,18 +190,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@android:color/white"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@android:color/white">
+                    app:cardElevation="4dp">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/logoutButton"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:text="@string/main_logout"
+                        android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="@android:color/white"
                         app:backgroundTint="#EF4444"
                         app:cornerRadius="16dp"
                         app:icon="@drawable/ic_logout"

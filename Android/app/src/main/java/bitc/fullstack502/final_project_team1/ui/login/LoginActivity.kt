@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import bitc.fullstack502.final_project_team1.MainActivity
 import bitc.fullstack502.final_project_team1.R
+import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.LoginRequest
 import com.google.android.material.button.MaterialButton
@@ -28,6 +29,13 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 이미 로그인되어 있으면 바로 메인으로 (레이아웃 세팅 전에)
+        if (AuthManager.isLoggedIn(this) && !AuthManager.isExpired(this)) {
+            goMain()
+            return
+        }
+
         setContentView(R.layout.activity_login)
 
         etId = findViewById(R.id.etId)
@@ -36,90 +44,59 @@ class LoginActivity : AppCompatActivity() {
         tvError = findViewById(R.id.tvError)
         progress = findViewById(R.id.progress)
 
-        etPw.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                attemptLogin()
-                true
-            } else false
-        }
-        btnLogin.setOnClickListener { attemptLogin() }
-    }
-
-    private fun attemptLogin() {
-        val id = etId.text?.toString()?.trim().orEmpty()
-        val pw = etPw.text?.toString().orEmpty()
-
         tvError.isVisible = false
 
+        etPw.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) { doLogin(); true } else false
+        }
+        btnLogin.setOnClickListener { doLogin() }
+    }
+
+
+    private fun doLogin() {
+        val id = etId.text?.toString()?.trim().orEmpty()
+        val pw = etPw.text?.toString()?.trim().orEmpty()
+
         if (id.isEmpty() || pw.isEmpty()) {
-            tvError.isVisible = true
-            tvError.text = getString(R.string.login_error_empty)
+            showError("아이디와 비밀번호를 입력하세요.")
             return
         }
 
+        tvError.isVisible = false
         setLoading(true)
-
-        // 테스트용 로그인 (admin / 1234)
-        if (id == "admin" && pw == "1234") {
-            // 테스트용 사용자 정보 저장
-            getSharedPreferences("auth", MODE_PRIVATE)
-                .edit()
-                .putString("token", "test_token_12345")
-                .putLong("user_id", 1)
-                .putString("username", "admin")
-                .putString("name", "관리자")
-                .putString("role", "admin")
-                .putString("email", "admin@example.com")
-                .putString("phone", "010-1234-5678")
-                .putLong("login_time", System.currentTimeMillis())
-                .apply()
-
-            Toast.makeText(this@LoginActivity, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-            finish()
-            return
-        }
 
         lifecycleScope.launch {
             try {
-                val res = ApiClient.service.login(LoginRequest(id, pw))
-                if (res.isSuccessful) {
-                    val body = res.body()
-                    if (body != null) {
-                        // 토큰 및 사용자 정보 저장 (SharedPreferences)
-                        getSharedPreferences("auth", MODE_PRIVATE)
-                            .edit()
-                            .putString("token", body.token)
-                            .putString("name", body.name)
-                            .putString("role", body.role)
-                            .putLong("login_time", System.currentTimeMillis())
-                            .apply()
-
-                        Toast.makeText(this@LoginActivity, getString(R.string.login_success), Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        finish()
-                    } else {
-                        showError("서버에서 유효하지 않은 응답을 받았습니다.")
-                    }
-                } else {
-                    when (res.code()) {
-                        401 -> showError("아이디 또는 비밀번호가 올바르지 않습니다.")
-                        403 -> showError("접근이 거부되었습니다.")
-                        404 -> showError("서버를 찾을 수 없습니다.")
-                        500 -> showError("서버 내부 오류가 발생했습니다.")
-                        else -> showError("로그인 실패: ${res.code()}")
-                    }
+                val resp = ApiClient.service.login(LoginRequest(id = id, pw = pw))
+                if (!resp.isSuccessful) {
+                    showError("서버 오류: ${resp.code()}")
+                    return@launch
                 }
-            } catch (e: java.net.ConnectException) {
-                showError("서버에 연결할 수 없습니다. 네트워크를 확인해주세요.")
-            } catch (e: java.net.SocketTimeoutException) {
-                showError("서버 응답 시간이 초과되었습니다.")
+                val body = resp.body()
+                if (body == null) {
+                    showError("응답이 비어있습니다.")
+                    return@launch
+                }
+                if (body.success) {
+                    AuthManager.save(this@LoginActivity, body)
+                    Toast.makeText(this@LoginActivity, "${body.name}님 환영합니다!", Toast.LENGTH_SHORT).show()
+                    goMain()
+                } else {
+                    showError(body.message.ifEmpty { "로그인 실패" })
+                }
             } catch (e: Exception) {
-                showError("네트워크 오류: ${e.message ?: "알 수 없는 오류"}")
+                showError("네트워크 오류: ${e.localizedMessage}")
             } finally {
                 setLoading(false)
             }
         }
+    }
+
+    private fun goMain() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
     }
 
     private fun setLoading(loading: Boolean) {

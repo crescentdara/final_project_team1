@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 목록/스피너 정렬 옵션 -->
+    <string-array name="sort_options">
+        <item>최신순</item>
+        <item>오래된순</item>
+        <item>제목 A→Z</item>
+        <item>제목 Z→A</item>
+    </string-array>
+</resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 바텀시트가 처음 보여줄 높이(프리뷰 영역) -->
+    <dimen name="map_peek_height">320dp</dimen>
+</resources>

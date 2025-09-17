@@ -1,6 +1,7 @@
 package bitc.full502.final_project_team1.api.web.controller;
 
 import bitc.full502.final_project_team1.api.web.dto.AssignRequestDTO;
+import bitc.full502.final_project_team1.api.web.dto.BuildingDTO;
 import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmentEntity;
@@ -154,4 +155,28 @@ public class BuildingController {
 
         return ResponseEntity.ok(Map.of("success", true, "assignedCount", assignments.size()));
     }
+
+    // 조사 목록 리스트 생성 부분
+    @PostMapping
+    public ResponseEntity<String> createBuilding(@RequestBody BuildingDTO dto) {
+        BuildingEntity entity = new BuildingEntity();
+
+        entity.setLotAddress(dto.getLotAddress());
+        entity.setLatitude(dto.getLatitude());
+        entity.setLongitude(dto.getLongitude());
+        entity.setBuildingName(dto.getBuildingName());
+        entity.setMainUseName(dto.getMainUseName());
+        entity.setStructureName(dto.getStructureName());
+        entity.setGroundFloors(dto.getGroundFloors());
+        entity.setBasementFloors(dto.getBasementFloors());
+        entity.setLandArea(dto.getLandArea());
+        entity.setBuildingArea(dto.getBuildingArea());
+
+        entity.setStatus(0);
+
+        buildingRepo.save(entity);
+
+        return ResponseEntity.ok("저장 완료");
+    }
+
 }

@@ -5,7 +5,6 @@ import bitc.full502.final_project_team1.core.domain.repository.UserAccountReposi
 import bitc.full502.final_project_team1.api.web.dto.UserSimpleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +17,25 @@ public class UserController {
 
     private final UserAccountRepository repo;
 
+    // 전체 조회 + 검색 (keyword 파라미터 optional)
     @GetMapping
     public List<UserSimpleDto> list(@RequestParam(required = false) String keyword) {
-        List<UserAccountEntity> list = (keyword != null && !keyword.isBlank())
-                ? repo.findTop100ByNameContainingOrUsernameContainingOrderByUserId(keyword, keyword)
-                : repo.findAll(Sort.by(Sort.Direction.ASC, "userId"));
-        return list.stream().map(UserSimpleDto::from).toList();
+        List<UserAccountEntity> users;
+
+        if (keyword != null && !keyword.isBlank()) {
+            // 🔍 EDITOR만 검색
+            users = repo.findByRoleAndNameContainingOrRoleAndUsernameContaining(
+                    UserAccountEntity.Role.EDITOR, keyword,
+                    UserAccountEntity.Role.EDITOR, keyword
+            );
+        } else {
+            // 📋 전체 조회 (EDITOR만)
+            users = repo.findByRole(UserAccountEntity.Role.EDITOR);
+        }
+
+        return users.stream()
+                .map(UserSimpleDto::from)
+                .toList();
     }
+
 }

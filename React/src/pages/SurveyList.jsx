@@ -6,7 +6,6 @@ function SurveyList() {
     const [addresses, setAddresses] = useState([]);
 
     const [emdList, setEmdList] = useState([]); // 읍면동 목록
-
     const [selectedEmd, setSelectedEmd] = useState(""); // 선택된 읍면동
 
     const [selectedLocation, setSelectedLocation] = useState({
@@ -19,6 +18,7 @@ function SurveyList() {
     // ✅ 조사자 관련 상태
     const [users, setUsers] = useState([]); // 조사자 목록
     const [selectedUser, setSelectedUser] = useState(null); // 선택된 조사자
+    const [userKeyword, setUserKeyword] = useState(""); // 🔍 대상자 검색어
 
     // ✅ 건물 선택 상태 (체크박스 다중 선택)
     const [selectedBuildings, setSelectedBuildings] = useState([]);
@@ -36,7 +36,7 @@ function SurveyList() {
         // 전체 조사지 불러오기
         handleSearch();
 
-        // 조사자 목록 불러오기
+        // 전체 조사자 불러오기
         axios
             .get("/web/api/users")
             .then((res) => setUsers(res.data))
@@ -53,6 +53,16 @@ function SurveyList() {
             })
             .then((res) => setAddresses(res.data))
             .catch((err) => console.error(err));
+    };
+
+    // =============================
+    // 대상자 검색
+    // =============================
+    const handleUserSearch = () => {
+        axios
+            .get("/web/api/users", { params: { keyword: userKeyword } })
+            .then((res) => setUsers(res.data))
+            .catch((err) => console.error("❌ 대상자 검색 실패:", err));
     };
 
     // =============================
@@ -226,6 +236,24 @@ function SurveyList() {
                     {/* 대상자 조회 */}
                     <div className="p-3 border rounded bg-white shadow-sm">
                         <h5 className="mb-3">대상자 조회</h5>
+
+                        {/* 🔎 대상자 검색 */}
+                        <div className="input-group mb-3">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="이름 또는 아이디 입력"
+                                value={userKeyword}
+                                onChange={(e) => setUserKeyword(e.target.value)}
+                            />
+                            <button
+                                className="btn btn-primary"
+                                style={{ backgroundColor: "#289eff", border: "none" }}
+                                onClick={handleUserSearch}
+                            >
+                                검색
+                            </button>
+                        </div>
 
                         <ul
                             className="list-group mb-3"

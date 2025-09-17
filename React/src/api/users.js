@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const api = axios.create({ baseURL: "/api", timeout: 10000 });
+const api = axios.create({ baseURL: "/web/api", timeout: 10000 });
 
 export async function fetchUsersAdvanced({ field = "all", keyword = "" } = {}) {
   // 백엔드 파라미터 매핑

@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
+      '/web/api': {
         target: 'http://localhost:8080', // 스프링 서버
         changeOrigin: true,
         secure: false,

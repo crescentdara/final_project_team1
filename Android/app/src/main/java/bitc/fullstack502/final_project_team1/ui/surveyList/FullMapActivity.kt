@@ -104,9 +104,94 @@ class FullMapActivity : AppCompatActivity() {
 
         val loc = lastLocation
         if (loc == null) {
-            Toast.makeText(this, "현위치 파악 중… 잠시만요.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "현위치 파악 중...", Toast.LENGTH_SHORT).show()
             return
         }
 
         var center = LatLng(loc.latitude, loc.longitude)
-        if (c
+        if (center.latitude.isNaN() || center.longitude.isNaN()) {
+            center = LatLng(37.5666102, 126.9783881) // 폴백
+        }
+
+        // ✅ 현위치에는 초록 피커를 만들거나 옮기지 않는다(파란 점만 표시).
+        // surveyPicker 는 그대로 유지된다.
+
+        // 원 속성 먼저 세팅 → 마지막에 map 부착
+        val c = circle ?: CircleOverlay().also { circle = it }
+        c.center = center
+        c.radius = radiusKm * 1000.0
+        c.color = Color.argb(48, 33, 150, 243)
+        c.outlineColor = Color.argb(200, 33, 150, 243)
+        c.outlineWidth = 2
+        if (c.map == null) c.map = map
+
+        map.moveCamera(CameraUpdate.fitBounds(circleBoundsSafe(center, c.radius), 64))
+
+        // 조사지 조회 (빈목록/실패도 크래시 없이)
+        lifecycleScope.launch {
+            try {
+                val uid = AuthManager.userId(this@FullMapActivity)
+                val list: List<AssignedBuilding> =
+                    if (uid > 0) {
+                        ApiClient.service.getAssignedNearby(
+                            userId = uid,
+                            lat = center.latitude,
+                            lng = center.longitude,
+                            radiusKm = radiusKm
+                        )
+                    } else emptyList()
+                setMarkers(list)
+                if (list.isEmpty()) {
+                    Toast.makeText(this@FullMapActivity, "반경 내 조사지가 없습니다.", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                setMarkers(emptyList())
+                Toast.makeText(this@FullMapActivity, "조사지 조회 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun setMarkers(list: List<AssignedBuilding>) {
+        markers.forEach { it.map = null }
+        markers.clear()
+        val map = naverMap ?: return
+
+        list.forEach { b ->
+            val lat = b.latitude ?: return@forEach
+            val lng = b.longitude ?: return@forEach
+            Marker(LatLng(lat, lng)).apply {
+                captionText = b.lotAddress
+                setOnClickListener(Overlay.OnClickListener { true })
+                this.map = map
+                markers += this
+            }
+        }
+    }
+
+    private fun circleBoundsSafe(center: LatLng, radiusMeters: Double): LatLngBounds {
+        val degPerMeterLat = 1.0 / 111_320.0
+        val cosLat = max(1e-6, abs(cos(Math.toRadians(center.latitude))))
+        val degPerMeterLng = 1.0 / (111_320.0 * cosLat)
+        val dLat = radiusMeters * degPerMeterLat
+        val dLng = radiusMeters * degPerMeterLng
+        return LatLngBounds(
+            LatLng(center.latitude - dLat, center.longitude - dLng),
+            LatLng(center.latitude + dLat, center.longitude + dLng)
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
+            // 초기엔 NoFollow 유지해서 조사지 화면을 깨지 않음
+            naverMap?.locationTrackingMode =
+                if (locationSource.isActivated) LocationTrackingMode.NoFollow
+                else LocationTrackingMode.None
+            return
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+}

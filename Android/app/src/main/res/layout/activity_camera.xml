@@ -19,55 +19,74 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/btn_investigation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="조사불가 여부" />
 
             <Button
+                android:id="@+id/btn_purpose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:text="행정목적 활용여부" />
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="활용유형" />
-
-            <Button
+                android:id="@+id/btn_idle_ratio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:text="유휴비율" />
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="건물 현황" />
-
-            <Button
+                android:id="@+id/btn_safety"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:text="안전등급" />
 
             <Button
+                android:id="@+id/btn_internal_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
-                android:text="사진 유무" />
+                android:text="내부상태" />
+
+            <Button
+                android:id="@+id/btn_external_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="외부상태" />
 
         </LinearLayout>
     </HorizontalScrollView>
 
+
     <ImageView
         android:id="@+id/capturedImageView"
         android:layout_width="match_parent"
-        android:layout_height="643dp"
+        android:layout_height="452dp"
         android:layout_marginTop="16dp"
         android:background="#EEEEEE"
         android:scaleType="centerCrop" />
+
+    <Button
+        android:id="@+id/photo_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사진 촬영"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/btn_edit_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사진 편집"
+        android:layout_marginLeft="8dp"/>
+
+
+
+
 
 </LinearLayout>

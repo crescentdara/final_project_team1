@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- ✅ 외부상태 -->
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="외부상태"
+android:textSize="18sp"
+android:textStyle="bold"
+android:layout_marginTop="16dp"/>
+
+    <!-- 외벽 -->
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="외벽"
+android:textSize="16sp"
+android:layout_marginTop="8dp"/>
+
+<RadioGroup
+android:id="@+id/radioGroup_wall"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal">
+<RadioButton
+    android:id="@+id/radio_wall_good"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="상" />
+<RadioButton
+    android:id="@+id/radio_wall_normal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="중" />
+<RadioButton
+    android:id="@+id/radio_wall_bad"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="하" />
+</RadioGroup>
+
+    <!-- 지붕옥상 -->
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="지붕옥상"
+android:textSize="16sp"
+android:layout_marginTop="8dp"/>
+
+<RadioGroup
+android:id="@+id/radioGroup_roof"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal">
+<RadioButton
+    android:id="@+id/radio_roof_good"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="상" />
+<RadioButton
+    android:id="@+id/radio_roof_normal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="중" />
+<RadioButton
+    android:id="@+id/radio_roof_bad"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="하" />
+</RadioGroup>
+
+    <!-- 창호 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="창호"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroup_window"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/radio_window_good"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="상" />
+        <RadioButton
+            android:id="@+id/radio_window_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="중" />
+        <RadioButton
+            android:id="@+id/radio_window_bad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="하" />
+    </RadioGroup>
+
+
+    <!-- 주차 -->
+<TextView
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="주차"
+android:textSize="16sp"
+android:layout_marginTop="8dp"/>
+
+<RadioGroup
+android:id="@+id/radioGroup_parking"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal">
+<RadioButton
+    android:id="@+id/radio_parking_good"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="상" />
+<RadioButton
+    android:id="@+id/radio_parking_normal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="중" />
+<RadioButton
+    android:id="@+id/radio_parking_bad"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="하" />
+</RadioGroup>
+
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="←"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#6200EE"
+        android:textColor="#FFFFFF"
+        android:padding="8dp"/>
+</LinearLayout>
+

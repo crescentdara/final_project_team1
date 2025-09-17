@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_label_safety"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="안전등급"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <RadioGroup
+        android:id="@+id/rg_safety_grade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rb_grade_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1등급"
+            android:padding="12dp"
+            android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/rb_grade_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2등급"
+            android:padding="12dp"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/rb_grade_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3등급"
+            android:padding="12dp"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/rb_grade_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="4등급"
+            android:padding="12dp"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp" />
+
+        <RadioButton
+            android:id="@+id/rb_grade_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5등급"
+            android:padding="12dp"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp" />
+
+    </RadioGroup>
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="←"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#6200EE"
+        android:textColor="#FFFFFF"
+        android:padding="8dp"/>
+
+</LinearLayout>

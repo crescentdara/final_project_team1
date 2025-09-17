@@ -1,134 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#BDBDBD"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- 상단 탭 버튼 영역 (가로 스크롤 가능) -->
-    <HorizontalScrollView
+    <!-- 스크롤 가능한 내용 -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:paddingBottom="8dp">
+        android:layout_height="match_parent"
+        android:background="#BDBDBD"
+        android:paddingBottom="80dp"> <!-- 하단 버튼 공간 확보 -->
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <Button
+            <!-- 상단 탭 버튼 영역 (가로 스크롤 가능) -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:paddingBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_investigation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="조사불가 여부" />
+
+                    <Button
+                        android:id="@+id/btn_purpose"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="행정목적 활용여부" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="활용유형" />
+
+                    <Button
+                        android:id="@+id/btn_idle_ratio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="유휴비율" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="건물 현황" />
+
+                    <Button
+                        android:id="@+id/btn_safety"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="안전등급" />
+
+                    <Button
+                        android:id="@+id/btn_internal_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="내부상태" />
+
+                    <Button
+                        android:id="@+id/btn_external_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="외부상태" />
+
+                    <Button
+                        android:id="@+id/photo_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="사진 촬영" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="사진 편집" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- 주소 표시 -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="조사불가 여부" />
+                android:text="부산시 남구 대연동 112-12"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"/>
 
-            <Button
-                android:layout_width="wrap_content"
+            <!-- 라디오 버튼 선택 영역 -->
+            <RadioGroup
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="행정목적 활용여부" />
+                android:orientation="vertical"
+                android:layout_marginTop="16dp">
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="활용유형" />
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="활용 중 (전부)"
+                    android:background="@drawable/radio_bg"
+                    android:buttonTint="@color/black"
+                    android:padding="12dp"
+                    android:textSize="16sp"/>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="유휴비율" />
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="활용 중 (일부유휴)"
+                    android:background="@drawable/radio_bg"
+                    android:buttonTint="@color/black"
+                    android:padding="12dp"
+                    android:layout_marginTop="8dp"
+                    android:textSize="16sp"/>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="건물 현황" />
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="유휴재산"
+                    android:background="@drawable/radio_bg"
+                    android:buttonTint="@color/black"
+                    android:padding="12dp"
+                    android:layout_marginTop="8dp"
+                    android:textSize="16sp"/>
+            </RadioGroup>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="안전등급" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="사진 유무" />
 
         </LinearLayout>
-    </HorizontalScrollView>
+    </ScrollView>
 
-    <!-- 주소 표시 -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="부산시 남구 대연동 112-12"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="center_horizontal"/>
+    <!-- 왼쪽 하단 큰 뒤로가기 버튼 -->
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:text="←"
+        android:textSize="24sp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#6200EE"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        android:contentDescription="Back Button" />
 
-    <!-- 라디오 버튼 선택 영역 -->
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp">
+    <!-- 오른쪽 하단 큰 다음 버튼 -->
+    <Button
+        android:id="@+id/next_button"
+        android:layout_width="103dp"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:backgroundTint="#6200EE"
+        android:contentDescription="Next Button"
+        android:text="다음"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp" />
 
-        <RadioButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="활용 중 (전부)"
-            android:background="@drawable/radio_bg"
-            android:buttonTint="@color/black"
-            android:padding="12dp"
-            android:textSize="16sp"/>
 
-        <RadioButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="활용 중 (일부유휴)"
-            android:background="@drawable/radio_bg"
-            android:buttonTint="@color/black"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"/>
-
-        <RadioButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="유휴재산"
-            android:background="@drawable/radio_bg"
-            android:buttonTint="@color/black"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"/>
-
-    </RadioGroup>
-
-    <!-- 하단 버튼 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="24dp"
-        android:weightSum="2">
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="뒤로"/>
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="다음"/>
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>

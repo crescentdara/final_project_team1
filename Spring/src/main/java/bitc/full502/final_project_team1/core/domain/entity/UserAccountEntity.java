@@ -23,10 +23,10 @@ public class UserAccountEntity {
     private String username;
 
     @Column(name = "password", length = 255, nullable = false)
-    private String password;                    // 컬럼명이 password 임에 주의(= 해시 저장 권장)
+    private String password;
 
     @Column(name = "name", length = 100, nullable = false)
-    private String name;                        // 현재는 지역명이 들어가 있지만 사람 이름 컬럼
+    private String name;                        //  사람 이름 컬럼
 
     public enum Role { ADMIN, EDITOR, VIEWER }
 
@@ -35,7 +35,7 @@ public class UserAccountEntity {
     private Role role;                          // DB에 'EDITOR' 같은 문자열로 저장됨
 
     @Column(name = "status", nullable = false)
-    private Integer status;                     // 스샷 기준 1/0 사용 중 (1=ACTIVE 권장)
+    private Integer status;                     // Active = 1 , Inactive = 2
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;            // DATETIME 매핑

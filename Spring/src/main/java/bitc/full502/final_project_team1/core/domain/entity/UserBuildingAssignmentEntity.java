@@ -34,6 +34,6 @@ public class UserBuildingAssignmentEntity {
     }
 
     @Column(nullable = false)
-    private Integer status;  // 0 = 미배정, 1 = 배정됨
+    private Integer status;  // assigned = 1 / unassigned = 2
 
 }

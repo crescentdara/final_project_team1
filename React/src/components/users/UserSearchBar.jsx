@@ -36,7 +36,7 @@ export default function UserSearchBar({ value, onChange }) {
       () =>
           (Array.isArray(options) ? options : []).map((u) => ({
             id: u.userId,
-            label: `${u.name || u.username} (ID:${u.username}${u.role ? ` / ${u.role}` : ""})`,
+            label: `${u.name || u.username} ( ID : ${u.username}${u.role ? ` / ${u.role} ` : ""})`,
           })),
       [options]
   );
@@ -48,7 +48,7 @@ export default function UserSearchBar({ value, onChange }) {
       : field === "username"
       ? "ID 검색"
       : field === "role"
-      ? "역할 입력 (ADMIN/EDITOR/VIEWER)"
+      ? "역할 입력 ( ADMIN / EDITOR / VIEWER )"
       : "통합 검색";
 
   return (
@@ -63,7 +63,7 @@ export default function UserSearchBar({ value, onChange }) {
             }
             disabled={loading}
         >
-          <option value="">{loading ? "불러오는 중…" : "- 조사원명 (ID:) -"}</option>
+          <option value="">{loading ? "불러오는 중…" : "- 이름 ( ID / 역할 ) -"}</option>
           {opts.map((o) => (
               <option key={o.id} value={o.id}>
                 {o.label}
@@ -82,8 +82,8 @@ export default function UserSearchBar({ value, onChange }) {
             }}
         >
           <option value="all">전체</option>
-          <option value="username">ID</option>
           <option value="name">이름</option>
+          <option value="username">ID</option>
           <option value="role">역할</option>
         </select>
 

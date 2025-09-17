@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuildingAssignmentEntity, Long> {
 
-    /** 유저의 배정 목록 (building_id, lot_address) DTO 프로젝션 없이 Map/DTO는 서비스/컨트롤러에서 조립 */
+    // 유저의 배정 목록 (building_id, lot_address) DTO 프로젝션 없이 Map/DTO는 서비스/컨트롤러에서 조립
     @Query("""
            select a.buildingId, b.lotAddress
            from UserBuildingAssignmentEntity a
@@ -19,7 +19,7 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
            """)
     List<Object[]> findPairsByUserId(Integer userId);
 
-    /** 특정 지역(키워드) 배정만 삭제 (라운드로빈 재배정 전에 사용) */
+    // 특정 지역(키워드) 배정만 삭제 (라운드로빈 재배정 전에 사용)
     @Modifying
     @Query("""
            delete from UserBuildingAssignmentEntity a

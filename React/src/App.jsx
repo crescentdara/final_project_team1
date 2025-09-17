@@ -1,7 +1,8 @@
-import { Routes, Route, Link } from 'react-router-dom';
-import SurveyList from './pages/SurveyList.jsx';
+import { Routes, Route, Link } from "react-router-dom";
+import SurveyList from "./pages/SurveyList.jsx";
 import CreateSurvey from "./pages/CreateSurvey.jsx";
 import CreateUser from "./pages/CreateUser.jsx";
+import Dashboard from "./pages/Dashboard.jsx"; // ✅ 추가
 
 function App() {
     return (
@@ -14,29 +15,36 @@ function App() {
                         <div>
                             <h2>메인 페이지</h2>
 
+                            <Link to="/dashboard" className="btn btn-primary mt-3">
+                                Dashboard 페이지로 이동
+                            </Link>
+
                             <Link to="/surveyList" className="btn btn-primary mt-3">
                                 SurveyList 페이지로 이동
                             </Link>
 
-                            <Link to="/CreateSurvey" className="btn btn-primary mt-3">
+                            <Link to="/createSurvey" className="btn btn-primary mt-3">
                                 CreateSurvey 페이지로 이동
                             </Link>
 
-                            <Link to="/CreateUser" className="btn btn-primary mt-3">
+                            <Link to="/createUser" className="btn btn-primary mt-3">
                                 CreateUser 페이지로 이동
                             </Link>
                         </div>
                     }
                 />
 
+                {/* Dashboard 페이지 */}
+                <Route path="/dashboard" element={<Dashboard />} />
+
                 {/* SurveyList 페이지 */}
                 <Route path="/surveyList" element={<SurveyList />} />
 
                 {/* CreateSurvey 페이지 */}
-                <Route path="/createSurvey" element={<CreateSurvey/>} />
+                <Route path="/createSurvey" element={<CreateSurvey />} />
 
                 {/* CreateUser 페이지 */}
-                <Route path="/CreateUser" element={<CreateUser/>} />
+                <Route path="/createUser" element={<CreateUser />} />
             </Routes>
         </div>
     );

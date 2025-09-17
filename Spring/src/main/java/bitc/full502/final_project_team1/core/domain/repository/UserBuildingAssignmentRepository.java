@@ -4,6 +4,7 @@ import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmen
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -29,4 +30,10 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
            )
            """)
     int deleteAllByLotAddressLike(String keyword);
+
+    @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u")
+    long countAllAssignments();
+
+    @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u WHERE u.status = :status")
+    long countByStatus(@Param("status") int status);
 }

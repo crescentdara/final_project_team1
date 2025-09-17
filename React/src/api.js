@@ -8,3 +8,8 @@ export const getTest = async () => {
     const res = await api.get("/test");
     return res.data;
 };
+
+export const getDashboardStats = async () => {
+    const res = await axios.get("/web/dashboard/stats");
+    return res.data;
+};

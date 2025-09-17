@@ -5,16 +5,25 @@ export default defineConfig({
     plugins: [react()],
     server: {
         proxy: {
+
             '/web/api': {
-                target: 'http://localhost:8080', // ✅ Spring Boot 서버 주소
+                target: 'http://localhost:8080',
                 changeOrigin: true,
                 secure: false,
             },
+
             '/web/building': {
                 target: 'http://localhost:8080',
                 changeOrigin: true,
                 secure: false,
+            },
+
+            '/web/dashboard': {  // ✅ 추가
+                target: 'http://localhost:8080',
+                changeOrigin: true,
+                secure: false,
             }
+
         }
     }
 })

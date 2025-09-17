@@ -1,27 +1,121 @@
 package bitc.fullstack502.final_project_team1.ui.surveyList
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.location.Location
+import android.os.Build
 import android.os.Bundle
-import android.widget.Button
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import bitc.fullstack502.final_project_team1.R   // ✅ R 명시 임포트
+import android.os.Handler
+import android.os.Looper
+import android.widget.ImageButton
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.core.content.ContextCompat
+import bitc.fullstack502.final_project_team1.R
+import com.google.android.gms.location.LocationServices
 
-class ArActivity : AppCompatActivity() {
+class ArActivity : ComponentActivity(), SensorEventListener {
+
+    companion object { const val EXTRA_SITES = "extra_sites" }
+
+    private lateinit var previewView: PreviewView
+    private lateinit var overlay: AROverlayView
+
+    private lateinit var sensorManager: SensorManager
+    private val rotation = FloatArray(9)
+    private val orient = FloatArray(3)
+
+    private val fused by lazy { LocationServices.getFusedLocationProviderClient(this) }
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val perm = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { startCameraAndSensors() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_ar)     // ✅ res/layout/activity_ar.xml 이 있어야 함
+        setContentView(R.layout.activity_ar)
 
-        val btnAR: Button = findViewById(R.id.btnAR)
-        val btnNormal: Button = findViewById(R.id.btnNormal)
+        previewView = findViewById(R.id.previewView)
+        overlay = findViewById(R.id.arOverlay)
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
 
-        btnAR.setOnClickListener {
-            Toast.makeText(this, "AR 모드 실행", Toast.LENGTH_SHORT).show()
-            // TODO: AR 화면/로직 시작 (예: startActivity(Intent(this, ArCoreActivity::class.java)))
-        }
+        overlay.sites = intent.getParcelableArrayListExtra(EXTRA_SITES) ?: arrayListOf()
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
-        btnNormal.setOnClickListener {
-            Toast.makeText(this, "일반 모드 실행", Toast.LENGTH_SHORT).show()
-            // TODO: 일반 지도/리스트 화면으로 이동
+        val needs = mutableListOf<String>()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+            needs += Manifest.permission.CAMERA
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            needs += Manifest.permission.ACCESS_FINE_LOCATION
+
+        if (needs.isNotEmpty()) perm.launch(needs.toTypedArray()) else startCameraAndSensors()
+    }
+
+    private fun startCameraAndSensors() {
+        // 카메라 프리뷰 시작
+        val fut = ProcessCameraProvider.getInstance(this)
+        fut.addListener({
+            val provider = fut.get()
+            val preview = Preview.Builder().build().apply {
+                setSurfaceProvider(previewView.surfaceProvider)
+            }
+            provider.unbindAll()
+            provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview)
+        }, ContextCompat.getMainExecutor(this))
+
+        try { fused.lastLocation.addOnSuccessListener { it?.let(::updateLoc) } } catch (_: SecurityException) {}
+
+        if (isEmulator()) {
+            // ✅ 에뮬레이터: 센서 대신 더미 값 주입
+            handler.post(object : Runnable {
+                override fun run() {
+                    overlay.updatePose(90f, 0f)
+                    handler.postDelayed(this, 1000L)
+                }
+            })
+        } else {
+            // ✅ 실제 기기: 센서 등록
+            sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)?.also {
+                sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
+            }
         }
     }
+
+    private fun updateLoc(loc: Location) { overlay.updateUserLocation(loc) }
+
+    override fun onSensorChanged(event: android.hardware.SensorEvent?) {
+        if (!isEmulator() && event?.sensor?.type == Sensor.TYPE_ROTATION_VECTOR) {
+            SensorManager.getRotationMatrixFromVector(rotation, event.values)
+            SensorManager.remapCoordinateSystem(rotation, SensorManager.AXIS_X, SensorManager.AXIS_Z, rotation)
+            SensorManager.getOrientation(rotation, orient)
+            val az = Math.toDegrees(orient[0].toDouble()).toFloat().let { if (it < 0f) it + 360f else it }
+            val pitch = Math.toDegrees(orient[1].toDouble()).toFloat()
+
+            overlay.updatePose(az, pitch)
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+
+    override fun onPause() {
+        super.onPause()
+        if (!isEmulator()) sensorManager.unregisterListener(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        try { fused.lastLocation.addOnSuccessListener { it?.let(::updateLoc) } } catch (_: SecurityException) {}
+    }
+
+    private fun isEmulator(): Boolean =
+        Build.FINGERPRINT.contains("generic") || Build.MODEL.contains("google_sdk") ||
+                Build.MODEL.lowercase().contains("emulator") || Build.BRAND.startsWith("generic")
 }

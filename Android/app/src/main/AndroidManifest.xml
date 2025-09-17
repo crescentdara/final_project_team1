@@ -9,8 +9,13 @@
 
     <!-- 권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -29,20 +34,21 @@
             android:name="com.naver.maps.map.NCP_KEY_ID"
             android:value="eeh71qt74n" />
 
-        <activity
-            android:name=".ui.SurveyResultActivity"
-            />
+        <activity android:name=".ui.SurveyResultActivity" />
 
-        <activity android:name=".ui.login.LoginActivity"
+        <activity
+            android:name=".ui.login.LoginActivity"
             android:exported="true">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <!-- 지도/AR/경로/리스트 등 -->
-        <activity android:name=".ui.surveyList.ArActivity" />
+        <activity
+            android:name=".ui.surveyList.ArActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".ui.surveyList.FullMapActivity" />
         <activity android:name=".ui.surveyList.RouteActivity" />
         <activity android:name=".ui.surveyList.SurveyListActivity" />

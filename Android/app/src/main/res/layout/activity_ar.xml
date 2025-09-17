@@ -1,32 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <!-- 카메라 뷰 자리 -->
-    <SurfaceView
-        android:id="@+id/surfaceCamera"
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- AR/일반 버튼 -->
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp">
+    <bitc.fullstack502.final_project_team1.ui.surveyList.AROverlayView
+        android:id="@+id/arOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false" />
 
-        <Button
-            android:id="@+id/btnAR"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="AR" />
-
-        <Button
-            android:id="@+id/btnNormal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="일반"
-            android:layout_marginTop="8dp"/>
-    </LinearLayout>
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_revert"
+        android:contentDescription="@null"/>
 </FrameLayout>

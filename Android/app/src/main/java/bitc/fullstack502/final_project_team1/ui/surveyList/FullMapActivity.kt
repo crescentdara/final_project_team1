@@ -96,6 +96,29 @@ class FullMapActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnRadius1).setOnClickListener { drawRadiusFromMyLocation(1.0) }
         findViewById<Button>(R.id.btnRadius2).setOnClickListener { drawRadiusFromMyLocation(2.0) }
         findViewById<Button>(R.id.btnRadius3).setOnClickListener { drawRadiusFromMyLocation(3.0) }
+
+        findViewById<Button>(R.id.btnAR).setOnClickListener {
+            val lat = intent.getDoubleExtra(EXTRA_LAT, Double.NaN)
+            val lng = intent.getDoubleExtra(EXTRA_LNG, Double.NaN)
+            val addr = intent.getStringExtra(EXTRA_ADDR) ?: "조사지"
+
+            if (lat.isNaN() || lng.isNaN()) {
+                Toast.makeText(this, "조사지 좌표가 없습니다.", Toast.LENGTH_SHORT).show()
+            } else {
+                val site = bitc.fullstack502.final_project_team1.network.dto.SurveySite(
+                    id = 1L,
+                    name = addr,
+                    lat = lat,
+                    lng = lng
+                )
+                val intent = Intent(this, ArActivity::class.java).apply {
+                    putParcelableArrayListExtra(ArActivity.EXTRA_SITES, arrayListOf(site))
+                }
+                startActivity(intent)
+            }
+        }
+
+
     }
 
     /** 반경 버튼: 조사지 피커는 유지, 현위치엔 피커를 두지 않고(파란 점만), 현위치 기준 원을 그림 */

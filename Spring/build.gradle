@@ -9,9 +9,11 @@ version = '0.0.1-SNAPSHOT'
 description = 'final_project_team1'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17) // JDK 17 사용
-    }
+//    toolchain {
+//        languageVersion = JavaLanguageVersion.of(17) // JDK 17 사용
+//    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 configurations {
@@ -22,22 +24,13 @@ configurations {
 
 repositories {
     mavenCentral()
-    // 플러그인 해석은 보통 Gradle Plugin Portal 기본값으로 되지만,
-    // settings.gradle에 pluginManagement가 막혀있다면 아래 줄을 settings에 추가 필요:
-    // pluginManagement { repositories { gradlePluginPortal(); mavenCentral() } }
 }
 
 dependencies {
-<<<<<<< HEAD
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-=======
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
->>>>>>> origin/web/jgy/SurveyList
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

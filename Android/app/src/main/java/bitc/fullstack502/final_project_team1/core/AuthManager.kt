@@ -1,3 +1,4 @@
+// core/AuthManager.kt
 package bitc.fullstack502.final_project_team1.core
 
 import android.content.Context
@@ -19,8 +20,12 @@ object AuthManager {
         p.putString(KEY_USERNAME, resp.user?.username)
         p.putString(KEY_NAME, resp.name)
         p.putString(KEY_ROLE, resp.role)
-        p.putLong(KEY_LOGIN_TIME, System.currentTimeMillis())   // ✅ 로그인 시간 기록
+        p.putLong(KEY_LOGIN_TIME, System.currentTimeMillis())
         p.apply()
+    }
+
+    fun clear(context: Context) {
+        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().clear().apply()
     }
 
     fun isLoggedIn(context: Context): Boolean {
@@ -36,10 +41,19 @@ object AuthManager {
         return loginTime <= 0 || (System.currentTimeMillis() - loginTime) > maxAgeMillis
     }
 
-    fun clear(context: Context) {
-        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().clear().apply()
-    }
+    // ── 접근자들 (UI/네트워킹에서 사용) ─────────────────────────
+    fun userId(context: Context): Int =
+        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getInt(KEY_USER_ID, -1)
+
+    fun token(context: Context): String? =
+        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_TOKEN, null)
+
+    fun username(context: Context): String? =
+        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_USERNAME, null)
 
     fun name(context: Context): String? =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_NAME, null)
+
+    fun role(context: Context): String? =
+        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_ROLE, null)
 }

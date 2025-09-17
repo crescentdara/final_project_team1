@@ -1,0 +1,33 @@
+<!-- res/layout/item_survey.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:padding="8dp"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="@android:drawable/dialog_holo_light_frame"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/tvAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="주소"
+        android:textStyle="bold"
+        android:textSize="16sp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp">
+        <Button
+            android:id="@+id/btnMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="지도보기"/>
+        <Button
+            android:id="@+id/btnRoute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="길찾기"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+</LinearLayout>

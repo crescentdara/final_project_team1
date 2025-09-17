@@ -1,14 +1,50 @@
+# === App ===
 spring:
+  application:
+    name: final_project_team1
+
+  # === Database ===
   datasource:
-    url: jdbc:mysql://58.239.58.243:3306/java502_team1_final_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true
-    username: java502_team1_final
-    password: java502_team1_final_1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      jdbc-url: jdbc:mysql://58.239.58.243:3306/java502_team1_final_db?characterEncoding=UTF-8&serverTimezone=UTC
+      username: java502_team1_final
+      password: java502_team1_final_1234
+      # === HikariCP 풀 설정 ===
+      max-lifetime: 30000
+      idle-timeout: 10000
+      connection-timeout: 20000
+      minimum-idle: 2
+      maximum-pool-size: 10
+
+  # === JPA 설정 ===
   jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+    defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 1000
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
+
+  sql:
+    init:
+      mode: always
+
+# === 서버 ===
 server:
   port: 8080
+
+# === 외부 API ===
+naver:
+  client:
+    id: ${NAVER_CLIENT_ID}
+    secret: ${NAVER_CLIENT_SECRET}

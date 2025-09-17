@@ -1,31 +1,39 @@
 package bitc.fullstack502.final_project_team1.ui.surveyList
 
-import android.Manifest
 import android.app.Dialog
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.widget.Button
-import androidx.core.content.ContextCompat
 import bitc.fullstack502.final_project_team1.R
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
-import com.naver.maps.map.LocationTrackingMode
+import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.util.FusedLocationSource
 
 class MapBottomSheetFragment : BottomSheetDialogFragment(), OnMapReadyCallback {
+
+    companion object {
+        private const val ARG_LAT = "lat"
+        private const val ARG_LNG = "lng"
+        private const val ARG_ADDR = "addr"
+
+        fun newInstance(lat: Double, lng: Double, addr: String) = MapBottomSheetFragment().apply {
+            arguments = Bundle().apply {
+                putDouble(ARG_LAT, lat); putDouble(ARG_LNG, lng); putString(ARG_ADDR, addr)
+            }
+        }
+    }
 
     private lateinit var mapView: MapView
     private lateinit var locationSource: FusedLocationSource
     private var naverMap: NaverMap? = null
     private var lastLocation: Location? = null
-
     private val REQ_LOCATION = 1100
 
     override fun getTheme(): Int = R.style.AppBottomSheetDialogTheme
@@ -36,14 +44,18 @@ class MapBottomSheetFragment : BottomSheetDialogFragment(), OnMapReadyCallback {
         dialog.setContentView(content)
 
         mapView = content.findViewById(R.id.mapView)
-        // ✅ Fragment 자신을 넘겨서 권한 콜백을 이 프래그먼트가 받게 함
         locationSource = FusedLocationSource(this, REQ_LOCATION)
 
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
         content.findViewById<Button>(R.id.btnRadius1).setOnClickListener {
-            startActivity(Intent(requireContext(), FullMapActivity::class.java))
+            // 전체화면 맵으로 넘어가서 반경 필터 사용
+            startActivity(FullMapActivity.newIntent(requireContext(),
+                lat = arguments?.getDouble(ARG_LAT),
+                lng = arguments?.getDouble(ARG_LNG),
+                address = arguments?.getString(ARG_ADDR)
+            ))
             dismiss()
         }
         return dialog
@@ -51,64 +63,31 @@ class MapBottomSheetFragment : BottomSheetDialogFragment(), OnMapReadyCallback {
 
     override fun onMapReady(map: NaverMap) {
         naverMap = map
-        map.cameraPosition = CameraPosition(LatLng(37.5666102, 126.9783881), 13.5)
-
         map.locationSource = locationSource
         map.uiSettings.isLocationButtonEnabled = true
 
-        // ✅ 권한이 있으면 바로 Follow, 없으면 즉시 요청
-        if (hasLocationPermission()) {
-            map.locationTrackingMode = LocationTrackingMode.Follow
-        } else {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                REQ_LOCATION
-            )
-            // 아직 권한 전이라도 버튼은 보이게 유지
-            map.locationTrackingMode = LocationTrackingMode.NoFollow
-        }
+        // 타겟 마커 표시
+        val lat = arguments?.getDouble(ARG_LAT)
+        val lng = arguments?.getDouble(ARG_LNG)
+        val addr = arguments?.getString(ARG_ADDR) ?: "조사지"
 
-        // 첫 위치 오면 카메라 한 번 위치로 이동(시트에서 바로 보이게)
-        map.addOnLocationChangeListener { loc: Location ->
-            if (lastLocation == null) {
-                map.cameraPosition = CameraPosition(LatLng(loc.latitude, loc.longitude), 14.5)
+        if (lat != null && lng != null) {
+            val pos = LatLng(lat, lng)
+            Marker(pos).apply {
+                captionText = addr
+                this.map = map
             }
-            lastLocation = loc
+            map.moveCamera(CameraUpdate.toCameraPosition(CameraPosition(pos, 15.0)))
+        } else {
+            map.cameraPosition = CameraPosition(LatLng(37.5666102, 126.9783881), 13.5)
         }
     }
 
-    private fun hasLocationPermission(): Boolean {
-        val c = requireContext()
-        return ContextCompat.checkSelfPermission(c, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(c, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-    }
-
-    // 생명주기 위임은 그대로
+    // 생명주기 위임
     override fun onStart() { super.onStart(); if (this::mapView.isInitialized) mapView.onStart() }
     override fun onResume() { super.onResume(); if (this::mapView.isInitialized) mapView.onResume() }
     override fun onPause() { if (this::mapView.isInitialized) mapView.onPause(); super.onPause() }
     override fun onStop() { if (this::mapView.isInitialized) mapView.onStop(); super.onStop() }
     override fun onLowMemory() { super.onLowMemory(); if (this::mapView.isInitialized) mapView.onLowMemory() }
     override fun onDestroy() { if (this::mapView.isInitialized) mapView.onDestroy(); super.onDestroy() }
-
-    // ✅ 권한 결과 처리: 허용 시 Follow로 전환
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-    ) {
-        if (locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
-            if (requestCode == REQ_LOCATION) {
-                if (locationSource.isActivated) {
-                    naverMap?.locationTrackingMode = LocationTrackingMode.Follow
-                } else {
-                    naverMap?.locationTrackingMode = LocationTrackingMode.None
-                }
-            }
-            return
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
 }

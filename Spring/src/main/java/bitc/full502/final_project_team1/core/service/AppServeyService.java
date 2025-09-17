@@ -1,0 +1,20 @@
+package bitc.full502.final_project_team1.core.service;
+
+import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
+
+import java.util.List;
+
+public interface AppServeyService {
+
+    /**
+     * 로그인 사용자에게 배정된 모든 조사지(거리 계산 없음).
+     */
+    List<AssignedBuildingDto> assigned(Integer userId);
+
+    /**
+     * 중심 좌표와 반경(KM) 내의 배정된 조사지 목록(거리 포함).
+     */
+    List<AssignedBuildingDto> assignedWithin(Integer userId, double lat, double lng, double radiusKm);
+
+
+}

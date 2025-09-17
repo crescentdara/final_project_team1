@@ -4,10 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import bitc.fullstack502.final_project_team1.MainActivity
 import bitc.fullstack502.final_project_team1.R
-import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
+import bitc.fullstack502.final_project_team1.ui.SurveyResultActivity
 import bitc.fullstack502.final_project_team1.ui.survey.SurveyStatusActivity
+import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity
 import com.google.android.material.button.MaterialButton
 
@@ -46,12 +46,12 @@ class CategoryActivity : AppCompatActivity() {
         }
 
         btnSurveyList.setOnClickListener {
-            // TODO: 조사목록 관리 페이지 구현
+            startActivity(Intent(this, SurveyListActivity::class.java))
             finish()
         }
 
         btnSurveyInput.setOnClickListener {
-            // TODO: 조사결과 입력 페이지 구현
+            startActivity(Intent(this, SurveyResultActivity::class.java))
             finish()
         }
 

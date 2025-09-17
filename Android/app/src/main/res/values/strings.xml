@@ -1,76 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<<<<<<< HEAD
-    <string name="app_name">부동산 실태조사</string>
-    <string name="login_title">부동산 실태조사</string>
-    <string name="login_subtitle">조사원 로그인</string>
-    <string name="login_id_hint">아이디</string>
-    <string name="login_password_hint">비밀번호</string>
-    <string name="login_button">로그인</string>
-    <string name="login_error_empty">아이디와 비밀번호를 모두 입력하세요.</string>
-    <string name="login_error_invalid">아이디 또는 비밀번호가 올바르지 않습니다.</string>
-    <string name="login_error_network">네트워크 오류가 발생했습니다.</string>
-    <string name="login_success">로그인 성공</string>
-    <string name="test_account">테스트 계정: admin / 1234</string>
-    <string name="main_welcome">환영합니다!</string>
-    <string name="main_description">부동산 실태조사 시스템에 로그인하셨습니다.</string>
+    <!-- 앱 이름 -->
+    <string name="app_name">Final_Project_Team1</string>
+
+    <!-- Category 화면 텍스트 -->
+    <string name="main_welcome">부동산 실태조사</string>
+    <string name="main_description">현장 조사, 현황 조회, 결과 입력 및 전송을 한 곳에서 처리하세요.</string>
     <string name="main_survey_start">조사 시작</string>
     <string name="main_survey_status">조사 현황</string>
     <string name="main_settings">설정</string>
     <string name="main_logout">로그아웃</string>
-    <string name="main_welcome_user">%1$s님, 환영합니다!</string>
 
+    <!-- 드로어/메뉴 -->
+    <string name="menu_logout">LOGOUT</string>
+    <string name="menu_survey_status">조사현황</string>
+    <string name="menu_survey_list">조사목록 관리</string>
+    <string name="menu_survey_input">조사결과 입력</string>
+    <string name="menu_data_transmission">데이터 전송</string>
 
-    <!-- 카테고리 메뉴 -->
-    <string name="category_survey_status">조사현황</string>
-    <string name="category_survey_list">조사목록 관리</string>
-    <string name="category_survey_input">조사결과 입력</string>
-    <string name="category_data_transmission">데이터 전송</string>
-    
-    <!-- 조사현황 -->
-    <string name="survey_scheduled">조사 예정</string>
-    <string name="survey_resurvey_target">재조사 대상</string>
-    <string name="survey_transmission_complete">전송 완료</string>
-    <string name="survey_not_transmitted">미전송</string>
-    <string name="survey_list_management">조사목록 관리 페이지로 이동</string>
-    <string name="data_transmission_page">데이터 전송 페이지로 이동</string>
-    
-    <!-- 데이터 전송 -->
-    <string name="data_transmission_title">데이터 전송</string>
-    <string name="survey_result">조사 결과</string>
-    <string name="transmit">전송하기</string>
-    <string name="sort_latest">최신순</string>
-    <string name="sort_oldest">과거순</string>
-    
-    <!-- 전송완료 -->
-    <string name="transmission_complete_title">전송 완료</string>
-    <string name="approval_complete">결재 완료</string>
-    <string name="filter_all">전체</string>
-    <string name="filter_approval_complete">결재완료</string>
-    <string name="filter_processing">처리중</string>
-    
-    <!-- 조사결과 -->
-    <string name="survey_result_title">조사결과</string>
-    <string name="management_number">관리번호</string>
-    <string name="survey_impossible">조사 불가 여부</string>
-    <string name="administrative_use">행정목적 활용여부</string>
-    <string name="utilization_type">활용유형</string>
-    <string name="idle_ratio">유휴비율</string>
-    <string name="building_status">건물 현황</string>
-    <string name="safety_grade">안전등급</string>
-    <string name="photo_existence">사진 유무</string>
-    <string name="save">저장</string>
-    <string name="cancel">취소</string>
+    <!-- 로그인 화면에서 참조하는 문자열 (activity_login.xml, activity_main.xml) -->
+    <string name="login_title">로그인</string>
+    <string name="login_subtitle">계정 정보를 입력하세요</string>
+    <string name="login_id_hint">아이디</string>
+    <string name="login_password_hint">비밀번호</string>
+    <string name="login_button">로그인</string>
 </resources>
-=======
-    <!-- 앱 이름 정의 -->
-    <string name="app_name">MyApp</string>
-
-    <!-- Spinner 옵션 정의 -->
-    <string-array name="sort_options">
-        <item>거리순</item>
-        <item>최신등록순</item>
-        <item>과거등록순</item>
-    </string-array>
-</resources>
->>>>>>> origin/app/hsm/SurveyResultInput

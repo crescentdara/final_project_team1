@@ -1,18 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-<<<<<<< HEAD
+    <!-- 외부 앱(티맵) 실행 조회 -->
     <queries>
         <package android:name="com.skt.tmap.ku" />
         <package android:name="com.skt.skaf.l001mtm091" />
     </queries>
 
+    <!-- 권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-=======
-    <uses-permission android:name="android.permission.INTERNET" />
->>>>>>> origin/app/hsm/SurveyResultInput
 
     <application
         android:allowBackup="true"
@@ -26,46 +24,38 @@
         android:theme="@style/Theme.Final_Project_Team1"
         android:usesCleartextTraffic="true">
 
-<<<<<<< HEAD
-        <!-- ✅ 여기! application 바로 아래에 한 번만 선언 -->
+        <!-- ✅ 네이버 맵 키: application 바로 아래에 한 번만 선언 -->
         <meta-data
             android:name="com.naver.maps.map.NCP_KEY_ID"
             android:value="eeh71qt74n" />
 
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".ui.SurveyResultActivity"
+            />
 
+        <activity android:name=".ui.login.LoginActivity"
+            android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+
+        <!-- 지도/AR/경로/리스트 등 -->
         <activity android:name=".ui.surveyList.ArActivity" />
         <activity android:name=".ui.surveyList.FullMapActivity" />
         <activity android:name=".ui.surveyList.RouteActivity" />
         <activity android:name=".ui.surveyList.SurveyListActivity" />
-        <activity
-            android:name=".ui.login.LoginActivity"
-            android:exported="true">
-=======
-        <!-- 메인 진입 액티비티 (앱 실행 시 처음 실행됨) -->
-        <activity
-            android:name=".ui.SurveyResultActivity"
-            android:exported="true" >
->>>>>>> origin/app/hsm/SurveyResultInput
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-<<<<<<< HEAD
+
+        <!-- 카테고리/상태 -->
         <activity android:name=".ui.category.CategoryActivity" />
         <activity android:name=".ui.survey.SurveyStatusActivity" />
 
-    </application>
-=======
-
-        <!-- 조사 입력 화면 액티비티 -->
+        <!-- 조사 입력 화면 -->
         <activity android:name=".ui.EnterActivity" />
 
-        <!-- 필요하면 MainActivity도 유지 -->
+        <!-- 필요하면 유지 -->
         <activity android:name=".MainActivity" />
 
     </application>
-
->>>>>>> origin/app/hsm/SurveyResultInput
 </manifest>

@@ -59,4 +59,15 @@
     <string name="photo_existence">사진 유무</string>
     <string name="save">저장</string>
     <string name="cancel">취소</string>
+
+    <!-- ✅ 메인페이지용 새로 추가한 부분 -->
+    <string name="title_main">부동산 실태조사</string> <!-- 툴바 제목 -->
+    <string name="placeholder_username">조사원명 자리</string> <!-- 사용자 이름 기본 -->
+    <string name="placeholder_progress">진행률: -%</string> <!-- 진행률 기본 -->
+    <string name="placeholder_total">총 조사 건수: -</string> <!-- 총 건수 기본 -->
+    <string name="placeholder_today">금일 완료: -</string> <!-- 금일 완료 기본 -->
+    <string name="btn_survey_list">조사목록 보기</string> <!-- 버튼 -->
+    <string name="label_dashboard">조사현황</string> <!-- 대시보드 제목 -->
+    <string name="label_detail">자세히 보기</string> <!-- 대시보드 오른쪽 링크 -->
+    <string name="placeholder_graph">그래프 영역</string> <!-- 그래프 자리 안내 -->
 </resources>

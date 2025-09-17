@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+<<<<<<< HEAD
     <string name="app_name">부동산 실태조사</string>
     <string name="login_title">부동산 실태조사</string>
     <string name="login_subtitle">조사원 로그인</string>
@@ -60,3 +62,15 @@
     <string name="save">저장</string>
     <string name="cancel">취소</string>
 </resources>
+=======
+    <!-- 앱 이름 정의 -->
+    <string name="app_name">MyApp</string>
+
+    <!-- Spinner 옵션 정의 -->
+    <string-array name="sort_options">
+        <item>거리순</item>
+        <item>최신등록순</item>
+        <item>과거등록순</item>
+    </string-array>
+</resources>
+>>>>>>> origin/app/hsm/SurveyResultInput

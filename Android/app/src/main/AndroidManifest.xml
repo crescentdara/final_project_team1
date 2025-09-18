@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -62,6 +64,34 @@
 
         <!-- 필요하면 유지 -->
         <activity android:name=".MainActivity" />
+
+        <activity android:name=".ui.CameraActivity" />
+
+        <activity android:name=".ui.ResultActivity" />
+
+        <activity android:name=".ui.PurposeActivity" />
+
+        <activity android:name=".ui.IdleRatioActivity" />
+
+        <activity android:name=".ui.SafetyGradeActivity" />
+
+        <activity android:name=".ui.ExternalStatusActivity" />
+
+        <activity android:name=".ui.InternalStatusActivity" />
+
+        <activity android:name=".ui.InvestigationActivity" />
+
+        <activity android:name=".ui.EditActivity" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 </manifest>

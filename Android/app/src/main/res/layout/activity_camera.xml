@@ -3,12 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 스크롤 가능한 내용 -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#BDBDBD"
-        android:paddingBottom="80dp"> <!-- 하단 버튼 공간 확보 -->
+        android:paddingBottom="80dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -16,7 +15,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 상단 탭 버튼 영역 (가로 스크롤 가능) -->
+            <!-- 상단 탭 버튼 영역 -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -28,6 +27,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
+                    <!-- 기존 버튼들 -->
                     <Button
                         android:id="@+id/btn_investigation"
                         android:layout_width="wrap_content"
@@ -82,13 +82,7 @@
                         android:text="외부상태" />
 
                     <Button
-                        android:id="@+id/photo_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:text="사진 촬영" />
-
-                    <Button
+                        android:id="@+id/btn_edit_photo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
@@ -97,83 +91,30 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
-            <!-- 주소 표시 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="부산시 남구 대연동 112-12"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_gravity="center_horizontal"/>
+            <!-- 카메라 결과 이미지 미리보기 -->
 
-            <!-- 라디오 버튼 선택 영역 -->
-            <RadioGroup
+            <!-- 사진 촬영 버튼: ImageButton으로 바꿔서 이미지 아이콘 사용 -->
+            <ImageView
+                android:id="@+id/capturedImageView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="16dp">
+                android:layout_height="497dp"
+                android:layout_marginTop="16dp"
+                android:background="#CCCCCC"
+                android:contentDescription="촬영된 이미지 미리보기"
+                android:scaleType="centerCrop" />
 
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="활용 중 (전부)"
-                    android:background="@drawable/radio_bg"
-                    android:buttonTint="@color/black"
-                    android:padding="12dp"
-                    android:textSize="16sp"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="활용 중 (일부유휴)"
-                    android:background="@drawable/radio_bg"
-                    android:buttonTint="@color/black"
-                    android:padding="12dp"
-                    android:layout_marginTop="8dp"
-                    android:textSize="16sp"/>
-
-                <RadioButton
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="유휴재산"
-                    android:background="@drawable/radio_bg"
-                    android:buttonTint="@color/black"
-                    android:padding="12dp"
-                    android:layout_marginTop="8dp"
-                    android:textSize="16sp"/>
-            </RadioGroup>
-
-
+            <ImageButton
+                android:id="@+id/photo_button"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@null"
+                android:contentDescription="사진 촬영"
+                android:src="@drawable/ic_camera"
+                android:scaleType="centerInside"
+                android:padding="8dp" />
 
         </LinearLayout>
     </ScrollView>
-
-    <!-- 왼쪽 하단 큰 뒤로가기 버튼 -->
-    <Button
-        android:id="@+id/back_button"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:text="←"
-        android:textSize="24sp"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#6200EE"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="16dp"
-        android:contentDescription="Back Button" />
-
-    <!-- 오른쪽 하단 큰 다음 버튼 -->
-    <Button
-        android:id="@+id/next_button"
-        android:layout_width="103dp"
-        android:layout_height="64dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:backgroundTint="#6200EE"
-        android:contentDescription="Next Button"
-        android:text="다음"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp" />
-
-
 </FrameLayout>

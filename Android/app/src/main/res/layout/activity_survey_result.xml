@@ -1,192 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- 기존 스크롤 내용 -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:background="#ffffff"
+        android:paddingBottom="80dp"> <!-- 하단 버튼 공간 확보 -->
 
-        <!-- 상단 바 -->
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="#ffffff">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/menu_icon"
-                android:layout_width="wrap_content"
+            <!-- 상단 바 -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="#ffffff">
+
+                <TextView
+                    android:id="@+id/menu_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:padding="16dp"
+                    android:text="☰"
+                    android:textSize="24sp"
+                    android:contentDescription="Menu" />
+
+                <TextView
+                    android:id="@+id/center_arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="↑"
+                    android:textSize="24sp"
+                    android:contentDescription="Arrow" />
+
+                <TextView
+                    android:id="@+id/logout_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="16dp"
+                    android:text="Logout"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+            </RelativeLayout>
+
+            <!-- 제목 + 정렬 영역 -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
+                android:orientation="horizontal"
+                android:paddingTop="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/title_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="조사결과 입력"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/sort_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/sort_options"
+                    android:spinnerMode="dropdown" />
+            </LinearLayout>
+
+            <!-- 반복되는 박스 4개 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/rounded_border"
                 android:padding="16dp"
-                android:text="☰"
-                android:textSize="24sp"
-                android:contentDescription="Menu" />
+                android:gravity="center_horizontal">
 
-            <TextView
-                android:id="@+id/center_arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="↑"
-                android:textSize="24sp"
-                android:contentDescription="Arrow" />
+                <TextView
+                    android:id="@+id/address_text1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="부산시 남구 대연동 112-12"
+                    android:textSize="16sp"
+                    android:textColor="#000000"
+                    android:gravity="center" />
 
-            <TextView
-                android:id="@+id/logout_text"
-                android:layout_width="wrap_content"
+                <Button
+                    android:id="@+id/input_result_button1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="조사결과 입력"
+                    android:backgroundTint="#6200EE"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_border"
                 android:padding="16dp"
-                android:text="Logout"
-                android:textColor="#000000"
-                android:textSize="16sp" />
-        </RelativeLayout>
+                android:gravity="center_horizontal">
 
-        <!-- 제목 + 정렬 영역 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="16dp"
-            android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/address_text2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="부산시 남구 대연동 113-8"
+                    android:textSize="16sp"
+                    android:textColor="#000000"
+                    android:gravity="center" />
 
-            <TextView
-                android:id="@+id/title_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="조사결과 입력"
-                android:gravity="center"
-                android:textColor="#000000"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                <Button
+                    android:id="@+id/input_result_button2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="조사결과 입력"
+                    android:backgroundTint="#6200EE"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
 
-            <Spinner
-                android:id="@+id/sort_spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/sort_options"
-                android:spinnerMode="dropdown" />
-        </LinearLayout>
-
-        <!-- 반복되는 박스 (총 4개) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/rounded_border"
-            android:padding="16dp"
-            android:gravity="center_horizontal">
-
-            <TextView
-                android:id="@+id/address_text1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="부산시 남구 대연동 112-12"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                android:gravity="center" />
-
-            <Button
-                android:id="@+id/input_result_button1"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="조사결과 입력"
-                android:backgroundTint="#6200EE"
-                android:textColor="#FFFFFF" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_border"
+                android:padding="16dp"
+                android:gravity="center_horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_border"
-            android:padding="16dp"
-            android:gravity="center_horizontal">
+                <TextView
+                    android:id="@+id/address_text3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="부산시 남구 대연동 114-5"
+                    android:textSize="16sp"
+                    android:textColor="#000000"
+                    android:gravity="center" />
 
-            <TextView
-                android:id="@+id/address_text2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="부산시 남구 대연동 113-8"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                android:gravity="center" />
+                <Button
+                    android:id="@+id/input_result_button3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="조사결과 입력"
+                    android:backgroundTint="#6200EE"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/input_result_button2"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="조사결과 입력"
-                android:backgroundTint="#6200EE"
-                android:textColor="#FFFFFF" />
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_border"
+                android:padding="16dp"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/address_text4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="부산시 남구 대연동 115-1"
+                    android:textSize="16sp"
+                    android:textColor="#000000"
+                    android:gravity="center" />
+
+                <Button
+                    android:id="@+id/input_result_button4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="조사결과 입력"
+                    android:backgroundTint="#6200EE"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
+
         </LinearLayout>
+    </ScrollView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_border"
-            android:padding="16dp"
-            android:gravity="center_horizontal">
+    <!-- 왼쪽 하단 큰 뒤로가기 버튼 -->
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:text="←"
+        android:textSize="24sp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#6200EE"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        android:contentDescription="Back Button" />
 
-            <TextView
-                android:id="@+id/address_text3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="부산시 남구 대연동 114-5"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                android:gravity="center" />
-
-            <Button
-                android:id="@+id/input_result_button3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="조사결과 입력"
-                android:backgroundTint="#6200EE"
-                android:textColor="#FFFFFF" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_border"
-            android:padding="16dp"
-            android:gravity="center_horizontal">
-
-            <TextView
-                android:id="@+id/address_text4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="부산시 남구 대연동 115-1"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                android:gravity="center" />
-
-            <Button
-                android:id="@+id/input_result_button4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="조사결과 입력"
-                android:backgroundTint="#6200EE"
-                android:textColor="#FFFFFF" />
-        </LinearLayout>
-
-    </LinearLayout>
-</ScrollView>
+</FrameLayout>

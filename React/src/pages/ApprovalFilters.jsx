@@ -1,23 +1,21 @@
+// src/pages/PendingApprovals.jsx
 import { useEffect, useMemo, useState } from "react";
-import "../components/modals/ResultModal.jsx";
 import ResultModal from "../components/modals/ResultModal.jsx";
 
 /** 상태 배지 */
 function StatusBadge({ status }) {
-
-
-
-
   const map = {
     PENDING:  { cls: "bg-warning text-dark", label: "대기" },
     APPROVED: { cls: "bg-success",           label: "승인" },
     REJECTED: { cls: "bg-danger",            label: "반려" },
   };
-  const s = map[status] || map.PENDING;
+  // ★ 변경: 서버에서 SENT/TEMP 같이 올 때도 배지 보이도록 방어
+  const s = map[status?.toUpperCase()] || { cls: "bg-secondary", label: status || "미정" };
   return <span className={`badge ${s.cls}`}>{s.label}</span>;
 }
 
-function ApprovalFilters({ keyword, setKeyword, sort, setSort, onRefresh }) {
+function ApprovalFilters({ keyword, setKeyword, sort, setSort, onSearch }) {
+
   return (
       <div className="d-flex flex-wrap gap-2 align-items-center mb-3">
         <h3 className="m-0 me-auto">결재 대기 중</h3>
@@ -38,9 +36,9 @@ function ApprovalFilters({ keyword, setKeyword, sort, setSort, onRefresh }) {
               placeholder="관리번호 / 조사원 / 주소 검색"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && onRefresh()}
+              onKeyDown={(e) => e.key === "Enter" && onSearch()}
           />
-          <button className="btn btn-outline-secondary" onClick={onRefresh}>검색</button>
+          <button className="btn btn-outline-secondary" onClick={onSearch}>검색</button>
         </div>
       </div>
   );
@@ -106,33 +104,56 @@ export default function PendingApprovals() {
   const [items, setItems] = useState([]);
   const [selected, setSelected] = useState(new Set());
 
-  // 페이지네이션(필요 시)
+  // 페이지네이션
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const pageSize = 10;
 
+  // 모달
   const [modalOpen, setModalOpen] = useState(false);
   const [modalItem, setModalItem] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState(null);
 
-  // 더미 로딩 (API 연결 전)
-  useEffect(() => {
+  /** 서버에서 목록 로드 */
+  const fetchApprovals = ({ requireKeyword = false } = {}) => {
     setLoading(true);
-    const timer = setTimeout(() => {
-      const mock = Array.from({ length: 6 }).map((_, i) => ({
-        id: i + 1,
-        caseNo: `M-${2300 + i}`,
-        investigator: `조사원${i + 1}`,
-        address: `서울시 강동구 ${i + 1}번지`,
-        submittedAt: "2025-09-15",
-        priority: i % 3 === 0 ? "높음" : "보통",
-        status: "PENDING", // ✅ 초기 상태
-      }));
-      setItems(mock);
-      setTotal(mock.length);
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, []);
+
+    const params = new URLSearchParams({
+      // status: "PENDING",               // ✖ (항상 PENDING으로 필터되어 비었음)
+      status: "",                          // ★ 변경: 상태 필터 제거(전체 보기)
+      keyword: keyword ?? "",
+      sort,
+      page: String(page),
+      size: String(pageSize),
+      requireKeyword: requireKeyword ? "true" : "false",
+    });
+
+    fetch(`/web/api/approvals?${params.toString()}`)
+        // ★ 변경: HTTP 에러 대비
+        .then(async (r) => {
+          if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
+          return r.json();
+        })
+        // ★ 변경: content/totalElements 키로 안전 매핑
+        .then((data) => {
+          const content = data.content ?? data.rows ?? data.sample ?? [];
+          const total = data.totalElements ?? data.total ?? content.length ?? 0;
+          setItems(content);
+          setTotal(total);
+          setSelected(new Set()); // 새 결과 로드 시 선택 초기화
+        })
+        .catch((e) => console.error(e))
+        .finally(() => setLoading(false));
+  };
+
+
+  // 초기 로드 + 정렬/페이지 바뀔 때
+  useEffect(() => {
+    // 초기 목록을 보여주려면 requireKeyword=false
+    fetchApprovals({ requireKeyword: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sort, page]);
 
   const allChecked = useMemo(
       () => items.length > 0 && selected.size === items.length,
@@ -153,49 +174,49 @@ export default function PendingApprovals() {
     );
   };
 
-  // 목록 새로고침 (실제 API 연동 자리)
-  const refresh = () => {
-    setLoading(true);
-    // fetch(`/web/api/approvals?status=PENDING&keyword=${keyword}&sort=${sort}&page=${page}&size=${pageSize}`)
-    //   .then(r => r.json())
-    //   .then(({ content, totalElements }) => { setItems(content); setTotal(totalElements); })
-    //   .finally(() => setLoading(false));
-    setTimeout(() => setLoading(false), 300);
-  };
-
-  // ✅ 옵티미스틱 UI 업데이트 유틸
+  /** 옵티미스틱 상태 변경 (승인/반려) */
   const updateStatusLocal = (ids, nextStatus) => {
     setItems((prev) =>
         prev.map((it) => (ids.includes(it.id) ? { ...it, status: nextStatus } : it))
     );
   };
 
+  /** 선택 승인/반려 (서버 연동은 주석 해제) */
   const approveSelected = async () => {
     if (selected.size === 0) return;
     const ids = [...selected];
-
-    // 1) 낙관적 업데이트 (즉시 초록 '승인' 표시)
     updateStatusLocal(ids, "APPROVED");
     setSelected(new Set());
-
     try {
-      // 2) 백엔드 동기화 (있다면)
       // await fetch("/web/api/approvals/bulk/approve", {
       //   method: "PATCH",
       //   headers: { "Content-Type": "application/json" },
       //   body: JSON.stringify({ ids }),
-      // }).then((r) => {
-      //   if (!r.ok) throw new Error("approve failed");
       // });
     } catch (e) {
       console.error(e);
-      // 3) 실패 시 롤백/리프레시 전략 중 택1
-      // refresh();
-      // 또는 롤백: updateStatusLocal(ids, "PENDING");
-      alert("승인 처리 중 오류가 발생했습니다.");
+      // fetchApprovals(); // 서버 기준으로 재동기화
     }
   };
 
+  const rejectSelected = async () => {
+    if (selected.size === 0) return;
+    const ids = [...selected];
+    updateStatusLocal(ids, "REJECTED");
+    setSelected(new Set());
+    try {
+      // await fetch("/web/api/approvals/bulk/reject", {
+      //   method: "PATCH",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ ids }),
+      // });
+    } catch (e) {
+      console.error(e);
+      // fetchApprovals();
+    }
+  };
+
+  /** 단건 승인/반려 (모달) */
   const approveOne = async (id) => {
     updateStatusLocal([id], "APPROVED");
     setModalOpen(false);
@@ -203,33 +224,7 @@ export default function PendingApprovals() {
       // await fetch("/web/api/approvals/bulk/approve", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: [id] }) });
     } catch (e) {
       console.error(e);
-      // 실패 시 필요한 경우 롤백 / refresh()
-    }
-  };
-
-  const rejectSelected = async () => {
-    if (selected.size === 0) return;
-    const ids = [...selected];
-
-    // 1) 낙관적 업데이트 (즉시 빨간 '반려' 표시)
-    updateStatusLocal(ids, "REJECTED");
-    setSelected(new Set());
-
-    try {
-      // 2) 백엔드 동기화 (있다면)
-      // await fetch("/web/api/approvals/bulk/reject", {
-      //   method: "PATCH",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ ids }),
-      // }).then((r) => {
-      //   if (!r.ok) throw new Error("reject failed");
-      // });
-    } catch (e) {
-      console.error(e);
-      // 3) 실패 시 롤백/리프레시
-      // refresh();
-      // 또는 롤백: updateStatusLocal(ids, "PENDING");
-      alert("반려 처리 중 오류가 발생했습니다.");
+      // fetchApprovals();
     }
   };
 
@@ -240,27 +235,44 @@ export default function PendingApprovals() {
       // await fetch("/web/api/approvals/bulk/reject", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: [id] }) });
     } catch (e) {
       console.error(e);
-      // 실패 시 필요한 경우 롤백 / refresh()
+      // fetchApprovals();
     }
   };
 
-  const openResult = async (id) => {
-    // 서버 상세 조회 자리 (안드로이드 연동 전이라 임시로 목록의 아이템 사용)
-    // const detail = await fetch(`/web/api/approvals/${id}`).then(r => r.json());
-    const found = items.find(x => x.id === id);
-    setModalItem(found ?? { id, caseNo: "-", investigator: "-", address: "-" });
-    setModalOpen(true);
+  /** 상세 모달 열기 (안드로이드 연동 전: 리스트 항목 활용) */
+  const openResult = async (id) => {                                // ★ 변경
+    setModalOpen(true);                 // 먼저 모달부터 열고
+    setDetailLoading(true);
+    setDetailError(null);
+    setModalItem(null);
+
+    try {
+      const res = await fetch(`/web/api/approvals/${id}`, { headers: { Accept: "application/json" } });
+      if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+      const detail = await res.json();  // SurveyResultDetailDto 모양 그대로
+      setModalItem(detail);
+    } catch (e) {
+      console.error(e);
+      setDetailError(e.message);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  /** 검색 버튼/Enter → 검색어 포함 결과만 */
+  const onSearch = () => {
+    setPage(1);
+    fetchApprovals({ requireKeyword: true });
   };
 
   return (
       <div className="container py-4">
-        {/* 상단 필터/검색 */}
         <ApprovalFilters
             keyword={keyword}
             setKeyword={setKeyword}
             sort={sort}
             setSort={setSort}
-            onRefresh={refresh}
+            onSearch={onSearch}
         />
 
         {/* 일괄 작업 바 */}
@@ -303,23 +315,27 @@ export default function PendingApprovals() {
             ))
         )}
 
-        {/* 페이지네이션(옵션) */}
+        {/* 페이지네이션 */}
         <nav className="mt-3">
           <ul className="pagination pagination-sm">
             <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
               <button className="page-link" onClick={() => setPage((p) => Math.max(1, p - 1))}>이전</button>
             </li>
             <li className="page-item"><span className="page-link bg-light">{page}</span></li>
-            <li className={`page-item ${items.length < pageSize ? "disabled" : ""}`}>
+            {/* ★ 변경: items.length < pageSize 대신 총건수 기준으로 비활성 */}
+            <li className={`page-item ${(page * pageSize >= total) ? "disabled" : ""}`}>
               <button className="page-link" onClick={() => setPage((p) => p + 1)}>다음</button>
             </li>
           </ul>
         </nav>
 
-        {/* ✅ 조사 결과 모달 */}
+
+        {/* 조사 결과 모달 */}
         <ResultModal
             open={modalOpen}
-            item={modalItem}
+            item={modalItem}            // ★ 상세 DTO 주입
+            loading={detailLoading}     // ★ 로딩 전달
+            error={detailError}         // ★ 에러 전달
             onClose={() => setModalOpen(false)}
             onApprove={approveOne}
             onReject={rejectOne}

@@ -1,10 +1,12 @@
 package bitc.full502.final_project_team1.core.domain.repository;
 
 import bitc.full502.final_project_team1.core.domain.entity.ReportEntity;
+import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReportRepository extends JpaRepository<ReportEntity, Long> {
@@ -17,4 +19,7 @@ public interface ReportRepository extends JpaRepository<ReportEntity, Long> {
 
     // 건물별 조회 (BuildingEntity의 PK는 id)
     List<ReportEntity> findByAssignment_Building_Id(Long buildingId);
+
+    Optional<ReportEntity> findBySurveyResult(SurveyResultEntity surveyResult);
+
 }

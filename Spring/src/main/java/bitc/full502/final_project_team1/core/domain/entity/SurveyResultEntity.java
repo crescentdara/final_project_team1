@@ -64,6 +64,14 @@ public class SurveyResultEntity {
     // 16. 상태 (TEMP, SENT 등)
     private String status;
 
+    // ✅ 외부상태 기타사항
+    @Column(name = "ext_etc", length = 500)
+    private String extEtc;
+
+    // ✅ 내부상태 기타사항
+    @Column(name = "int_etc", length = 500)
+    private String intEtc;
+
     // 건물
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "building_id")

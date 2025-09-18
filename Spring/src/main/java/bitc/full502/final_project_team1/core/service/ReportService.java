@@ -26,4 +26,7 @@ public interface ReportService {
 
     /** 📌 건물별 보고서 조회 */
     List<ReportEntity> getReportsByBuilding(Long buildingId);
+
+    /** 📌 승인 처리 (PDF 생성 예정) */
+    void approveSurveyResult(Long surveyResultId, Integer userId);
 }

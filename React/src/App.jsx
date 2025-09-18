@@ -6,7 +6,8 @@ import ApprovalFilters from "./pages/ApprovalFilters.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ResultReport from "./pages/ResultReport.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
-import TotalSurveyList from "./pages/TotalSurveyList.jsx"; // ✅ 추가
+import TotalSurveyList from "./pages/TotalSurveyList.jsx";
+import SurveyPending from "./pages/SurveyPending.jsx"; // ✅ 추가
 
 function App() {
     return (
@@ -39,9 +40,22 @@ function App() {
                                 Report 페이지로 이동
                             </Link>
 
-                            <Link to="/web/api/users" className={'btn btn-outline-secondary me-3'}>조사원 상새정보</Link>
-                            <Link to="/web/api/approval" className={'btn btn-outline-primary me-3'}>결재 대기 중</Link>
-                            <Link to="/web/api/survey" className={'btn btn-outline-info'}>전체 조사 목록</Link>
+                            <Link to="/web/api/users" className={'btn btn-outline-secondary me-3'}>
+                                조사원 상새정보
+                            </Link>
+
+                            <Link to="/web/api/approval" className={'btn btn-outline-primary me-3'}>
+                                결재 대기 중
+                            </Link>
+
+                            <Link to="/web/api/survey" className={'btn btn-outline-info'}>
+                                전체 조사 목록
+                            </Link>
+
+                            <Link to="/surveyPending" className="btn btn-primary mt-3">
+                                SurveyPending 페이지로 이동
+                            </Link>
+
                         </div>
                     }
                 />
@@ -69,6 +83,10 @@ function App() {
 
                 {/* 전체 조사 목록 페이지 */}
                 <Route path="/web/api/survey" element={<TotalSurveyList />} />
+
+                {/* SurveyPending 페이지 */}
+                <Route path="/SurveyPending" element={<SurveyPending />} />
+
             </Routes>
         </div>
     );

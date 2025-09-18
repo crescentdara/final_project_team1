@@ -3,6 +3,7 @@ package bitc.full502.final_project_team1.api.web.controller;
 import bitc.full502.final_project_team1.core.domain.entity.ReportEntity;
 import bitc.full502.final_project_team1.core.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,5 +37,15 @@ public class ReportController {
     @GetMapping("/building/{buildingId}")
     public List<ReportEntity> getReportsByBuilding(@PathVariable Long buildingId) {
         return reportService.getReportsByBuilding(buildingId);
+    }
+
+    /** 📌 승인 처리 (PDF 생성 예정) */
+    @PostMapping("/approve/{surveyResultId}")
+    public ResponseEntity<String> approveSurveyResult(
+            @PathVariable Long surveyResultId,
+            @RequestParam Integer userId   // 👉 승인자 ID
+    ) {
+        reportService.approveSurveyResult(surveyResultId, userId);
+        return ResponseEntity.ok("승인되었습니다");
     }
 }

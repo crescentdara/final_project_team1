@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AppServeyServiceImpl implements AppServeyService {
+public class SurveyServiceImpl implements SurveyService {
 
     private final AppAssignmentQueryRepository appAssignmentQueryRepository;
 

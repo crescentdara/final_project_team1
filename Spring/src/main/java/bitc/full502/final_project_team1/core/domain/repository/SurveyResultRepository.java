@@ -11,11 +11,7 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
 
     List<SurveyResultEntity> findByUser_UserIdAndStatus(Integer userId, String status);
 
-    // 미전송(TEMP) 건수
     long countByUser_UserIdAndStatus(Integer userId, String status);
-
-    // 재조사 대상 (예: safety <= 2 이면 재조사)
-    long countByUser_UserIdAndSafetyLessThanEqual(Integer userId, Integer safety);
 
 
 }

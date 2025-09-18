@@ -4,7 +4,7 @@ import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
 
 import java.util.List;
 
-public interface AppServeyService {
+public interface SurveyService {
 
     /**
      * 로그인 사용자에게 배정된 모든 조사지(거리 계산 없음).

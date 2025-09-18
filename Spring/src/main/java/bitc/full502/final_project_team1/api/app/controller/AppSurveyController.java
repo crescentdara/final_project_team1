@@ -1,7 +1,7 @@
 package bitc.full502.final_project_team1.api.app.controller;
 
 import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
-import bitc.full502.final_project_team1.core.service.AppServeyService;
+import bitc.full502.final_project_team1.core.service.SurveyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AppSurveyController {
 
-    private final AppServeyService appSurveyService;
+    private final SurveyService appSurveyService;
 
     // ex) GET /api/mobile/surveys/assigned?userId=7
     @GetMapping("/assigned")

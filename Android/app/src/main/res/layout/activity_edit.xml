@@ -17,14 +17,14 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent" />
 
-    <!-- 하단 버튼 영역 -->
+    <!-- 하단 툴바 -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:padding="8dp"
         android:scrollbars="none"
-        android:background="#AAFFFFFF"> <!-- 반투명 배경 -->
+        android:background="#AAFFFFFF">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -33,47 +33,73 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="8dp">
 
-            <Button
-                android:id="@+id/colorButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="색상" />
+            <!-- 색상 팔레트 -->
+            <ImageButton
+                android:id="@+id/redButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/color_red"
+                android:contentDescription="빨강" />
 
-            <Button
+            <ImageButton
+                android:id="@+id/blueButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/color_blue"
+                android:contentDescription="파랑" />
+
+            <ImageButton
+                android:id="@+id/greenButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/color_green"
+                android:contentDescription="초록" />
+
+            <!-- 브러시 -->
+            <ImageButton
                 android:id="@+id/brushButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="두께" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_brush"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="브러쉬" />
 
-            <!-- 도형 선택 버튼 추가 -->
-            <Button
+            <!-- 도형 -->
+            <ImageButton
                 android:id="@+id/shapeButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="도형" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_rectangle"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="도형" />
 
-            <Button
+            <!-- 지우개 -->
+            <ImageButton
                 android:id="@+id/eraserButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="지우개" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_eraser"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="지우개" />
 
-            <Button
+            <!-- 초기화 -->
+            <ImageButton
                 android:id="@+id/clearButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="초기화" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_clear"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="초기화" />
 
-            <Button
-                android:id="@+id/save_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="저장" />
+            <!-- 저장 -->
+            <ImageButton
+                android:id="@+id/saveButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_save"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="저장" />
+
         </LinearLayout>
     </HorizontalScrollView>
 

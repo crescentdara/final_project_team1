@@ -67,6 +67,33 @@
             <RadioButton android:id="@+id/radio_floor_normal" android:text="중" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             <RadioButton android:id="@+id/radio_floor_bad" android:text="하" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </RadioGroup>
+
+        <!-- 기타사항 입력 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="기타사항"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"/>
+        <EditText
+            android:id="@+id/editText_remarks"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:hint="기타 특이사항을 입력하세요."
+            android:gravity="top"
+            android:background="@android:drawable/edit_text"
+            android:padding="8dp"
+            android:inputType="textMultiLine"/>
+
+        <!-- 음성 입력 버튼 -->
+        <Button
+            android:id="@+id/button_voice_input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🎤 음성 입력"
+            android:layout_marginTop="8dp"/>
+
+        <!-- 뒤로가기 버튼 -->
         <Button
             android:id="@+id/back_button"
             android:layout_width="wrap_content"

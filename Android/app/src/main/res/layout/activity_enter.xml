@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#BDBDBD"
-        android:paddingBottom="80dp"> <!-- 하단 버튼 공간 확보 -->
+        android:paddingBottom="80dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -16,7 +16,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- 상단 탭 버튼 영역 (가로 스크롤 가능) -->
+            <!-- 상단 탭 버튼 -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,50 +38,50 @@
                         android:id="@+id/btn_purpose"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
                         android:text="행정목적 활용여부" />
 
                     <Button
                         android:id="@+id/btn_idle_ratio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
                         android:text="유휴비율" />
 
                     <Button
                         android:id="@+id/btn_safety"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
                         android:text="안전등급" />
 
                     <Button
                         android:id="@+id/btn_internal_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
                         android:text="내부상태" />
 
                     <Button
                         android:id="@+id/btn_external_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
                         android:text="외부상태" />
 
                     <Button
-                        android:id="@+id/photo_button"
+                        android:id="@+id/photo_button_tab"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
                         android:text="사진 촬영" />
 
                     <Button
+                        android:id="@+id/photo_edit_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
                         android:text="사진 편집" />
-
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -93,51 +93,272 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginTop="16dp"
-                android:layout_gravity="center_horizontal"/>
+                android:layout_gravity="center_horizontal" />
 
-            <!-- 라디오 버튼 선택 영역 -->
-            <RadioGroup
+            <!-- 단계별 컨테이너 -->
+            <LinearLayout
+                android:id="@+id/stage_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="16dp">
 
-                <RadioButton
+                <!-- 조사불가 여부 -->
+                <LinearLayout
+                    android:id="@+id/stage_investigation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="활용 중 (전부)"
-                    android:background="@drawable/radio_bg"
-                    android:buttonTint="@color/black"
-                    android:padding="12dp"
-                    android:textSize="16sp"/>
+                    android:orientation="vertical">
 
-                <RadioButton
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="조사불가 여부"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="조사 가능" />
+
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="조사 불가" />
+                    </RadioGroup>
+                </LinearLayout>
+
+                <!-- 행정목적 활용여부 -->
+                <LinearLayout
+                    android:id="@+id/stage_purpose"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="활용 중 (일부유휴)"
-                    android:background="@drawable/radio_bg"
-                    android:buttonTint="@color/black"
-                    android:padding="12dp"
-                    android:layout_marginTop="8dp"
-                    android:textSize="16sp"/>
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
-                <RadioButton
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="행정목적 활용여부"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="활용"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="일부 활용"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="미활용"/>
+                    </RadioGroup>
+                </LinearLayout>
+
+                <!-- 유휴비율 -->
+                <LinearLayout
+                    android:id="@+id/stage_idle_ratio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="유휴재산"
-                    android:background="@drawable/radio_bg"
-                    android:buttonTint="@color/black"
-                    android:padding="12dp"
-                    android:layout_marginTop="8dp"
-                    android:textSize="16sp"/>
-            </RadioGroup>
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="유휴비율"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="10% 미만 유휴"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="10~50% 미만 유휴"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="50~70% 유휴"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="70~100% 유휴"/>
+                    </RadioGroup>
+                </LinearLayout>
+
+                <!-- 안전등급 -->
+                <LinearLayout
+                    android:id="@+id/stage_safety"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="안전등급" android:textSize="18sp" android:textStyle="bold"/>
+
+                    <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="1등급"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="2등급"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="3등급"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="4등급"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="5등급"/>
+                    </RadioGroup>
+                </LinearLayout>
+
+                <!-- 내부상태 -->
+                <LinearLayout
+                    android:id="@+id/stage_internal_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="내부상태" android:textSize="18sp" android:textStyle="bold"/>
+
+                    <!-- 현관 -->
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="현관"/>
+                    <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="상"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="중"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="하"/>
+                    </RadioGroup>
+
+                    <!-- 천장 -->
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="천장"/>
+                    <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="상"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="중"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="하"/>
+                    </RadioGroup>
+
+                    <!-- 바닥 -->
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="바닥"/>
+                    <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="상"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="중"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="하"/>
+                    </RadioGroup>
+                </LinearLayout>
+
+                <!-- 외부상태 -->
+                <LinearLayout
+                    android:id="@+id/stage_external_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="외부상태" android:textSize="18sp" android:textStyle="bold"/>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="외벽"/>
+                    <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="상"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="중"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="하"/>
+                    </RadioGroup>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="지붕옥상"/>
+                    <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="상"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="중"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="하"/>
+                    </RadioGroup>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="창호"/>
+                    <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="상"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="중"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="하"/>
+                    </RadioGroup>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="주차"/>
+                    <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="상"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="중"/>
+                        <RadioButton android:layout_width="match_parent" android:layout_height="wrap_content" android:text="하"/>
+                    </RadioGroup>
+                </LinearLayout>
+
+                <!-- 사진 촬영 단계 -->
+                <LinearLayout
+                    android:id="@+id/stage_photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:paddingTop="16dp">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="사진 촬영" android:textSize="18sp" android:textStyle="bold"/>
+
+                    <ImageView android:id="@+id/capturedImageView" android:layout_width="match_parent" android:layout_height="300dp" android:layout_marginTop="16dp" android:background="#CCCCCC" android:contentDescription="촬영된 이미지 미리보기" android:scaleType="centerCrop"/>
+
+                    <ImageButton android:id="@+id/photo_button" android:layout_width="64dp" android:layout_height="64dp" android:layout_marginTop="16dp" android:layout_gravity="center_horizontal" android:background="@null" android:contentDescription="사진 촬영" android:src="@drawable/ic_camera" android:scaleType="centerInside" android:padding="8dp"/>
+                </LinearLayout>
+
+                <!-- 사진 편집 단계 -->
+                <!-- 사진 편집 단계 -->
+                <LinearLayout
+                    android:id="@+id/stage_photo_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:paddingTop="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="사진 편집"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+
+                    <!-- DrawingView -->
+                    <bitc.fullstack502.final_project_team1.ui.transmission.DrawingView
+                        android:id="@+id/drawingView"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:layout_marginTop="16dp"
+                        android:background="#EEEEEE"/>
+
+                    <!-- 편집 툴바 -->
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center">
+
+                            <Button android:id="@+id/btn_mode_free" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="펜"/>
+                            <Button android:id="@+id/btn_mode_rect" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="사각형" android:layout_marginStart="8dp"/>
+                            <Button android:id="@+id/btn_mode_circle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="원" android:layout_marginStart="8dp"/>
+                            <Button android:id="@+id/btn_mode_line" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="선" android:layout_marginStart="8dp"/>
+                            <ToggleButton android:id="@+id/btn_eraser" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="지우개" android:textOff="지우개" android:layout_marginStart="8dp"/>
+                            <Button android:id="@+id/btn_undo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="되돌리기" android:layout_marginStart="8dp"/>
+                            <Button android:id="@+id/btn_redo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="다시하기" android:layout_marginStart="8dp"/>
+                            <Button android:id="@+id/btn_color" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="색상 선택" android:layout_marginStart="8dp"/>
+                        </LinearLayout>
+                    </HorizontalScrollView>
+
+                    <!-- 저장/초기화 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="end"
+                        android:layout_marginTop="8dp">
+
+                        <Button android:id="@+id/btn_clear" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="초기화"/>
+                        <Button android:id="@+id/btn_save_edit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="저장" android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-    <!-- 왼쪽 하단 큰 뒤로가기 버튼 -->
+    <!-- 뒤로가기 버튼 -->
     <Button
         android:id="@+id/back_button"
         android:layout_width="64dp"
@@ -147,21 +368,17 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#6200EE"
         android:layout_gravity="bottom|start"
-        android:layout_margin="16dp"
-        android:contentDescription="Back Button" />
+        android:layout_margin="16dp"/>
 
-    <!-- 오른쪽 하단 큰 다음 버튼 -->
+    <!-- 다음 버튼 -->
     <Button
         android:id="@+id/next_button"
         android:layout_width="103dp"
         android:layout_height="64dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:backgroundTint="#6200EE"
-        android:contentDescription="Next Button"
         android:text="다음"
         android:textColor="#FFFFFF"
-        android:textSize="24sp" />
-
-
+        android:textSize="24sp"
+        android:backgroundTint="#6200EE"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"/>
 </FrameLayout>

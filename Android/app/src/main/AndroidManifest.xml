@@ -58,7 +58,7 @@
         <activity android:name=".ui.survey.SurveyStatusActivity" />
 
         <!-- 조사 입력 화면 -->
-        <activity android:name=".ui.EnterActivity" />
+        <activity android:name=".ui.transmission.SurveyActivity"/>
 
         <!-- 필요하면 유지 -->
         <activity android:name=".MainActivity" />

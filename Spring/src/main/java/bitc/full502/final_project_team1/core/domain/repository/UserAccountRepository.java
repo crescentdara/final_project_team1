@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-package bitc.full502.final_project_team1.core.domain.repository;
-
-import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-=======
 // src/main/java/bitc/full502/final_project_team1/core/domain/repository/UserAccountRepository.java
 package bitc.full502.final_project_team1.core.domain.repository;
 
@@ -12,16 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
->>>>>>> origin/web/his/TotalSurveyList
 
 import java.util.List;
 
 public interface UserAccountRepository extends JpaRepository<UserAccountEntity, Integer> {
-<<<<<<< HEAD
     List<UserAccountEntity> findTop100ByNameContainingOrUsernameContainingOrderByUserId(
             String nameKeyword, String usernameKeyword
     );
-=======
 
     List<UserAccountEntity> findTop200ByOrderByUserIdAsc();
 
@@ -59,5 +50,4 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
     @Query("select u from UserAccountEntity u " +
             "where lower(str(u.role)) like lower(concat('%', :kw, '%'))")
     List<UserAccountEntity> searchByRoleLikeIgnoreCase(@Param("kw") String kw, Pageable pageable);
->>>>>>> origin/web/his/TotalSurveyList
 }

@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-<<<<<<< HEAD
     plugins: [react()],
     server: {
         proxy: {
@@ -28,16 +27,3 @@ export default defineConfig({
         }
     }
 })
-=======
-  plugins: [react()],
-  server: {
-    proxy: {
-      '/web/api': {
-        target: 'http://localhost:8080', // 스프링 서버
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
-})
->>>>>>> origin/web/his/TotalSurveyList

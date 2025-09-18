@@ -4,20 +4,13 @@ import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmen
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-<<<<<<< HEAD
 import org.springframework.data.repository.query.Param;
-=======
->>>>>>> origin/web/his/TotalSurveyList
 
 import java.util.List;
 
 public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuildingAssignmentEntity, Long> {
 
-<<<<<<< HEAD
     /** 유저의 배정 목록 (building_id, lot_address) DTO 프로젝션 없이 Map/DTO는 서비스/컨트롤러에서 조립 */
-=======
-    // 유저의 배정 목록 (building_id, lot_address) DTO 프로젝션 없이 Map/DTO는 서비스/컨트롤러에서 조립
->>>>>>> origin/web/his/TotalSurveyList
     @Query("""
            select a.buildingId, b.lotAddress
            from UserBuildingAssignmentEntity a
@@ -27,11 +20,7 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
            """)
     List<Object[]> findPairsByUserId(Integer userId);
 
-<<<<<<< HEAD
     /** 특정 지역(키워드) 배정만 삭제 (라운드로빈 재배정 전에 사용) */
-=======
-    // 특정 지역(키워드) 배정만 삭제 (라운드로빈 재배정 전에 사용)
->>>>>>> origin/web/his/TotalSurveyList
     @Modifying
     @Query("""
            delete from UserBuildingAssignmentEntity a
@@ -41,7 +30,6 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
            )
            """)
     int deleteAllByLotAddressLike(String keyword);
-<<<<<<< HEAD
 
     @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u")
     long countAllAssignments();
@@ -49,6 +37,4 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
     @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u WHERE u.status = :status")
     long countByStatus(@Param("status") int status);
 
-=======
->>>>>>> origin/web/his/TotalSurveyList
 }

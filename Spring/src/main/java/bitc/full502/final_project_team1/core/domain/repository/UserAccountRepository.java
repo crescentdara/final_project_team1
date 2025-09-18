@@ -50,4 +50,13 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
     @Query("select u from UserAccountEntity u " +
             "where lower(str(u.role)) like lower(concat('%', :kw, '%'))")
     List<UserAccountEntity> searchByRoleLikeIgnoreCase(@Param("kw") String kw, Pageable pageable);
+
+    // 🔍 role=EDITOR 전체 조회
+    List<UserAccountEntity> findByRole(UserAccountEntity.Role role);
+
+    // 🔍 role=EDITOR + 이름/username 검색
+    List<UserAccountEntity> findByRoleAndNameContainingOrRoleAndUsernameContaining(
+            UserAccountEntity.Role role1, String name,
+            UserAccountEntity.Role role2, String username
+    );
 }

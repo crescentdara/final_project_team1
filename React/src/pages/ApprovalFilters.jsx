@@ -183,21 +183,27 @@ export default function PendingApprovals() {
 
   /** 선택 승인/반려 (서버 연동은 주석 해제) */
   const approveSelected = async () => {
-    if (selected.size === 0) return;
-    const ids = [...selected];
-    updateStatusLocal(ids, "APPROVED");
-    setSelected(new Set());
-    try {
-      // await fetch("/web/api/approvals/bulk/approve", {
-      //   method: "PATCH",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ ids }),
-      // });
-    } catch (e) {
-      console.error(e);
-      // fetchApprovals(); // 서버 기준으로 재동기화
-    }
+      if (selected.size === 0) return;
+      const ids = [...selected];
+
+      try {
+          const res = await fetch("/web/api/approvals/bulk/approve", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ids }),
+          });
+          if (!res.ok) throw new Error("승인 요청 실패");
+
+          alert("결재가 승인되었습니다.");   // ✅ 승인 성공 모달/알림
+          updateStatusLocal(ids, "APPROVED"); // UI 동기화
+          setSelected(new Set());
+      } catch (e) {
+          console.error(e);
+          alert("승인 중 오류 발생");
+          // fetchApprovals(); // 서버 상태로 재동기화 가능
+      }
   };
+
 
   const rejectSelected = async () => {
     if (selected.size === 0) return;
@@ -218,26 +224,41 @@ export default function PendingApprovals() {
 
   /** 단건 승인/반려 (모달) */
   const approveOne = async (id) => {
-    updateStatusLocal([id], "APPROVED");
-    setModalOpen(false);
-    try {
-      // await fetch("/web/api/approvals/bulk/approve", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: [id] }) });
-    } catch (e) {
-      console.error(e);
-      // fetchApprovals();
-    }
+      try {
+          const res = await fetch("/web/api/approvals/bulk/approve", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ids: [id] }),
+          });
+          if (!res.ok) throw new Error("승인 요청 실패");
+
+          alert("결재가 승인되었습니다.");   // ✅ 승인 알림
+          updateStatusLocal([id], "APPROVED"); // UI 동기화
+          setModalOpen(false);
+      } catch (e) {
+          console.error(e);
+          alert("승인 중 오류 발생");
+      }
   };
 
-  const rejectOne = async (id) => {
-    updateStatusLocal([id], "REJECTED");
-    setModalOpen(false);
-    try {
-      // await fetch("/web/api/approvals/bulk/reject", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: [id] }) });
-    } catch (e) {
-      console.error(e);
-      // fetchApprovals();
-    }
-  };
+    const rejectOne = async (id) => {
+        try {
+            const res = await fetch("/web/api/approvals/bulk/reject", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ids: [id] }),
+            });
+            if (!res.ok) throw new Error("반려 요청 실패");
+
+            alert("결재가 반려되었습니다.");   // ✅ 반려 알림
+            updateStatusLocal([id], "REJECTED");
+            setModalOpen(false);
+        } catch (e) {
+            console.error(e);
+            alert("반려 중 오류 발생");
+        }
+    };
+
 
   /** 상세 모달 열기 (안드로이드 연동 전: 리스트 항목 활용) */
   const openResult = async (id) => {                                // ★ 변경

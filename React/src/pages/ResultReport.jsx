@@ -4,59 +4,63 @@ import axios from "axios";
 function ResultReport() {
     const [reports, setReports] = useState([]);
 
-    // ✅ 컴포넌트 mount 시 보고서 목록 불러오기
+    // ✅ 전체 보고서 불러오기
     useEffect(() => {
-        axios
-            .get("/web/report")
-            .then((res) => {
-                console.log("✅ 보고서 응답:", res.data); // 구조 확인용
-                // 응답이 배열인지 확인 후 세팅
-                if (Array.isArray(res.data)) {
-                    setReports(res.data);
-                } else if (res.data.content) {
-                    // JPA Page 응답일 경우
-                    setReports(res.data.content);
-                } else {
-                    // 단일 객체일 경우
-                    setReports([res.data]);
-                }
-            })
-            .catch((err) => console.error("❌ 보고서 목록 불러오기 실패:", err));
+        axios.get("/web/api/report")
+            .then((res) => setReports(res.data))
+            .catch((err) => console.error("보고서 목록 불러오기 실패:", err));
     }, []);
 
+    // ✅ PDF 보기 (새 창 열기)
+    const handleViewPdf = (reportId) => {
+        window.open(`/web/api/report/pdf/${reportId}`, "_blank");
+    };
+
+    // ✅ PDF 다운로드
+    const handleDownloadPdf = (reportId) => {
+        axios({
+            url: `/web/api/report/pdf/${reportId}`,
+            method: "GET",
+            responseType: "blob", // 중요
+        }).then((res) => {
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `report-${reportId}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+        });
+    };
+
     return (
-        <div className="container mt-4">
-            <h2>결과 보고서 목록</h2>
-            <table className="table table-striped mt-3">
+        <div className="container">
+            <h2>📑 결과 보고서</h2>
+            <table border="1" width="100%">
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>조사원</th>
-                    <th>건물 주소</th>
-                    <th>결재자</th>
-                    <th>결재일시</th>
+                    <th>조사자</th>
+                    <th>주소</th>
+                    <th>승인자</th>
+                    <th>승인일시</th>
+                    <th>PDF</th>
                 </tr>
                 </thead>
                 <tbody>
-                {reports.length > 0 ? (
-                    reports.map((r) => (
-                        <tr key={r.assignmentId}>
-                            <td>{r.assignmentId}</td>
-                            <td>{r.userName}</td>
-                            <td>{r.buildingAddress}</td>
-                            <td>{r.approvedByName}</td>
-                            <td>{r.approvedAt}</td>
-                        </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan="5" className="text-center">
-                            결과 보고서가 없습니다.
+                {reports.map((r) => (
+                    <tr key={r.id}>
+                        <td>{r.id}</td>
+                        <td>{r.surveyResult?.user?.name ?? "-"}</td>
+                        <td>{r.surveyResult?.building?.lotAddress ?? "-"}</td>
+                        <td>{r.approvedBy?.name ?? "-"}</td>
+                        <td>{r.approvedAt}</td>
+                        <td>
+                            <button onClick={() => handleViewPdf(r.id)}>보기</button>
+                            <button onClick={() => handleDownloadPdf(r.id)}>다운로드</button>
                         </td>
                     </tr>
-                )}
+                ))}
                 </tbody>
-
             </table>
         </div>
     );

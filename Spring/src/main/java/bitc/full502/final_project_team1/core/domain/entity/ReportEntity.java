@@ -17,7 +17,7 @@ public class ReportEntity {
 
     /** 어떤 배정 건물 조사에 대한 보고서인지 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignment_id", nullable = false)
+    @JoinColumn(name = "assignment_id", nullable = true)
     private UserBuildingAssignmentEntity assignment;
 
     /** 어떤 조사 결과에 대한 보고서인지 */

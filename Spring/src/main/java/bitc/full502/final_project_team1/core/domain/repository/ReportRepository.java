@@ -9,12 +9,14 @@ import java.util.List;
 @Repository
 public interface ReportRepository extends JpaRepository<ReportEntity, Long> {
 
-    // 조사원별 조회 (UserAccountEntity의 PK는 userId)
+    // 조사원별 조회
     List<ReportEntity> findByAssignment_User_UserId(Long userId);
 
-    // 결재자별 조회 (UserAccountEntity의 PK는 userId)
+    // 결재자별 조회 (PK 이름 맞춰주기)
     List<ReportEntity> findByApprovedBy_UserId(Long approverId);
 
-    // 건물별 조회 (BuildingEntity의 PK는 id)
+    // 건물별 조회
     List<ReportEntity> findByAssignment_Building_Id(Long buildingId);
 }
+
+

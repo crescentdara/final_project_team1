@@ -7,4 +7,10 @@
         <item>제목 A→Z</item>
         <item>제목 Z→A</item>
     </string-array>
+
+    <string-array name="survey_list_sort">
+        <item>최신순</item>
+        <item>오래된순</item>
+        <item>거리순</item>
+    </string-array>
 </resources>

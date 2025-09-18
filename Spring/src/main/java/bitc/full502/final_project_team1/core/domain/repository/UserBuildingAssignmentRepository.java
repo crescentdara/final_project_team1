@@ -1,9 +1,11 @@
 package bitc.full502.final_project_team1.core.domain.repository;
 
+import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
 import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -29,4 +31,10 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
            )
            """)
     int deleteAllByLotAddressLike(String keyword);
+
+
+
+
+
+
 }

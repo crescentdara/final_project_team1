@@ -13,15 +13,6 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
 
 
     @Query(value = """
-            SELECT b.id, b.lot_address, b.latitude, b.longitude, NULL AS distance_m
-            FROM user_building_assignment a
-            JOIN building b ON b.id = a.building_id
-            WHERE a.user_id = :userId
-            ORDER BY b.id
-            """, nativeQuery = true)
-    List<Object[]> findAssignedAll(@Param("userId") Integer userId);
-
-    @Query(value = """
             SELECT 
               b.id,
               b.lot_address,
@@ -41,4 +32,13 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
                                       @Param("lat") double lat,
                                       @Param("lng") double lng,
                                       @Param("radiusMeters") double radiusMeters);
+
+    @Query("""
+    select b.id, b.lotAddress, b.latitude, b.longitude, a.assignedAt
+    from UserBuildingAssignmentEntity a
+    join a.building b
+    where a.user.userId = :userId
+    order by a.assignedAt desc
+    """)
+    List<Object[]> findAssignedAll(@Param("userId") Integer userId);
 }

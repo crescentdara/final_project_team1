@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,23 +38,30 @@ public class AppServeyServiceImpl implements AppServeyService {
 
     private AssignedBuildingDto toDtoNoDistance(Object[] r) {
         return new AssignedBuildingDto(
-                toLong(r[0]),
-                toStr(r[1]),
-                toDbl(r[2]),
-                toDbl(r[3]),
-                null
+                toLong(r[0]),   // b.id
+                toStr(r[1]),    // b.lotAddress
+                toDbl(r[2]),    // b.latitude
+                toDbl(r[3]),    // b.longitude
+                null,           // distanceMeters
+                toDate(r[4])    // ✅ uba.assignedAt
         );
     }
 
     private AssignedBuildingDto toDtoWithDistance(Object[] r) {
         return new AssignedBuildingDto(
-                toLong(r[0]),
-                toStr(r[1]),
-                toDbl(r[2]),
-                toDbl(r[3]),
-                toDbl(r[4])
+                toLong(r[0]),   // b.id
+                toStr(r[1]),    // b.lotAddress
+                toDbl(r[2]),    // b.latitude
+                toDbl(r[3]),    // b.longitude
+                toDbl(r[4]),    // distanceMeters
+                toDate(r[5])    // ✅ uba.assignedAt
         );
     }
+
+    private LocalDateTime toDate(Object o) {
+        return (o instanceof LocalDateTime dt) ? dt : null;
+    }
+
 
     private Long toLong(Object o) { return o == null ? null : ((Number) o).longValue(); }
     private Double toDbl(Object o) { return o == null ? null : ((Number) o).doubleValue(); }

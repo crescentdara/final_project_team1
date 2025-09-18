@@ -25,17 +25,18 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="조사목록"
+        android:text="조사예정 목록"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp" />
 
     <!-- 정렬 선택 -->
     <Spinner
         android:id="@+id/spinnerSort"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="8dp"/>
+        android:layout_marginVertical="8dp"
+        android:entries="@array/survey_list_sort"/>
 
     <!-- 목록 -->
     <ScrollView

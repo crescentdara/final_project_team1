@@ -5,5 +5,6 @@ data class AssignedBuilding(
     val lotAddress: String,
     val latitude: Double?,
     val longitude: Double?,
-    val distanceMeters: Double?
+    val distanceMeters: Double?,
+    val assignedAt: String?
 )

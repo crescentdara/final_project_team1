@@ -49,6 +49,14 @@ public class SurveyResultEntity {
     // 11. 내부상태 - 바닥 (1~3)
     private Integer floor;
 
+    // ✅ 외부상태 기타사항
+    @Column(name = "ext_etc", length = 500)
+    private String extEtc;
+
+    // ✅ 내부상태 기타사항
+    @Column(name = "int_etc", length = 500)
+    private String intEtc;
+
     // 12. 외부사진 경로
     private String extPhoto;
 

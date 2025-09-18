@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/web/api/users")
+@RequestMapping("/web/api")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
@@ -18,7 +18,7 @@ public class UserController {
     private final UserAccountRepository repo;
 
     // 전체 조회 + 검색 (keyword 파라미터 optional)
-    @GetMapping
+    @GetMapping("/users/search")
     public List<UserSimpleDto> list(@RequestParam(required = false) String keyword) {
         List<UserAccountEntity> users;
 

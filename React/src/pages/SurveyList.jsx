@@ -38,7 +38,7 @@ function SurveyList() {
 
         // 전체 조사자 불러오기
         axios
-            .get("/web/api/users")
+            .get("/web/api/users/search")
             .then((res) => setUsers(res.data))
             .catch((err) => console.error("❌ 조사자 목록 불러오기 실패:", err));
     }, []);
@@ -60,7 +60,7 @@ function SurveyList() {
     // =============================
     const handleUserSearch = () => {
         axios
-            .get("/web/api/users", { params: { keyword: userKeyword } })
+            .get("/web/api/users/search", { params: { keyword: userKeyword } })
             .then((res) => setUsers(res.data))
             .catch((err) => console.error("❌ 대상자 검색 실패:", err));
     };

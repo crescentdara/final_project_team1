@@ -32,7 +32,7 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
            """)
     int deleteAllByLotAddressLike(String keyword);
 
-
+    long countByUser_UserIdAndStatus(Integer userId, Integer status);
 
 
 

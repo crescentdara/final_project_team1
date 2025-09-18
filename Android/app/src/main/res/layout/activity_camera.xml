@@ -1,92 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#BDBDBD"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- 상단 탭 버튼 영역 (가로 스크롤 가능) -->
-    <HorizontalScrollView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:paddingBottom="8dp">
+        android:layout_height="match_parent"
+        android:background="#BDBDBD"
+        android:paddingBottom="80dp">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <Button
-                android:id="@+id/btn_investigation"
-                android:layout_width="wrap_content"
+            <!-- 상단 탭 버튼 영역 -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="조사불가 여부" />
+                android:scrollbars="none"
+                android:paddingBottom="8dp">
 
-            <Button
-                android:id="@+id/btn_purpose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="행정목적 활용여부" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_idle_ratio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="유휴비율" />
+                    <!-- 기존 버튼들 -->
+                    <Button
+                        android:id="@+id/btn_investigation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="조사불가 여부" />
 
-            <Button
-                android:id="@+id/btn_safety"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="안전등급" />
+                    <Button
+                        android:id="@+id/btn_purpose"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="행정목적 활용여부" />
 
-            <Button
-                android:id="@+id/btn_internal_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="내부상태" />
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="활용유형" />
 
-            <Button
-                android:id="@+id/btn_external_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:text="외부상태" />
+                    <Button
+                        android:id="@+id/btn_idle_ratio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="유휴비율" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="건물 현황" />
+
+                    <Button
+                        android:id="@+id/btn_safety"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="안전등급" />
+
+                    <Button
+                        android:id="@+id/btn_internal_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="내부상태" />
+
+                    <Button
+                        android:id="@+id/btn_external_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="외부상태" />
+
+                    <Button
+                        android:id="@+id/btn_edit_photo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="사진 편집" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- 카메라 결과 이미지 미리보기 -->
+
+            <!-- 사진 촬영 버튼: ImageButton으로 바꿔서 이미지 아이콘 사용 -->
+            <ImageView
+                android:id="@+id/capturedImageView"
+                android:layout_width="match_parent"
+                android:layout_height="497dp"
+                android:layout_marginTop="16dp"
+                android:background="#CCCCCC"
+                android:contentDescription="촬영된 이미지 미리보기"
+                android:scaleType="centerCrop" />
+
+            <ImageButton
+                android:id="@+id/photo_button"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@null"
+                android:contentDescription="사진 촬영"
+                android:src="@drawable/ic_camera"
+                android:scaleType="centerInside"
+                android:padding="8dp" />
 
         </LinearLayout>
-    </HorizontalScrollView>
-
-
-    <ImageView
-        android:id="@+id/capturedImageView"
-        android:layout_width="match_parent"
-        android:layout_height="452dp"
-        android:layout_marginTop="16dp"
-        android:background="#EEEEEE"
-        android:scaleType="centerCrop" />
-
-    <Button
-        android:id="@+id/photo_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="사진 촬영"
-        android:layout_marginTop="16dp"/>
-
-    <Button
-        android:id="@+id/btn_edit_photo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="사진 편집"
-        android:layout_marginLeft="8dp"/>
-
-
-
-
-
-</LinearLayout>
+    </ScrollView>
+</FrameLayout>

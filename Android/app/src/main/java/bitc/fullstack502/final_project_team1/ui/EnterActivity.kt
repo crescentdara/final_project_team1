@@ -6,6 +6,8 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import bitc.fullstack502.final_project_team1.R
 
+
+
 class EnterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,12 +22,6 @@ class EnterActivity : AppCompatActivity() {
             finish() // 현재 액티비티 종료
         }
 
-        val photoButton = findViewById<Button>(R.id.photo_button)
-        photoButton.setOnClickListener {
-            val intent = Intent(this, CameraActivity::class.java)
-            startActivity(intent)
-
-        }
 
         val nextButton = findViewById<Button>(R.id.next_button)
         nextButton.setOnClickListener {
@@ -68,5 +64,12 @@ class EnterActivity : AppCompatActivity() {
             val intent = Intent(this, InternalStatusActivity::class.java)
             startActivity(intent)
         }
+
+        val photoButton = findViewById<Button>(R.id.photo_button) // Button이면 Button 타입
+        photoButton.setOnClickListener {
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 }

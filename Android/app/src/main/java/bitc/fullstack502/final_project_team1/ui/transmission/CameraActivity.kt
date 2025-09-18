@@ -2,84 +2,125 @@ package bitc.fullstack502.final_project_team1.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import bitc.fullstack502.final_project_team1.R
-
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class CameraActivity : AppCompatActivity() {
 
     private lateinit var capturedImageView: ImageView
-    private lateinit var photoButton: Button
+    private lateinit var photoButton: ImageButton
+    private lateinit var editButton: Button
+    private lateinit var photoUri: Uri
+    private var photoFile: File? = null
 
-    private var isFirstPhoto = true // true = 외부, false = 내부
-    private var externalPhoto: Bitmap? = null
-    private var internalPhoto: Bitmap? = null
-
-    companion object {
-        private const val REQUEST_IMAGE_CAPTURE = 1
-    }
+    private val REQUEST_IMAGE_CAPTURE = 1
+    private val REQUEST_CAMERA_PERMISSION = 100
+    private val REQUEST_EDIT_IMAGE = 200
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_camera) // 레이아웃 파일명
+        setContentView(R.layout.activity_camera)
 
         capturedImageView = findViewById(R.id.capturedImageView)
         photoButton = findViewById(R.id.photo_button)
+        editButton = findViewById(R.id.btn_edit_photo)
 
+        // 사진 촬영 버튼
         photoButton.setOnClickListener {
-            dispatchTakePictureIntent()
-        }
-    }
-
-    // 카메라 인텐트 실행
-    private fun dispatchTakePictureIntent() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(packageManager) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-        } else {
-            Toast.makeText(this, "카메라 앱을 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    // 촬영 결과 처리
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            val imageBitmap = data?.extras?.get("data") as Bitmap
-            capturedImageView.setImageBitmap(imageBitmap)
-
-            if (isFirstPhoto) {
-                // 외부 사진 편집
-                startEditImage(imageBitmap, isExternal = true)
+            if (checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
             } else {
-                // 내부 사진 편집
-                startEditImage(imageBitmap, isExternal = false)
+                dispatchTakePictureIntent()
+            }
+        }
+
+        // 사진 편집 버튼
+        editButton.setOnClickListener {
+            openEditActivity()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                dispatchTakePictureIntent()
+            } else {
+                Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    // 편집 함수 예제
-    private fun startEditImage(bitmap: Bitmap, isExternal: Boolean) {
-        // 여기서 Crop / Filter / 편집 라이브러리 호출 가능
-        // 예제에서는 그대로 저장
-
-        if (isExternal) {
-            externalPhoto = bitmap
-            Toast.makeText(this, "외부 사진 편집 완료", Toast.LENGTH_SHORT).show()
-            isFirstPhoto = false // 다음 사진은 내부
-        } else {
-            internalPhoto = bitmap
-            Toast.makeText(this, "내부 사진 편집 완료", Toast.LENGTH_SHORT).show()
+    private fun dispatchTakePictureIntent() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        photoFile = try {
+            createImageFile()
+        } catch (ex: IOException) {
+            Toast.makeText(this, "이미지 파일 생성 실패", Toast.LENGTH_SHORT).show()
+            null
         }
 
-        // 편집 후 ImageView 업데이트 (옵션)
-        capturedImageView.setImageBitmap(bitmap)
+        photoFile?.let {
+            photoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", it)
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+    }
+
+    private fun openEditActivity() {
+        if (photoFile != null) {
+            val intent = Intent(this, EditActivity::class.java)
+            intent.putExtra("imageUri", photoUri.toString())
+            startActivityForResult(intent, REQUEST_EDIT_IMAGE)
+        } else {
+            Toast.makeText(this, "먼저 사진을 찍으세요.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        try {
+            if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+                // 찍은 사진 바로 표시
+                val bitmap = BitmapFactory.decodeFile(photoFile!!.absolutePath)
+                capturedImageView.setImageBitmap(bitmap)
+            } else if (requestCode == REQUEST_EDIT_IMAGE && resultCode == Activity.RESULT_OK) {
+                // 편집 후 표시
+                val editedUriString = data?.getStringExtra("editedImageUri")
+                editedUriString?.let {
+                    val editedBitmap = BitmapFactory.decodeFile(File(Uri.parse(it).path!!).absolutePath)
+                    capturedImageView.setImageBitmap(editedBitmap)
+                    // 최신 URI 업데이트
+                    photoUri = Uri.parse(it)
+                    photoFile = File(photoUri.path!!)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "이미지 불러오기 실패", Toast.LENGTH_SHORT).show()
+        }
     }
 }

@@ -1,10 +1,16 @@
 package bitc.full502.final_project_team1.core.service;
 
+import bitc.full502.final_project_team1.api.app.dto.AppSurveyResultRequest;
+import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
+import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
+import bitc.full502.final_project_team1.core.domain.repository.BuildingRepository;
 import bitc.full502.final_project_team1.core.domain.repository.SurveyResultRepository;
+import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,29 +19,109 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SurveyResultServiceImpl implements SurveyResultService {
 
-    private final SurveyResultRepository repository;
+    private final SurveyResultRepository surveyResultRepository;
+    private final BuildingRepository buildingRepository;
+    private final UserAccountRepository userAccountRepository;
+    private final FileStorageService fileStorageService;
 
     @Override
     @Transactional
     public SurveyResultEntity save(SurveyResultEntity surveyResult) {
-        return repository.save(surveyResult);
+        return surveyResultRepository.save(surveyResult);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<SurveyResultEntity> findById(Long id) {
-        return repository.findById(id);
+        return surveyResultRepository.findById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SurveyResultEntity> findAll() {
-        return repository.findAll();
+        return surveyResultRepository.findAll();
     }
 
     @Override
     @Transactional
     public void deleteById(Long id) {
-        repository.deleteById(id);
+        surveyResultRepository.deleteById(id);
     }
+
+    @Override
+    public SurveyResultEntity saveSurvey(AppSurveyResultRequest dto) {
+        BuildingEntity building = buildingRepository.findById(dto.getBuildingId())
+                .orElseThrow(() -> new IllegalArgumentException("건물 ID가 존재하지 않습니다."));
+        UserAccountEntity user = userAccountRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("유저 ID가 존재하지 않습니다."));
+
+        SurveyResultEntity entity = SurveyResultEntity.builder()
+                .possible(dto.getPossible())
+                .adminUse(dto.getAdminUse())
+                .idleRate(dto.getIdleRate())
+                .safety(dto.getSafety())
+                .wall(dto.getWall())
+                .roof(dto.getRoof())
+                .windowState(dto.getWindowState())
+                .parking(dto.getParking())
+                .entrance(dto.getEntrance())
+                .ceiling(dto.getCeiling())
+                .floor(dto.getFloor())
+                .extEtc(dto.getExtEtc())
+                .intEtc(dto.getIntEtc())
+                .extPhoto(dto.getExtPhoto())
+                .extEditPhoto(dto.getExtEditPhoto())
+                .intPhoto(dto.getIntPhoto())
+                .intEditPhoto(dto.getIntEditPhoto())
+                .status(dto.getStatus())
+                .building(building)
+                .user(user)
+                .build();
+
+        return surveyResultRepository.save(entity);
+    }
+
+    @Override
+    public SurveyResultEntity updateSurvey(Long id, AppSurveyResultRequest dto,
+                                           MultipartFile extPhoto, MultipartFile extEditPhoto,
+                                           MultipartFile intPhoto, MultipartFile intEditPhoto) {
+
+        SurveyResultEntity entity = surveyResultRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 설문 없음"));
+
+        // DTO 값 덮어쓰기
+        entity.setPossible(dto.getPossible());
+        entity.setAdminUse(dto.getAdminUse());
+        entity.setIdleRate(dto.getIdleRate());
+        entity.setSafety(dto.getSafety());
+        entity.setWall(dto.getWall());
+        entity.setRoof(dto.getRoof());
+        entity.setWindowState(dto.getWindowState());
+        entity.setParking(dto.getParking());
+        entity.setEntrance(dto.getEntrance());
+        entity.setCeiling(dto.getCeiling());
+        entity.setFloor(dto.getFloor());
+        entity.setExtEtc(dto.getExtEtc());
+        entity.setIntEtc(dto.getIntEtc());
+        entity.setStatus(dto.getStatus());
+
+        // 파일이 새로 업로드되면 교체
+        if (extPhoto != null) entity.setExtPhoto(fileStorageService.storeFile(extPhoto, "ext"));
+        if (extEditPhoto != null) entity.setExtEditPhoto(fileStorageService.storeFile(extEditPhoto, "ext-edit"));
+        if (intPhoto != null) entity.setIntPhoto(fileStorageService.storeFile(intPhoto, "int"));
+        if (intEditPhoto != null) entity.setIntEditPhoto(fileStorageService.storeFile(intEditPhoto, "int-edit"));
+
+        return surveyResultRepository.save(entity);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SurveyResultEntity> findTempByUser(Integer userId) {
+        return surveyResultRepository.findByUser_UserIdAndStatus(userId, "TEMP");
+    }
+
+
+
+
 }

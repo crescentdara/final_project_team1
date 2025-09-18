@@ -5,7 +5,7 @@ import android.content.Intent
 import android.graphics.*
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,39 +16,44 @@ class EditActivity : AppCompatActivity() {
 
     private lateinit var editImageView: ImageView
     private lateinit var drawingView: DrawingView
-    private lateinit var saveButton: Button
-    private lateinit var colorButton: Button
-    private lateinit var brushButton: Button
-    private lateinit var eraserButton: Button
-    private lateinit var clearButton: Button
-    private lateinit var shapeButton: Button
+    private lateinit var redButton: ImageButton
+    private lateinit var blueButton: ImageButton
+    private lateinit var greenButton: ImageButton
+    private lateinit var brushButton: ImageButton
+    private lateinit var eraserButton: ImageButton
+    private lateinit var clearButton: ImageButton
+    private lateinit var shapeButton: ImageButton
+    private lateinit var saveButton: ImageButton
     private lateinit var imageUri: Uri
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
 
+        // 뷰 초기화
         editImageView = findViewById(R.id.editImageView)
         drawingView = findViewById(R.id.drawingView)
-        saveButton = findViewById(R.id.save_button)
-        colorButton = findViewById(R.id.colorButton)
+        redButton = findViewById(R.id.redButton)
+        blueButton = findViewById(R.id.blueButton)
+        greenButton = findViewById(R.id.greenButton)
         brushButton = findViewById(R.id.brushButton)
         eraserButton = findViewById(R.id.eraserButton)
         clearButton = findViewById(R.id.clearButton)
-        shapeButton = findViewById(R.id.shapeButton) // 도형 선택 버튼 추가
+        shapeButton = findViewById(R.id.shapeButton)
+        saveButton = findViewById(R.id.saveButton)
 
-        val uriString = intent.getStringExtra("imageUri")
-        if (uriString != null) {
-            imageUri = Uri.parse(uriString)
+        // 이미지 로딩
+        intent.getStringExtra("imageUri")?.let {
+            imageUri = Uri.parse(it)
             try {
-                val inputStream = contentResolver.openInputStream(imageUri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream?.close()
-                if (bitmap != null) {
-                    editImageView.setImageBitmap(bitmap)
-                    drawingView.setBackgroundBitmap(bitmap)
-                } else {
-                    Toast.makeText(this, "이미지 로딩 실패", Toast.LENGTH_SHORT).show()
+                contentResolver.openInputStream(imageUri)?.use { stream ->
+                    val bitmap = BitmapFactory.decodeStream(stream)
+                    if (bitmap != null) {
+                        editImageView.setImageBitmap(bitmap)
+                        drawingView.setBackgroundBitmap(bitmap)
+                    } else {
+                        Toast.makeText(this, "이미지 로딩 실패", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -57,17 +62,9 @@ class EditActivity : AppCompatActivity() {
         }
 
         // 색상 선택
-        colorButton.setOnClickListener {
-            val colors = arrayOf("빨강", "파랑", "초록", "검정")
-            val colorValues = arrayOf(Color.RED, Color.BLUE, Color.GREEN, Color.BLACK)
-            AlertDialog.Builder(this)
-                .setTitle("색상 선택")
-                .setItems(colors) { _, which ->
-                    drawingView.setColor(colorValues[which])
-                    drawingView.enableEraser(false)
-                }
-                .show()
-        }
+        redButton.setOnClickListener { drawingView.setColor(Color.RED); drawingView.enableEraser(false) }
+        blueButton.setOnClickListener { drawingView.setColor(Color.BLUE); drawingView.enableEraser(false) }
+        greenButton.setOnClickListener { drawingView.setColor(Color.GREEN); drawingView.enableEraser(false) }
 
         // 브러시 두께 선택
         brushButton.setOnClickListener {
@@ -111,27 +108,29 @@ class EditActivity : AppCompatActivity() {
         saveButton.setOnClickListener {
             val drawnBitmap = drawingView.getBitmap()
 
-            val inputStream = contentResolver.openInputStream(imageUri)
-            val backgroundBitmap = BitmapFactory.decodeStream(inputStream)
-            inputStream?.close()
+            contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                val backgroundBitmap = BitmapFactory.decodeStream(inputStream)
+                if (backgroundBitmap != null) {
+                    val finalBitmap = Bitmap.createBitmap(
+                        backgroundBitmap.width,
+                        backgroundBitmap.height,
+                        Bitmap.Config.ARGB_8888
+                    )
+                    val canvas = Canvas(finalBitmap)
+                    canvas.drawBitmap(backgroundBitmap, 0f, 0f, null)
+                    canvas.drawBitmap(drawnBitmap, 0f, 0f, null)
 
-            if (backgroundBitmap != null) {
-                val finalBitmap = Bitmap.createBitmap(backgroundBitmap.width, backgroundBitmap.height, Bitmap.Config.ARGB_8888)
-                val canvas = Canvas(finalBitmap)
-                canvas.drawBitmap(backgroundBitmap, 0f, 0f, null)
-                canvas.drawBitmap(drawnBitmap, 0f, 0f, null)
+                    val file = File(cacheDir, "edited_image.png")
+                    file.outputStream().use { finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
 
-                val file = File(cacheDir, "edited_image.png")
-                file.outputStream().use {
-                    finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+                    val resultIntent = Intent().apply {
+                        putExtra("editedImageUri", Uri.fromFile(file).toString())
+                    }
+                    setResult(RESULT_OK, resultIntent)
+                    finish()
+                } else {
+                    Toast.makeText(this, "배경 이미지 로딩 실패", Toast.LENGTH_SHORT).show()
                 }
-
-                val resultIntent = Intent()
-                resultIntent.putExtra("editedImageUri", Uri.fromFile(file).toString())
-                setResult(RESULT_OK, resultIntent)
-                finish()
-            } else {
-                Toast.makeText(this, "배경 이미지 로딩 실패", Toast.LENGTH_SHORT).show()
             }
         }
     }

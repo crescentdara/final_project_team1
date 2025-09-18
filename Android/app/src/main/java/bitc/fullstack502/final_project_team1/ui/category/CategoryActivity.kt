@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import bitc.fullstack502.final_project_team1.R
-import bitc.fullstack502.final_project_team1.ui.SurveyResultActivity
 import bitc.fullstack502.final_project_team1.ui.survey.SurveyStatusActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity
@@ -47,11 +46,6 @@ class CategoryActivity : AppCompatActivity() {
 
         btnSurveyList.setOnClickListener {
             startActivity(Intent(this, SurveyListActivity::class.java))
-            finish()
-        }
-
-        btnSurveyInput.setOnClickListener {
-            startActivity(Intent(this, SurveyResultActivity::class.java))
             finish()
         }
 

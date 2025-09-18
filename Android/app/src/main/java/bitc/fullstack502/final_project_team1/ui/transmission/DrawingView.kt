@@ -1,4 +1,4 @@
-package bitc.fullstack502.final_project_team1.ui
+package bitc.fullstack502.final_project_team1.ui.transmission
 
 import android.content.Context
 import android.graphics.*

@@ -8,8 +8,10 @@ import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.ui.category.CategoryActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.TransmissionCompleteActivity
+
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
+import kotlin.jvm.java
 
 class SurveyStatusActivity : AppCompatActivity() {
 

@@ -11,7 +11,7 @@
         android:scaleType="fitCenter" />
 
     <!-- 그림 그리는 뷰 -->
-    <bitc.fullstack502.final_project_team1.ui.DrawingView
+    <bitc.fullstack502.final_project_team1.ui.transmission.DrawingView
         android:id="@+id/drawingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

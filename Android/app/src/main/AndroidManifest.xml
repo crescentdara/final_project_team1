@@ -36,8 +36,6 @@
             android:name="com.naver.maps.map.NCP_KEY_ID"
             android:value="eeh71qt74n" />
 
-        <activity android:name=".ui.SurveyResultActivity" />
-
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="true">
@@ -65,23 +63,23 @@
         <!-- 필요하면 유지 -->
         <activity android:name=".MainActivity" />
 
-        <activity android:name=".ui.CameraActivity" />
+        <activity android:name=".ui.transmission.CameraActivity" />
 
-        <activity android:name=".ui.ResultActivity" />
+        <activity android:name=".ui.transmission.ResultActivity" />
 
-        <activity android:name=".ui.PurposeActivity" />
+        <activity android:name=".ui.transmission.PurposeActivity" />
 
-        <activity android:name=".ui.IdleRatioActivity" />
+        <activity android:name=".ui.transmission.IdleRatioActivity" />
 
-        <activity android:name=".ui.SafetyGradeActivity" />
+        <activity android:name=".ui.transmission.SafetyGradeActivity" />
 
-        <activity android:name=".ui.ExternalStatusActivity" />
+        <activity android:name=".ui.transmission.ExternalStatusActivity" />
 
-        <activity android:name=".ui.InternalStatusActivity" />
+        <activity android:name=".ui.transmission.InternalStatusActivity" />
 
-        <activity android:name=".ui.InvestigationActivity" />
+        <activity android:name=".ui.transmission.InvestigationActivity" />
 
-        <activity android:name=".ui.EditActivity" />
+        <activity android:name=".ui.transmission.EditActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

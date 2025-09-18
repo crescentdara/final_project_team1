@@ -42,23 +42,11 @@
                         android:text="행정목적 활용여부" />
 
                     <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:text="활용유형" />
-
-                    <Button
                         android:id="@+id/btn_idle_ratio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:text="유휴비율" />
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:text="건물 현황" />
 
                     <Button
                         android:id="@+id/btn_safety"

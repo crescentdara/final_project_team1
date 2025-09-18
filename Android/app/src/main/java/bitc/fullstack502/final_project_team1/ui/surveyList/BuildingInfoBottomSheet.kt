@@ -1,5 +1,6 @@
 package bitc.fullstack502.final_project_team1.ui.surveyList
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.TextView
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
+import bitc.fullstack502.final_project_team1.ui.EnterActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,8 +49,13 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val infoContainer = view.findViewById<LinearLayout>(R.id.infoContainer)
 
         btnStart.setOnClickListener {
-            // TODO: 조사 시작 페이지 이동 (아직 미구현)
+            val intent = Intent(requireContext(), EnterActivity::class.java).apply {
+                putExtra("buildingId", buildingId) // 필요하면 건물 ID 전달
+            }
+            startActivity(intent)
+            dismiss() // 바텀시트 닫기
         }
+
 
         CoroutineScope(Dispatchers.Main).launch {
             runCatching {

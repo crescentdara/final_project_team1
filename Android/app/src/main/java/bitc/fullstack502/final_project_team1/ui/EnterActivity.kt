@@ -5,22 +5,20 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import bitc.fullstack502.final_project_team1.R
-
+import bitc.fullstack502.final_project_team1.ui.transmission.CameraActivity
+import bitc.fullstack502.final_project_team1.ui.transmission.ExternalStatusActivity
+import bitc.fullstack502.final_project_team1.ui.transmission.IdleRatioActivity
+import bitc.fullstack502.final_project_team1.ui.transmission.InternalStatusActivity
+import bitc.fullstack502.final_project_team1.ui.transmission.InvestigationActivity
+import bitc.fullstack502.final_project_team1.ui.transmission.PurposeActivity
+import bitc.fullstack502.final_project_team1.ui.transmission.ResultActivity
+import bitc.fullstack502.final_project_team1.ui.transmission.SafetyGradeActivity
 
 
 class EnterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter)
-
-        // 뒤로가기 버튼 이벤트
-        val backButton = findViewById<Button>(R.id.back_button)
-        backButton.setOnClickListener {
-            // SurveyResultActivity로 이동
-            val intent = Intent(this, SurveyResultActivity::class.java)
-            startActivity(intent)
-            finish() // 현재 액티비티 종료
-        }
 
 
         val nextButton = findViewById<Button>(R.id.next_button)
@@ -70,6 +68,8 @@ class EnterActivity : AppCompatActivity() {
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
         }
+
+        val buildingId = intent.getLongExtra("buildingId", -1)
 
     }
 }

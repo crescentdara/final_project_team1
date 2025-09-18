@@ -3,7 +3,6 @@ package bitc.fullstack502.final_project_team1.ui.survey
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import bitc.fullstack502.final_project_team1.R
@@ -11,7 +10,8 @@ import com.google.android.material.button.MaterialButton
 
 class SurveyResultDialog(
     private val context: Context,
-    private val address: String
+    private val address: String,
+    private val onSendComplete: (() -> Unit)? = null // ✅ 콜백 추가
 ) {
     private lateinit var dialog: AlertDialog
 
@@ -33,7 +33,8 @@ class SurveyResultDialog(
         view.findViewById<MaterialButton>(R.id.btnSend).setOnClickListener {
             Toast.makeText(context, "조사결과 전송 완료", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
-            // TODO: 서버에 전송 로직 구현
+            // ✅ 서버 전송 후 완료 페이지 이동
+            onSendComplete?.invoke()
         }
 
         dialog = AlertDialog.Builder(context)

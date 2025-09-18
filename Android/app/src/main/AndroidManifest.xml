@@ -1,16 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- ✅ 외부 앱 호출 가능하도록 queries 정의 (Tmap 관련 패키지) -->
+    <!-- 외부 앱 호출 (Tmap 관련) -->
     <queries>
         <package android:name="com.skt.tmap.ku" />
         <package android:name="com.skt.skaf.l001mtm091" />
     </queries>
 
-    <!-- ✅ 권한 설정 -->
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- 네트워크 통신 -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 정밀 위치 -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 대략적 위치 -->
+    <!-- 권한 설정 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -24,21 +24,21 @@
         android:theme="@style/Theme.Final_Project_Team1"
         android:usesCleartextTraffic="true">
 
-        <!-- ✅ 네이버맵 인증키 -->
+        <!-- 네이버맵 인증키 -->
         <meta-data
             android:name="com.naver.maps.map.NCP_KEY_ID"
             android:value="eeh71qt74n" />
 
-        <!-- ✅ 메인 액티비티 (앱 실행 시 진입점 아님, IntroActivity 이후 이동됨) -->
+        <!-- 메인 액티비티 -->
         <activity android:name=".MainActivity" />
 
-        <!-- ✅ 지도/경로 관련 Activity -->
+        <!-- 지도/경로 관련 -->
         <activity android:name=".ui.surveyList.ArActivity" />
         <activity android:name=".ui.surveyList.FullMapActivity" />
         <activity android:name=".ui.surveyList.RouteActivity" />
         <activity android:name=".ui.surveyList.SurveyListActivity" />
 
-        <!-- ✅ IntroActivity를 앱 실행시 최초 화면으로 지정 -->
+        <!-- IntroActivity (앱 실행 시 최초 화면) -->
         <activity
             android:name=".ui.intro.IntroActivity"
             android:exported="true">
@@ -48,28 +48,19 @@
             </intent-filter>
         </activity>
 
-        <!-- ❌ 기존: LoginActivity가 런처였으나 IntroActivity로 교체 -->
-        <!--
-        <activity
-            android:name=".ui.login.LoginActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        -->
-
-        <!-- ✅ LoginActivity: 일반 로그인 화면 -->
+        <!-- 로그인 화면 -->
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="true" />
 
-        <!-- ✅ 조사예정 관리 화면 -->
+        <!-- 조사예정 관리 -->
         <activity android:name=".ui.survey.SurveyStatusActivity" />
 
-        <!-- ✅ 전송완료 페이지 (조사내역 조회 시 이동) -->
+        <!-- 전송완료 페이지 -->
         <activity android:name=".ui.transmission.TransmissionCompleteActivity" />
+
+        <!-- ✅ 미전송 내역 (데이터 전송 페이지) -->
+        <activity android:name=".ui.transmission.DataTransmissionActivity" />
 
     </application>
 </manifest>

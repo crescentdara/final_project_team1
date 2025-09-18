@@ -5,9 +5,15 @@ import App from './App.jsx';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
+<<<<<<< HEAD
         <BrowserRouter>
             <App />
         </BrowserRouter>
+=======
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+>>>>>>> origin/web/his/TotalSurveyList
     </StrictMode>
 );
 

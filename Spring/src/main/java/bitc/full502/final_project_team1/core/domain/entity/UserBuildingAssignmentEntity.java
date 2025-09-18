@@ -34,5 +34,11 @@ public class UserBuildingAssignmentEntity {
     }
 
     @Column(nullable = false)
+<<<<<<< HEAD
     private Integer status;  // 1 = 배정 , 2 = 결재 대기, 3 = 결재 완료, 4 = 반려
 }
+=======
+    private Integer status;  // assigned = 1 / unassigned = 2
+
+}
+>>>>>>> origin/web/his/TotalSurveyList

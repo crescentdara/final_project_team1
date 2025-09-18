@@ -1,13 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ✅ 외부 앱 호출 가능하도록 queries 정의 (Tmap 관련 패키지) -->
     <queries>
         <package android:name="com.skt.tmap.ku" />
         <package android:name="com.skt.skaf.l001mtm091" />
     </queries>
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- ✅ 권한 설정 -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 네트워크 통신 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 정밀 위치 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 대략적 위치 -->
 
     <application
         android:allowBackup="true"
@@ -26,14 +29,16 @@
             android:name="com.naver.maps.map.NCP_KEY_ID"
             android:value="eeh71qt74n" />
 
+        <!-- ✅ 메인 액티비티 (앱 실행 시 진입점 아님, IntroActivity 이후 이동됨) -->
         <activity android:name=".MainActivity" />
 
+        <!-- ✅ 지도/경로 관련 Activity -->
         <activity android:name=".ui.surveyList.ArActivity" />
         <activity android:name=".ui.surveyList.FullMapActivity" />
         <activity android:name=".ui.surveyList.RouteActivity" />
         <activity android:name=".ui.surveyList.SurveyListActivity" />
 
-        <!-- ✅ IntroActivity를 새 런처 화면으로 지정 -->
+        <!-- ✅ IntroActivity를 앱 실행시 최초 화면으로 지정 -->
         <activity
             android:name=".ui.intro.IntroActivity"
             android:exported="true">
@@ -43,7 +48,7 @@
             </intent-filter>
         </activity>
 
-        <!-- ❌ 기존: LoginActivity가 런처였음 (이제 주석 처리) -->
+        <!-- ❌ 기존: LoginActivity가 런처였으나 IntroActivity로 교체 -->
         <!--
         <activity
             android:name=".ui.login.LoginActivity"
@@ -55,11 +60,16 @@
         </activity>
         -->
 
-        <!-- ✅ LoginActivity는 일반 화면으로만 사용 -->
+        <!-- ✅ LoginActivity: 일반 로그인 화면 -->
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="true" />
-        <activity android:name=".ui.category.CategoryActivity" />
+
+        <!-- ✅ 조사예정 관리 화면 -->
         <activity android:name=".ui.survey.SurveyStatusActivity" />
+
+        <!-- ✅ 전송완료 페이지 (조사내역 조회 시 이동) -->
+        <activity android:name=".ui.transmission.TransmissionCompleteActivity" />
+
     </application>
 </manifest>

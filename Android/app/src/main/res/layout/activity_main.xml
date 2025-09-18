@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- 상단 앱바 (로그인 페이지와 동일 톤의 보라색) -->
+    <!-- 상단 앱바 -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -28,14 +28,15 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- ✅ 카드1: 조사원 정보 -->
+            <!-- ✅ 조사원 현황 카드 -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardUserInfo"
+                android:id="@+id/cardSurveyor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:backgroundTint="#6366F1"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -43,25 +44,51 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
+                    <!-- 상단 제목 + 버튼 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvCardTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="활동 현황"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
                     <!-- 조사원 이름 -->
                     <TextView
                         android:id="@+id/tvUserName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="@string/placeholder_username"
-                        android:textColor="#333333"
+                        android:layout_marginTop="12dp"
+                        android:text="조사원 이름"
+                        android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
+                    <!-- 사번 -->
+                    <TextView
+                        android:id="@+id/tvEmpNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="사번 : -"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
 
                     <!-- 진행률 -->
                     <TextView
                         android:id="@+id/tvProgress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="진행률 : -%"
-                        android:textColor="#555555"
+                        android:layout_marginTop="8dp"
+                        android:text="🚩 진행률 : -%"
+                        android:textColor="@android:color/white"
                         android:textSize="14sp" />
 
                     <!-- 총 조사 건수 -->
@@ -69,8 +96,9 @@
                         android:id="@+id/tvTotalCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="총 조사 건수 : -"
-                        android:textColor="#555555"
+                        android:layout_marginTop="6dp"
+                        android:text="🗂 총 조사 건수 : -"
+                        android:textColor="@android:color/white"
                         android:textSize="14sp" />
 
                     <!-- 금일 완료 -->
@@ -78,29 +106,36 @@
                         android:id="@+id/tvTodayCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        android:text="금일 완료 : -"
-                        android:textColor="#555555"
+                        android:layout_marginTop="6dp"
+                        android:text="✅ 금일 완료 : -"
+                        android:textColor="@android:color/white"
                         android:textSize="14sp" />
-
-                    <!-- 조사목록 보기 버튼 (Outlined, 오른쪽 정렬) -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="end">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnSurveyList"
-                            style="?attr/materialButtonOutlinedStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="조사목록 보기"
-                            android:textSize="12sp" />
-                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ✅ 카드2: 조사현황 대시보드 -->
+            <!-- ✅ 조사목록 보기 버튼 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSurveyList"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="#6366F1"
+                    android:icon="@android:drawable/ic_menu_agenda"
+                    android:iconTint="#FFFFFF"
+                    android:text="조사목록 보기"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    app:iconGravity="textStart" />
+            </LinearLayout>
+
+            <!-- ✅ 조사현황 대시보드 -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardDashboard"
                 android:layout_width="match_parent"
@@ -138,7 +173,7 @@
                             android:textSize="14sp" />
                     </LinearLayout>
 
-                    <!-- 그래프 영역 (추후 구현) -->
+                    <!-- 그래프 영역 -->
                     <LinearLayout
                         android:id="@+id/dashboardContainer"
                         android:layout_width="match_parent"

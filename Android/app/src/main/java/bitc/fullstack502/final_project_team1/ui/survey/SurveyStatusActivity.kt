@@ -24,22 +24,7 @@ class SurveyStatusActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_survey_status)
-
-        initViews()
         setupClickListeners()
-    }
-
-    private fun initViews() {
-        toolbar = findViewById(R.id.toolbar)
-        cardSurveyScheduled = findViewById(R.id.cardSurveyScheduled)
-        cardResurveyTarget = findViewById(R.id.cardResurveyTarget)
-        cardTransmissionComplete = findViewById(R.id.cardTransmissionComplete)
-        cardNotTransmitted = findViewById(R.id.cardNotTransmitted)
-
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu) // 햄버거 아이콘
     }
 
     private fun setupClickListeners() {
@@ -48,7 +33,7 @@ class SurveyStatusActivity : AppCompatActivity() {
             showCategoryModal()
         }
 
-        // ✅ 조사예정
+        // ✅ 조사예정관리
         cardSurveyScheduled.setOnClickListener {
             Toast.makeText(this, "조사목록 관리 페이지 준비중", Toast.LENGTH_SHORT).show()
         }
@@ -58,7 +43,7 @@ class SurveyStatusActivity : AppCompatActivity() {
             Toast.makeText(this, "재조사 대상 페이지 준비중", Toast.LENGTH_SHORT).show()
         }
 
-        // ✅ 전송 완료
+        // ✅ 조사내역조회
         cardTransmissionComplete.setOnClickListener {
             startActivity(Intent(this, TransmissionCompleteActivity::class.java))
         }

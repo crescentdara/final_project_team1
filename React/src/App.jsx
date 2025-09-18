@@ -2,7 +2,8 @@ import { Routes, Route, Link } from "react-router-dom";
 import SurveyList from "./pages/SurveyList.jsx";
 import CreateSurvey from "./pages/CreateSurvey.jsx";
 import CreateUser from "./pages/CreateUser.jsx";
-import Dashboard from "./pages/Dashboard.jsx"; // ✅ 추가
+import Dashboard from "./pages/Dashboard.jsx";
+import ResultReport from "./pages/ResultReport.jsx"; // ✅ 추가
 
 function App() {
     return (
@@ -15,10 +16,6 @@ function App() {
                         <div>
                             <h2>메인 페이지</h2>
 
-                            <Link to="/dashboard" className="btn btn-primary mt-3">
-                                Dashboard 페이지로 이동
-                            </Link>
-
                             <Link to="/surveyList" className="btn btn-primary mt-3">
                                 SurveyList 페이지로 이동
                             </Link>
@@ -30,12 +27,17 @@ function App() {
                             <Link to="/createUser" className="btn btn-primary mt-3">
                                 CreateUser 페이지로 이동
                             </Link>
+
+                            <Link to="/dashboard" className="btn btn-primary mt-3">
+                                Dashboard 페이지로 이동
+                            </Link>
+
+                            <Link to="/resultReport" className="btn btn-primary mt-3">
+                                Report 페이지로 이동
+                            </Link>
                         </div>
                     }
                 />
-
-                {/* Dashboard 페이지 */}
-                <Route path="/dashboard" element={<Dashboard />} />
 
                 {/* SurveyList 페이지 */}
                 <Route path="/surveyList" element={<SurveyList />} />
@@ -45,6 +47,12 @@ function App() {
 
                 {/* CreateUser 페이지 */}
                 <Route path="/createUser" element={<CreateUser />} />
+
+                {/* Dashboard 페이지 */}
+                <Route path="/dashboard" element={<Dashboard />} />
+
+                {/* Dashboard 페이지 */}
+                <Route path="/resultReport" element={<ResultReport />} />
             </Routes>
         </div>
     );

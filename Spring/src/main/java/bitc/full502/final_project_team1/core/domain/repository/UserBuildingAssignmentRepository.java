@@ -36,4 +36,5 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
 
     @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u WHERE u.status = :status")
     long countByStatus(@Param("status") int status);
+
 }

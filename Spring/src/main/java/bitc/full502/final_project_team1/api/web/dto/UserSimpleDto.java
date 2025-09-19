@@ -12,7 +12,8 @@ public class UserSimpleDto {
     private Integer userId;
     private String username;
     private String name;
-    private String role;     // 문자열로 제공 (EDITOR 등)
+    private String empNo;
+    private String role;
     private Integer status;
 
     public static UserSimpleDto from(UserAccountEntity u) {
@@ -20,6 +21,7 @@ public class UserSimpleDto {
                 u.getUserId(),
                 u.getUsername(),
                 u.getName(),
+                u.getEmpNo(),
                 u.getRole() != null ? u.getRole().name() : null,
                 u.getStatus()
         );

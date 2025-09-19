@@ -2,55 +2,40 @@ import axios from "axios";
 
 const api = axios.create({ baseURL: "/web/api", timeout: 10000 });
 
-export async function fetchUsersAdvanced({ field = "all", keyword = "" } = {}) {
-  // 백엔드 파라미터 매핑
-  const backendField = field === "role" ? "role" : "name";
-  const res = await api.get("/users", { params: { field: backendField, keyword } });
+// ✅ 페이징 + 검색 포함된 조사원 리스트
+export async function fetchUsersPaged({ page = 0, size = 10, field = "all", keyword = "" } = {}) {
+    const res = await api.get("/users/page", {
+        params: { page, size, field, keyword }
+    });
 
-  const d = res?.data;
-  const arr =
-      Array.isArray(d) ? d :
-          Array.isArray(d?.items) ? d.items :
-              Array.isArray(d?.data) ? d.data :
-                  Array.isArray(d?.users) ? d.users : [];
-
-  const normalized = arr.map(u => ({
-    userId: u.userId ?? u.user_id ?? u.id,
-    username: u.username ?? u.user_name ?? "",
-    name: u.name ?? "",
-    role: typeof u.role === "string" ? u.role : (u.role?.name ?? ""),
-    status: u.status,
-    createdAt: u.createdAt,
-  }));
-
-  // 프론트 추가 필터 (username 전용 등)
-  const kw = String(keyword ?? "").trim();
-  if (!kw) return normalized;
-
-  if (field === "username") {
-    const low = kw.toLowerCase();
-    return normalized.filter(u => (u.username ?? "").toLowerCase().includes(low));
-  }
-
-  if (field === "all") {
-    const low = kw.toLowerCase();
-    const up = kw.toUpperCase();
-    return normalized.filter(u =>
-        (u.name ?? "").toLowerCase().includes(low) ||
-        (u.username ?? "").toLowerCase().includes(low) ||
-        (u.role ?? "").toUpperCase() === up
-    );
-  }
-
-  return normalized;
+    // 서버에서 Page<UserSimpleDto> 구조 반환
+    // { content, totalPages, totalElements, size, number, first, last ... }
+    return res.data;
 }
 
+// ✅ 단건 상세 조회
 export async function fetchUserDetail(userId) {
-  const res = await api.get(`/users/${userId}`);
-  return res.data; // {userId, username, name, role, status, createdAt}
+    const res = await api.get(`/users/${userId}`);
+    return res.data;
 }
 
+// ✅ 배정 건물 조회
 export async function fetchUserAssignments(userId) {
-  const res = await api.get(`/users/${userId}/assignments`);
-  return Array.isArray(res.data) ? res.data : []; // [{buildingId, lotAddress}]
+    const res = await api.get(`/users/${userId}/assignments`);
+    return Array.isArray(res.data) ? res.data : [];
+}
+
+// ✅ 간단 조사원 리스트 (초기 로딩 등)
+export async function fetchUsersSimple() {
+    const res = await api.get("/users/simple");
+    const arr = Array.isArray(res.data) ? res.data : [];
+
+    return arr.map(u => ({
+        userId: u.userId,
+        username: u.username,
+        name: u.name,
+        empNo: u.empNo,
+        role: u.role,
+        status: u.status,
+    }));
 }

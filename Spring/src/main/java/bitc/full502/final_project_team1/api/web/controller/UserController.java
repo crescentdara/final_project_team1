@@ -7,6 +7,7 @@ import bitc.full502.final_project_team1.api.web.dto.UserDetailDto;
 import bitc.full502.final_project_team1.api.web.dto.UserSimpleDto;
 import bitc.full502.final_project_team1.core.service.AssignmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -165,4 +166,54 @@ public class UserController {
         int created = assignmentService.assignRegionRoundRobin(keyword);
         return java.util.Collections.singletonMap("created", created);
     }
+
+    // 간단 조사원 리스트 조회 (처음 페이지 로드시 사용)
+    @GetMapping("/users/simple")
+    public List<UserSimpleDto> getSimpleUsers() {
+        // EDITOR 조사원만, userId 오름차순
+        List<UserAccountEntity> users = userRepo.findAllByRoleOrderByUserIdAsc(UserAccountEntity.Role.EDITOR);
+
+        return users.stream()
+                .map(UserSimpleDto::from)
+                .toList();
+    }
+
+    @GetMapping("/users/page")
+    public Page<UserSimpleDto> getPagedUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "all") String field,
+            @RequestParam(required = false) String keyword
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("userId").ascending());
+        String kw = (keyword == null) ? "" : keyword.trim();
+
+        Page<UserAccountEntity> result;
+
+        if (kw.isEmpty()) {
+            result = userRepo.findByRole(UserAccountEntity.Role.EDITOR, pageable);
+        } else {
+            switch (field.toLowerCase()) {
+                case "name":
+                    result = userRepo.findByRoleAndNameContainingIgnoreCase(UserAccountEntity.Role.EDITOR, kw, pageable);
+                    break;
+                case "username":
+                    result = userRepo.findByRoleAndUsernameContainingIgnoreCase(UserAccountEntity.Role.EDITOR, kw, pageable);
+                    break;
+                case "empno":
+                    result = userRepo.findByRoleAndEmpNoContainingIgnoreCase(UserAccountEntity.Role.EDITOR, kw, pageable);
+                    break;
+                case "all":
+                default:
+                    result = userRepo.searchAllFields(UserAccountEntity.Role.EDITOR, kw, pageable);
+                    break;
+            }
+        }
+
+        return result.map(UserSimpleDto::from);
+    }
+
+
+
+
 }

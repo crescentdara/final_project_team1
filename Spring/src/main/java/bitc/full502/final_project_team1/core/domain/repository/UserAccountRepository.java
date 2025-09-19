@@ -2,6 +2,7 @@
 package bitc.full502.final_project_team1.core.domain.repository;
 
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -59,4 +60,30 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
     @Query("select u from UserAccountEntity u " +
             "where lower(str(u.role)) like lower(concat('%', :kw, '%'))")
     List<UserAccountEntity> searchByRoleLikeIgnoreCase(@Param("kw") String kw, Pageable pageable);
+
+    // 조사자 상세 정보
+    List<UserAccountEntity> findAllByRoleOrderByUserIdAsc(UserAccountEntity.Role role);
+
+    // 페이징 - 개별 검색
+    Page<UserAccountEntity> findByRole(UserAccountEntity.Role role, Pageable pageable);
+
+    Page<UserAccountEntity> findByRoleAndNameContainingIgnoreCase(
+            UserAccountEntity.Role role, String name, Pageable pageable);
+
+    Page<UserAccountEntity> findByRoleAndUsernameContainingIgnoreCase(
+            UserAccountEntity.Role role, String username, Pageable pageable);
+
+    Page<UserAccountEntity> findByRoleAndEmpNoContainingIgnoreCase(
+            UserAccountEntity.Role role, String empNo, Pageable pageable);
+
+    // 전체 검색 (이름 + 아이디 + 사번)
+    @Query("SELECT u FROM UserAccountEntity u " +
+            "WHERE u.role = :role " +
+            "AND (LOWER(u.name) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "OR LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "OR LOWER(u.empNo) LIKE LOWER(CONCAT('%', :kw, '%')))")
+    Page<UserAccountEntity> searchAllFields(@Param("role") UserAccountEntity.Role role,
+                                            @Param("kw") String keyword,
+                                            Pageable pageable);
+
 }

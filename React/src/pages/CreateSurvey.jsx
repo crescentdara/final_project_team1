@@ -45,10 +45,10 @@ function CreateSurvey() {
     const handleSubmit = async () => {
         try {
             const response = await axios.post("/web/building", formData);
-            alert("저장 성공 ✅");
+            alert("저장 성공");
             console.log("서버 응답:", response.data);
         } catch (error) {
-            alert("저장 실패 ❌");
+            alert("저장 실패");
             console.error("저장 중 오류 발생:", error);
         }
     };
@@ -115,7 +115,11 @@ function CreateSurvey() {
                         value={formData.latitude}
                         onChange={(e) => handleNumberChange(e, true)}
                     />
-                    {errors.latitude && <small style={{ color: "red" }}>{errors.latitude}</small>}
+                    {errors.latitude && (
+                        <div style={{ color: "red", fontSize: "12px", marginTop: "-8px", marginBottom: "10px" }}>
+                            {errors.latitude}
+                        </div>
+                    )}
 
                     <label>경도</label>
                     <input
@@ -125,7 +129,11 @@ function CreateSurvey() {
                         value={formData.longitude}
                         onChange={(e) => handleNumberChange(e, true)}
                     />
-                    {errors.longitude && <small style={{ color: "red" }}>{errors.longitude}</small>}
+                    {errors.longitude && (
+                        <div style={{ color: "red", fontSize: "12px", marginTop: "-8px", marginBottom: "10px" }}>
+                            {errors.longitude}
+                        </div>
+                    )}
 
                     <div style={{ textAlign: "right" }}>
                         <button
@@ -143,6 +151,7 @@ function CreateSurvey() {
             {step === 2 && (
                 <div>
                     <h3>건물 정보</h3>
+
                     <label>건물명</label>
                     <input
                         style={inputStyle}
@@ -185,7 +194,9 @@ function CreateSurvey() {
                         onChange={(e) => handleNumberChange(e, false)}
                     />
                     {errors.groundFloors && (
-                        <small style={{ color: "red" }}>{errors.groundFloors}</small>
+                        <div style={{ color: "red", fontSize: "12px", marginTop: "-8px", marginBottom: "10px" }}>
+                            {errors.groundFloors}
+                        </div>
                     )}
 
                     <label>지하층수</label>
@@ -197,7 +208,9 @@ function CreateSurvey() {
                         onChange={(e) => handleNumberChange(e, false)}
                     />
                     {errors.basementFloors && (
-                        <small style={{ color: "red" }}>{errors.basementFloors}</small>
+                        <div style={{ color: "red", fontSize: "12px", marginTop: "-8px", marginBottom: "10px" }}>
+                            {errors.basementFloors}
+                        </div>
                     )}
 
                     <div style={{ textAlign: "right" }}>
@@ -215,10 +228,12 @@ function CreateSurvey() {
                 </div>
             )}
 
+
             {/* Step 3 */}
             {step === 3 && (
                 <div>
                     <h3>면적 정보</h3>
+
                     <label>대지면적</label>
                     <input
                         style={inputStyle}
@@ -227,7 +242,11 @@ function CreateSurvey() {
                         value={formData.landArea}
                         onChange={(e) => handleNumberChange(e, true)}
                     />
-                    {errors.landArea && <small style={{ color: "red" }}>{errors.landArea}</small>}
+                    {errors.landArea && (
+                        <div style={{ color: "red", fontSize: "12px", marginTop: "-8px", marginBottom: "10px" }}>
+                            {errors.landArea}
+                        </div>
+                    )}
 
                     <label>건축면적</label>
                     <input
@@ -238,7 +257,9 @@ function CreateSurvey() {
                         onChange={(e) => handleNumberChange(e, true)}
                     />
                     {errors.buildingArea && (
-                        <small style={{ color: "red" }}>{errors.buildingArea}</small>
+                        <div style={{ color: "red", fontSize: "12px", marginTop: "-8px", marginBottom: "10px" }}>
+                            {errors.buildingArea}
+                        </div>
                     )}
 
                     <div style={{ textAlign: "right" }}>
@@ -255,6 +276,7 @@ function CreateSurvey() {
                     </div>
                 </div>
             )}
+
         </div>
     );
 }

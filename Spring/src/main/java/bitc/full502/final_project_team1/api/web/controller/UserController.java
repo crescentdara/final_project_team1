@@ -213,7 +213,12 @@ public class UserController {
         return result.map(UserSimpleDto::from);
     }
 
-
-
+    // 중복 확인
+    // 아이디 중복 체크 API
+    @GetMapping("/users/check-username")
+    public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
+        boolean exists = userRepo.existsByUsername(username);
+        return ResponseEntity.ok(exists);
+    }
 
 }

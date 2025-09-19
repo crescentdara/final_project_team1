@@ -86,4 +86,7 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
                                             @Param("kw") String keyword,
                                             Pageable pageable);
 
+    // 중복 확인
+    boolean existsByUsername(String username);
+
 }

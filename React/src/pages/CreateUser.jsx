@@ -9,12 +9,34 @@ function CreateUser() {
         empNo: "",
     });
 
-    const [errors, setErrors] = useState({});
+    const [usernameValid, setUsernameValid] = useState(null); // null=미확인, true=사용가능, false=불가능
+    const [loading, setLoading] = useState(false); // 아이디 체크 중 로딩 상태
 
     // 입력값 변경 핸들러
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+
+        if (name === "username") {
+            if (value.trim() === "") {
+                setUsernameValid(null);
+                return;
+            }
+
+            try {
+                setLoading(true);
+                const res = await axios.get("/web/api/users/check-username", {
+                    params: { username: value.trim() },
+                });
+                // 백엔드: true = 이미 있음 → 사용 불가능 / false = 없음 → 사용 가능
+                setUsernameValid(!res.data);
+            } catch (err) {
+                console.error("아이디 중복 확인 실패:", err);
+                setUsernameValid(null);
+            } finally {
+                setLoading(false);
+            }
+        }
     };
 
     // 유효성 검사
@@ -23,7 +45,8 @@ function CreateUser() {
             formData.name.trim() !== "" &&
             formData.username.trim() !== "" &&
             formData.password.trim() !== "" &&
-            formData.empNo.trim() !== ""
+            formData.empNo.trim() !== "" &&
+            usernameValid === true
         );
     };
 
@@ -44,7 +67,6 @@ function CreateUser() {
             await axios.post("/web/api/users", formData);
             alert("등록 성공");
             console.log("등록된 데이터:", formData);
-            // TODO: 필요 시 목록 페이지로 이동
         } catch (error) {
             alert("등록 실패");
             console.error("등록 오류:", error);
@@ -65,7 +87,7 @@ function CreateUser() {
         width: "100%",
         padding: "8px",
         marginTop: "5px",
-        marginBottom: "10px",
+        marginBottom: "5px",
         borderRadius: "4px",
         border: "1px solid #ccc",
     };
@@ -102,6 +124,15 @@ function CreateUser() {
                 value={formData.username}
                 onChange={handleChange}
             />
+            {loading && (
+                <p style={{ color: "gray", fontSize: "13px" }}>아이디 확인 중...</p>
+            )}
+            {usernameValid === false && (
+                <p style={{ color: "red", fontSize: "13px" }}>사용 불가능한 아이디 입니다</p>
+            )}
+            {usernameValid === true && (
+                <p style={{ color: "green", fontSize: "13px" }}>사용 가능한 아이디 입니다</p>
+            )}
 
             <label>비밀번호</label>
             <input
@@ -124,9 +155,8 @@ function CreateUser() {
                 <button
                     type="button"
                     style={{
-                        height: "38px",             // input 높이에 맞춤
-                        lineHeight: "38px",         // 버튼 안 텍스트 수직 중앙 정렬
-                        padding: "0 16px",          // 좌우 여백
+                        height: "38px",
+                        padding: "0 16px",
                         fontSize: "14px",
                         borderRadius: "6px",
                         cursor: "pointer",
@@ -139,7 +169,6 @@ function CreateUser() {
                     사번 생성
                 </button>
             </div>
-
 
             <div style={{ textAlign: "right", marginTop: "20px" }}>
                 <button

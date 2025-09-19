@@ -18,15 +18,13 @@
     <string name="menu_survey_input">조사결과 입력</string>
     <string name="menu_data_transmission">데이터 전송</string>
 
-<<<<<<< HEAD
     <!-- 로그인 화면에서 참조하는 문자열 (activity_login.xml, activity_main.xml) -->
     <string name="login_title">로그인</string>
     <string name="login_subtitle">계정 정보를 입력하세요</string>
     <string name="login_id_hint">아이디</string>
     <string name="login_password_hint">비밀번호</string>
     <string name="login_button">로그인</string>
-</resources>
-=======
+
     <!-- 카테고리 메뉴 -->
     <string name="category_survey_status">조사현황</string>
     <string name="category_survey_list">조사목록 관리</string>
@@ -79,4 +77,3 @@
     <string name="label_detail">자세히 보기</string> <!-- 대시보드 오른쪽 링크 -->
     <string name="placeholder_graph">그래프 영역</string> <!-- 그래프 자리 안내 -->
 </resources>
->>>>>>> origin/app/shs/SurveyDate

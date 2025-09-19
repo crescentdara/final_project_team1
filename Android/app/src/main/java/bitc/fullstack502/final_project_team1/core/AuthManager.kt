@@ -21,12 +21,8 @@ object AuthManager {
         p.putString(KEY_USERNAME, resp.user?.username)
         p.putString(KEY_NAME, resp.name)
         p.putString(KEY_ROLE, resp.role)
-<<<<<<< HEAD
-        p.putLong(KEY_LOGIN_TIME, System.currentTimeMillis())
-=======
         p.putString(KEY_EMP_NO, resp.user?.empno)   // ✅ 사번 저장
         p.putLong(KEY_LOGIN_TIME, System.currentTimeMillis())   // ✅ 로그인 시간 기록
->>>>>>> origin/app/shs/SurveyDate
         p.apply()
     }
 
@@ -60,13 +56,11 @@ object AuthManager {
     fun name(context: Context): String? =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_NAME, null)
 
-<<<<<<< HEAD
     fun role(context: Context): String? =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_ROLE, null)
-}
-=======
+
     fun empNo(context: Context): String? =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
             .getString(KEY_EMP_NO, null) // ✅ 사번 불러오기
 }
->>>>>>> origin/app/shs/SurveyDate
+

@@ -1,21 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-<<<<<<< HEAD
-    <!-- 외부 앱(티맵) 실행 조회 -->
-=======
     <!-- 외부 앱 호출 (Tmap 관련) -->
->>>>>>> origin/app/shs/SurveyDate
     <queries>
         <package android:name="com.skt.tmap.ku" />
         <package android:name="com.skt.skaf.l001mtm091" />
     </queries>
 
-<<<<<<< HEAD
-    <!-- 권한 -->
-=======
     <!-- 권한 설정 -->
->>>>>>> origin/app/shs/SurveyDate
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -39,28 +31,15 @@
         android:theme="@style/Theme.Final_Project_Team1"
         android:usesCleartextTraffic="true">
 
-<<<<<<< HEAD
-        <!-- ✅ 네이버 맵 키: application 바로 아래에 한 번만 선언 -->
-=======
         <!-- 네이버맵 인증키 -->
->>>>>>> origin/app/shs/SurveyDate
         <meta-data
             android:name="com.naver.maps.map.NCP_KEY_ID"
             android:value="eeh71qt74n" />
 
-<<<<<<< HEAD
-=======
         <!-- 메인 액티비티 -->
         <activity android:name=".MainActivity" />
 
-        <!-- 지도/경로 관련 -->
-        <activity android:name=".ui.surveyList.ArActivity" />
-        <activity android:name=".ui.surveyList.FullMapActivity" />
-        <activity android:name=".ui.surveyList.RouteActivity" />
-        <activity android:name=".ui.surveyList.SurveyListActivity" />
-
         <!-- IntroActivity (앱 실행 시 최초 화면) -->
->>>>>>> origin/app/shs/SurveyDate
         <activity
             android:name=".ui.intro.IntroActivity"
             android:exported="true">
@@ -70,7 +49,6 @@
             </intent-filter>
         </activity>
 
-<<<<<<< HEAD
         <!-- 지도/AR/경로/리스트 등 -->
         <activity
             android:name=".ui.surveyList.ArActivity"
@@ -86,8 +64,6 @@
         <!-- 조사 입력 화면 -->
         <activity android:name=".ui.transmission.SurveyActivity"/>
 
-        <!-- 필요하면 유지 -->
-        <activity android:name=".MainActivity" />
 
         <activity android:name=".ui.transmission.CameraActivity" />
 
@@ -116,21 +92,15 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-=======
         <!-- 로그인 화면 -->
         <activity
-            android:name=".ui.login.LoginActivity"
-            android:exported="true" />
-
-        <!-- 조사예정 관리 -->
-        <activity android:name=".ui.survey.SurveyStatusActivity" />
+            android:name=".ui.login.LoginActivity" />
 
         <!-- 전송완료 페이지 -->
         <activity android:name=".ui.transmission.TransmissionCompleteActivity" />
 
         <!-- ✅ 미전송 내역 (데이터 전송 페이지) -->
         <activity android:name=".ui.transmission.DataTransmissionActivity" />
->>>>>>> origin/app/shs/SurveyDate
 
     </application>
 </manifest>

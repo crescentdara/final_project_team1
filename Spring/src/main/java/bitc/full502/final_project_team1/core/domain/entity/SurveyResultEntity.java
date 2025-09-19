@@ -102,4 +102,5 @@ public class SurveyResultEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
+
 }

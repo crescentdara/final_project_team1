@@ -5,7 +5,12 @@ import bitc.full502.final_project_team1.api.web.dto.IdsRequestDto;
 import bitc.full502.final_project_team1.api.web.dto.PageResponseDto;
 import bitc.full502.final_project_team1.api.web.dto.ResultDetailDto;
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
+import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
+import bitc.full502.final_project_team1.core.domain.repository.SurveyResultRepository;
+import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
+import bitc.full502.final_project_team1.core.service.ReportService;
 import bitc.full502.final_project_team1.core.service.SurveyResultService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +25,10 @@ import java.util.Map;
 public class SurveyResultController {
 
     private final SurveyResultService surveyResultService;
-
+    private final SurveyResultRepository repo;
+    private final ReportService reportService;
+    private final UserAccountRepository userRepo;
+    
     // 리스트 조회
     @GetMapping("/approvals")
     public PageResponseDto<ApprovalItemDto> list(
@@ -57,25 +65,49 @@ public class SurveyResultController {
         );
     }
 
-    // 상세 모달
+    /** 상세 */
     @GetMapping("/approvals/{id}")
     public ResultDetailDto detail(@PathVariable Long id) {
-        var e = surveyResultService.findByIdOrThrow(id);
+        var e = repo.findByIdWithUserAndBuilding(id).orElseThrow();
         return ResultDetailDto.from(e);
     }
 
-    // 일괄 승인
+    /** 일괄 승인 + PDF 생성 */
     @PatchMapping("/approvals/bulk/approve")
+    @Transactional
     public Map<String, Object> approve(@RequestBody IdsRequestDto req) {
-        int updated = surveyResultService.approveBulk(req.getIds());
-        return Map.of("updated", updated);
+        var list = repo.findAllById(req.getIds());
+        int count = 0;
+
+        // 🔹 관리자 계정 approver로 지정
+        UserAccountEntity approver = userRepo.findById(9)   // 관리자 PK
+                .orElseThrow(() -> new IllegalArgumentException("관리자 계정을 찾을 수 없습니다."));
+
+        for (var e : list) {
+            if (!"APPROVED".equalsIgnoreCase(e.getStatus())) {
+                e.setStatus("APPROVED");
+                count++;
+
+                // PDF 생성 + ReportEntity 저장
+                reportService.createReport(e.getId(), approver);
+            }
+        }
+        return Map.of("updated", count);
     }
 
-    // 일괄 반려
+    /** 일괄 반려 */
     @PatchMapping("/approvals/bulk/reject")
+    @Transactional
     public Map<String, Object> reject(@RequestBody IdsRequestDto req) {
-        int updated = surveyResultService.rejectBulk(req.getIds());
-        return Map.of("updated", updated);
+        var list = repo.findAllById(req.getIds());
+        int count = 0;
+        for (var e : list) {
+            if (!"REJECTED".equalsIgnoreCase(e.getStatus())) {
+                e.setStatus("REJECTED");
+                count++;
+            }
+        }
+        return Map.of("updated", count);
     }
 
 }

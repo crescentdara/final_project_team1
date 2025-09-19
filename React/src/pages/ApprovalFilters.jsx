@@ -1,6 +1,7 @@
 // src/pages/PendingApprovals.jsx
 import { useEffect, useMemo, useState } from "react";
 import ResultModal from "../components/modals/ResultModal.jsx";
+import Pagination from "../components/ui/Pagination.jsx";
 
 /** 상태 배지 */
 function StatusBadge({ status }) {
@@ -316,19 +317,17 @@ export default function PendingApprovals() {
         )}
 
         {/* 페이지네이션 */}
-        <nav className="mt-3">
-          <ul className="pagination pagination-sm">
-            <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-              <button className="page-link" onClick={() => setPage((p) => Math.max(1, p - 1))}>이전</button>
-            </li>
-            <li className="page-item"><span className="page-link bg-light">{page}</span></li>
-            {/* ★ 변경: items.length < pageSize 대신 총건수 기준으로 비활성 */}
-            <li className={`page-item ${(page * pageSize >= total) ? "disabled" : ""}`}>
-              <button className="page-link" onClick={() => setPage((p) => p + 1)}>다음</button>
-            </li>
-          </ul>
-        </nav>
-
+        <Pagination
+          page={page}
+          total={total}        // ✅ 아이템 총개수
+          pageSize={pageSize}
+          size={pageSize}      // ✅ 기본 prop 이름 사용(또는 pageSize 그대로도 작동함)
+          onChange={setPage}
+          siblings={1}
+          boundaries={1}
+          className="justify-content-center"
+          lastAsLabel={false}
+        />
 
         {/* 조사 결과 모달 */}
         <ResultModal

@@ -158,17 +158,20 @@ class SurveyListActivity : AppCompatActivity() {
     private fun bindList(list: List<AssignedBuilding>) {
         container.removeAllViews()
         val inf = LayoutInflater.from(this)
+
         list.forEach { item ->
             val row = inf.inflate(R.layout.item_survey, container, false)
 
-            row.findViewById<TextView>(R.id.tvAddress).text = item.lotAddress
+            // 주소 문자열: null/blank 안전 처리
+            val addrText = item.lotAddress?.takeIf { it.isNotBlank() } ?: "주소 없음"
 
-            // 행 클릭 → 건물 상세 바텀시트
+            // 주소 표시
+            row.findViewById<TextView>(R.id.tvAddress).text = addrText
+
+            // 행 클릭 → 건물 상세 (item.id 가 non-null이면 굳이 체크 불필요)
             row.setOnClickListener {
-                if (item.id != null) {
-                    BuildingInfoBottomSheet.newInstance(item.id)
-                        .show(supportFragmentManager, "buildingInfo")
-                }
+                BuildingInfoBottomSheet.newInstanceForNew(item.id)
+                    .show(supportFragmentManager, "buildingInfo")
             }
 
             // 지도보기
@@ -178,7 +181,8 @@ class SurveyListActivity : AppCompatActivity() {
                 if (lat == null || lng == null) {
                     Toast.makeText(this, "좌표 정보가 없습니다.", Toast.LENGTH_SHORT).show()
                 } else {
-                    MapBottomSheetFragment.newInstance(lat, lng, item.lotAddress)
+                    // addr: String(Non-null) 요구 → 안전 문자열 전달
+                    MapBottomSheetFragment.newInstance(lat, lng, addrText)
                         .show(supportFragmentManager, "mapDialog")
                 }
             }
@@ -190,10 +194,11 @@ class SurveyListActivity : AppCompatActivity() {
                 if (lat == null || lng == null) {
                     Toast.makeText(this, "좌표 정보가 없습니다.", Toast.LENGTH_SHORT).show()
                 } else {
+                    // destName: String(Non-null) 요구 → 안전 문자열 전달
                     startTmapRouteFromMyLocation(
                         destLat = lat,
                         destLng = lng,
-                        destName = item.lotAddress
+                        destName = addrText
                     )
                 }
             }
@@ -201,6 +206,7 @@ class SurveyListActivity : AppCompatActivity() {
             container.addView(row)
         }
     }
+
 
     /** 거리 계산 (단위 m) */
     private fun distance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {

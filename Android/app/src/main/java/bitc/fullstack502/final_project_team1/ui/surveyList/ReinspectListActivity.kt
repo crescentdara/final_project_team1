@@ -50,8 +50,17 @@ class ReinspectListActivity : AppCompatActivity() {
     private fun loadAndRender() {
         lifecycleScope.launch {
             try {
-                val auth = AuthManager.bearerOrThrow(this@ReinspectListActivity) // <-- 여기
-                val res = ApiClient.service.getSurveysReJe(auth, page = 0, size = 200)
+                val uid = AuthManager.userId(this@ReinspectListActivity)  // ← uid 사용
+                if (uid <= 0) {
+                    Toast.makeText(this@ReinspectListActivity, "로그인이 필요합니다.", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                val res = ApiClient.service.getSurveysReJe(
+                    userId = uid,    // ← Header: X-USER-ID 로 전송
+                    page = 0,
+                    size = 200
+                )
 
                 var items = res.page.content
                 when (spinnerSort.selectedItemPosition) {
@@ -59,11 +68,17 @@ class ReinspectListActivity : AppCompatActivity() {
                     2 -> items = items.sortedByDescending { it.updatedAtIso ?: "" } // 반려일자순
                 }
                 render(items)
+
             } catch (e: Exception) {
-                Toast.makeText(this@ReinspectListActivity, "재조사 목록 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@ReinspectListActivity,
+                    "재조사 목록 실패: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
+
 
     private fun render(list: List<SurveyListItemDto>) {
         listContainer.removeAllViews()

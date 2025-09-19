@@ -1,4 +1,3 @@
-// ui/surveyList/FullMapActivity.kt
 package bitc.fullstack502.final_project_team1.ui.surveyList
 
 import android.content.Context
@@ -24,7 +23,6 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.NaverMapOptions
 import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Marker
-import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.util.FusedLocationSource
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -183,13 +181,19 @@ class FullMapActivity : AppCompatActivity() {
             val lat = b.latitude ?: return@forEach
             val lng = b.longitude ?: return@forEach
             Marker(LatLng(lat, lng)).apply {
-                captionText = b.lotAddress
-                setOnClickListener(Overlay.OnClickListener { true })
+                // null/blank 안전 디폴트
+                val name = b.lotAddress?.takeIf { it.isNotBlank() } ?: "조사지 #${b.id}"
+                captionText = name               // <- String 으로 확정
+
+                // SAM 생성자 경고 제거(람다로)
+                setOnClickListener { true }
+
                 this.map = map
                 markers += this
             }
         }
     }
+
 
     private fun circleBoundsSafe(center: LatLng, radiusMeters: Double): LatLngBounds {
         val degPerMeterLat = 1.0 / 111_320.0

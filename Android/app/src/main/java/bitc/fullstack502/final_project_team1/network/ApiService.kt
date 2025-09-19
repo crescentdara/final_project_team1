@@ -22,6 +22,7 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+// ApiService.kt
 interface ApiService {
 
     @POST("login")
@@ -75,34 +76,37 @@ interface ApiService {
     @GET("survey/result/{id}")
     suspend fun getSurvey(@Path("id") id: Long): Response<SurveyResultResponse>
 
-    /** 상단 카운트 (서버: GET /app/surveys/status) */
-    @GET("surveys/status")
+
+    // ===== 여기부터 목록/카운트 경로 교체 =====
+    /** 상단 카운트 (서버: GET /app/survey/status/status, Header: X-USER-ID) */
+    @GET("survey/status/status")
     suspend fun getSurveyStatus(
-        @Header("Authorization") token: String
+        @Header("X-USER-ID") userId: Int
     ): AppUserSurveyStatusResponse
 
-    /** 목록 + 카운트 (status = APPROVED|SENT|REJECTED|TEMP|null) */
-    @GET("surveys")
+    /** 목록 + 카운트 (서버: GET /app/survey/status, Header: X-USER-ID, status optional) */
+    @GET("survey/status")
     suspend fun getSurveys(
-        @Header("Authorization") token: String,
+        @Header("X-USER-ID") userId: Int,
         @Query("status") status: String? = null,
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 50
     ): ListWithStatusResponse<SurveyListItemDto>
 
-    /** 재조사 목록 + 카운트 (status=REJECTED 고정) */
-    @GET("surveys")
+    /** 재조사 목록 (status=REJECTED 고정) */
+    @GET("survey/status")
     suspend fun getSurveysReJe(
-        @Header("Authorization") token: String,
+        @Header("X-USER-ID") userId: Int,
         @Query("status") status: String = "REJECTED",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 50
     ): ListWithStatusResponse<SurveyListItemDto>
 
-    /** 재조사 시작(TEMP 전환) (서버: POST /app/surveys/reinspect/{id}/redo/start) */
-    @POST("surveys/reinspect/{surveyId}/redo/start")
+    /** 재조사 시작 경로는 서버 구현에 맞춰 조정 필요 */
+    @POST("survey/reinspect/{surveyId}/redo/start")
     suspend fun startRedo(
-        @Header("Authorization") token: String,
+        @Header("X-USER-ID") userId: Int,  // ← Int
         @Path("surveyId") surveyId: Long
     ): ResponseBody
+
 }

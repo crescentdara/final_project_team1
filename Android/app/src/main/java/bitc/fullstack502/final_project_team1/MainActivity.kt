@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
 import bitc.fullstack502.final_project_team1.ui.survey.SurveyStatusActivity
+import bitc.fullstack502.final_project_team1.ui.surveyList.ReinspectListActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.TransmissionCompleteActivity
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity() {
             popupWindow.dismiss()
         }
         popupView.findViewById<MaterialButton>(R.id.btnResurveyTarget)?.setOnClickListener {
-            startActivity(Intent(this, SurveyListActivity::class.java))
+            startActivity(Intent(this, ReinspectListActivity::class.java))
             popupWindow.dismiss()
         }
         popupView.findViewById<MaterialButton>(R.id.btnSurveyHistory)?.setOnClickListener {

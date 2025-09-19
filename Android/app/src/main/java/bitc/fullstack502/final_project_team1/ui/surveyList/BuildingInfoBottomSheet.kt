@@ -123,10 +123,17 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         }
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val auth = AuthManager.bearerOrThrow(requireContext()) // ← context 필요
-                ApiClient.service.startRedo(auth, surveyId) // TEMP 전환
+                // 1) 토큰 말고 uid 사용
+                val uid = AuthManager.userId(requireContext())
+                if (uid <= 0) {
+                    Toast.makeText(requireContext(), R.string.login_required, Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
 
-                // 같은 surveyId로 수정 모드 진입
+                // 2) 헤더: X-USER-ID(Int)
+                ApiClient.service.startRedo(uid, surveyId)
+
+                // 3) 성공 → 에디터 진입
                 val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
                     putExtra("surveyId", surveyId)
                     putExtra("buildingId", buildingId)
@@ -135,11 +142,18 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                 startActivity(intent)
                 dismiss()
             } catch (e: Exception) {
-                Toast.makeText(requireContext(),
-                    getString(R.string.reinspect_start_failed_fmt, e.message ?: ""), Toast.LENGTH_SHORT).show()
+                val msg = if (e is retrofit2.HttpException) {
+                    "HTTP ${e.code()}"
+                } else e.message ?: ""
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.reinspect_start_failed_fmt, msg),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
+
 
     private fun openEditorNew() {
         val intent = Intent(requireContext(), SurveyActivity::class.java).apply {

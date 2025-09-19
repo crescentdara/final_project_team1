@@ -30,6 +30,10 @@ object AuthManager {
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().clear().apply()
     }
 
+    fun logout(context: Context) { // ✅ 편의 로그아웃
+        clear(context)
+    }
+
     fun isLoggedIn(context: Context): Boolean {
         val p = context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
         val token = p.getString(KEY_TOKEN, null)
@@ -43,12 +47,39 @@ object AuthManager {
         return loginTime <= 0 || (System.currentTimeMillis() - loginTime) > maxAgeMillis
     }
 
+    fun refreshLoginTime(context: Context) { // ✅ 세션 시간 갱신
+        context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
+            .edit().putLong(KEY_LOGIN_TIME, System.currentTimeMillis()).apply()
+    }
+
+    fun requireLoggedIn(context: Context) { // ✅ 보장용
+        if (!isLoggedIn(context)) {
+            throw IllegalStateException("로그인이 필요합니다.")
+        }
+    }
+
     // ── 접근자들 (UI/네트워킹에서 사용) ─────────────────────────
     fun userId(context: Context): Int =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getInt(KEY_USER_ID, -1)
 
+    fun userIdOrThrow(context: Context): Int { // ✅ 없으면 예외
+        val id = userId(context)
+        if (id <= 0) throw IllegalStateException("유저 정보가 없습니다. 다시 로그인 해주세요.")
+        return id
+    }
+
     fun token(context: Context): String? =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_TOKEN, null)
+
+    fun tokenOrThrow(context: Context): String { // ✅ 없으면 예외
+        val t = token(context)
+        if (t.isNullOrBlank()) throw IllegalStateException("토큰이 없습니다. 다시 로그인 해주세요.")
+        return t
+    }
+
+    fun bearerOrThrow(context: Context): String { // ✅ Authorization 헤더용
+        return "Bearer ${tokenOrThrow(context)}"
+    }
 
     fun username(context: Context): String? =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_USERNAME, null)
@@ -60,7 +91,5 @@ object AuthManager {
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_ROLE, null)
 
     fun empNo(context: Context): String? =
-        context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
-            .getString(KEY_EMP_NO, null) // ✅ 사번 불러오기
+        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_EMP_NO, null) // ✅ 사번 불러오기
 }
-

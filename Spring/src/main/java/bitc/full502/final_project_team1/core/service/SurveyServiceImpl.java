@@ -1,13 +1,18 @@
 package bitc.full502.final_project_team1.core.service;
 
-import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
+import bitc.full502.final_project_team1.api.app.dto.*;
+import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
 import bitc.full502.final_project_team1.core.domain.repository.AppAssignmentQueryRepository;
+import bitc.full502.final_project_team1.core.domain.repository.SurveyResultRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +21,7 @@ import java.util.stream.Collectors;
 public class SurveyServiceImpl implements SurveyService {
 
     private final AppAssignmentQueryRepository appAssignmentQueryRepository;
+    private final SurveyResultRepository surveyResultRepository;
 
     @Override
     public List<AssignedBuildingDto> assigned(Integer userId) {
@@ -66,5 +72,61 @@ public class SurveyServiceImpl implements SurveyService {
     private Long toLong(Object o) { return o == null ? null : ((Number) o).longValue(); }
     private Double toDbl(Object o) { return o == null ? null : ((Number) o).doubleValue(); }
     private String toStr(Object o) { return o == null ? null : o.toString(); }
+
+    @Override
+    public AppUserSurveyStatusResponse getStatus(Integer userId) {
+        Map<String, Long> counts = surveyResultRepository.countGroupByStatus(userId).stream()
+                .collect(Collectors.toMap(SurveyResultRepository.StatusCount::getStatus,
+                        SurveyResultRepository.StatusCount::getCnt));
+
+        long approved = counts.getOrDefault("APPROVED", 0L);
+        long rejected = counts.getOrDefault("REJECTED", 0L);
+        long sent     = counts.getOrDefault("SENT", 0L);
+        long temp     = counts.getOrDefault("TEMP", 0L);
+
+        return new AppUserSurveyStatusResponse(approved, rejected, sent, temp);
+    }
+
+    @Override
+    public ListWithStatusResponse<SurveyListItemDto> getListWithStatus(
+            Integer userId, String status, int page, int size
+    ) {
+        Page<SurveyResultEntity> p = surveyResultRepository.findByUserAndStatusPage(
+                userId, status, PageRequest.of(page, size));
+
+        var items = p.getContent().stream()
+                .map(this::toItem).toList();
+
+        var state = getStatus(userId);
+
+        return ListWithStatusResponse.<SurveyListItemDto>builder()
+                .status(state)
+                .page(PageDto.<SurveyListItemDto>builder()
+                        .content(items)
+                        .number(p.getNumber())
+                        .size(p.getSize())
+                        .totalElements(p.getTotalElements())
+                        .totalPages(p.getTotalPages())
+                        .last(p.isLast())
+                        .build())
+                .build();
+    }
+
+    private SurveyListItemDto toItem(SurveyResultEntity s) {
+        var b = s.getBuilding();
+        String address = (b.getRoadAddress() != null && !b.getRoadAddress().isBlank())
+                ? b.getRoadAddress() : b.getLotAddress();
+
+        return SurveyListItemDto.builder()
+                .surveyId(s.getId())
+                .buildingId(b.getId())
+                .address(address)
+                .buildingName(b.getBuildingName())
+                .status(s.getStatus())
+                .updatedAtIso(s.getUpdatedAt() != null ? s.getUpdatedAt().toString() : null)
+                // 반려 사유 전용 컬럼이 있으면 교체
+                .rejectReason(s.getIntEtc())
+                .build();
+    }
 
 }

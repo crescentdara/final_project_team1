@@ -58,10 +58,10 @@
         <activity android:name=".ui.surveyList.SurveyListActivity" />
 
         <activity android:name=".ui.survey.SurveyStatusActivity" />
+        <activity android:name=".ui.surveyList.ReinspectListActivity" />
 
         <!-- 조사 입력 화면 -->
         <activity android:name=".ui.SurveyActivity"/>
-
 
         <activity android:name=".ui.transmission.CameraActivity" />
 

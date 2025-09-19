@@ -1,6 +1,9 @@
 package bitc.full502.final_project_team1.core.service;
 
+import bitc.full502.final_project_team1.api.app.dto.AppUserSurveyStatusResponse;
 import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
+import bitc.full502.final_project_team1.api.app.dto.ListWithStatusResponse;
+import bitc.full502.final_project_team1.api.app.dto.SurveyListItemDto;
 
 import java.util.List;
 
@@ -16,5 +19,10 @@ public interface SurveyService {
      */
     List<AssignedBuildingDto> assignedWithin(Integer userId, double lat, double lng, double radiusKm);
 
+    AppUserSurveyStatusResponse getStatus(Integer userId);
+
+    ListWithStatusResponse<SurveyListItemDto> getListWithStatus(
+            Integer userId, String status, int page, int size
+    );
 
 }

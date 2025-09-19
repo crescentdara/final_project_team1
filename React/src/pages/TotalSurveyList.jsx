@@ -1,6 +1,7 @@
 // src/pages/SurveyIndex.jsx
 import {useEffect, useState} from "react";
 import Pagination from "../components/ui/Pagination.jsx";
+import {useNavigate} from "react-router-dom";
 
 const statusOptions = [
   { value: "", label: "전체 상태" },
@@ -12,79 +13,80 @@ const statusOptions = [
 
 const statusBadge = (s) =>
     s==="UNASSIGNED" ? "bg-secondary" :
-    s==="ASSIGNED"   ? "bg-info text-dark" :
-    s==="REWORK"     ? "bg-warning text-dark" :
-    s==="APPROVED"   ? "bg-success" : "bg-light text-dark";
+        s==="ASSIGNED"   ? "bg-info text-dark" :
+            s==="REWORK"     ? "bg-warning text-dark" :
+                s==="APPROVED"   ? "bg-success" : "bg-light text-dark";
 
-// 공백("")을 건너뛰고 첫 번째 '비어있지 않은' 값을 골라주는 헬퍼
+// 공백("")을 건너뛰고 첫 번째 비어있지 않은 값
 const firstNonBlank = (...vals) => {
   for (const v of vals) {
     if (v == null) continue;
-    if (typeof v === "string") {
-      if (v.trim() !== "") return v.trim();
-    } else if (v !== "") {
-      return v;
-    }
+    if (typeof v === "string") { if (v.trim() !== "") return v.trim(); }
+    else if (v !== "") return v;
   }
   return null;
 };
 
-// 서버 응답을 화면용으로 표준화
+// ✅ NEW: 상태를 4종으로 표준화(서버 응답 형태 제각각 호환)
+function normalizeStatus(x) {
+  const raw = (x.status ?? x.resultStatus ?? "").toString().trim().toUpperCase();
+  const alias = {
+    PENDING: "ASSIGNED", SENT: "ASSIGNED", TEMP: "ASSIGNED",
+    REWORK: "REWORK", APPROVED: "APPROVED", ASSIGNED: "ASSIGNED", UNASSIGNED: "UNASSIGNED",
+  };
+  if (alias[raw]) return alias[raw];
+  if (x.approved === true) return "APPROVED";
+  if (x.assigned === true) return "ASSIGNED";
+  return "UNASSIGNED";
+}
+
+// ✅ REPLACED: 응답을 화면 공통 스키마로 표준화(중복 함수 제거, 하나만 사용)
 function adaptRow(x) {
   const id = firstNonBlank(x.id, x.buildingId, x.caseNo, x.manageNo);
   const caseNo = firstNonBlank(x.caseNo, x.manageNo, x.buildingId, id);
   const address = firstNonBlank(x.address, x.roadAddress, x.lotAddress) ?? "-";
-  const investigatorId = firstNonBlank(x.assignedUserId, x.investigatorId);
-  const investigatorName = firstNonBlank(x.assignedUserName, x.investigatorName) ?? "-";
-  const derivedStatus =
-      x.status ??
-      (x.approved ? "APPROVED" :
-          (typeof x.resultStatus === "string" ? x.resultStatus :
-              (x.assigned ? "ASSIGNED" : "UNASSIGNED")));
-  return { ...x, id, caseNo, address, investigatorId, investigatorName, status: derivedStatus };
+  const investigatorId = firstNonBlank(x.assignedUserId, x.investigatorId, x.userId);
+  const investigatorName = firstNonBlank(
+      x.assignedUserName, x.investigatorName, x.investigator, x.userName
+  ) ?? "-";
+
+  return { ...x, id, caseNo, address, investigatorId, investigatorName, status: normalizeStatus(x) };
 }
 
 export default function TotalSurveyList() {
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
+  const navigate = useNavigate();
 
   // 검색 상태
   const [status, setStatus] = useState("");
-  const [investigatorId, setInvestigatorId] = useState("");   // 선택된 조사원 id
+  const [investigatorId, setInvestigatorId] = useState(""); // 선택된 조사원 id
   const [keyword, setKeyword] = useState("");
   const [sort, setSort] = useState("latest");
   const [page, setPage] = useState(1);
   const size = 10;
 
-  // 전체 조사원 목록을 백엔드에서 1회 로드 (페이지 rows에서 유추 X)
+  // ✅ NEW: 검색모드 플래그(상태/조사원/키워드 중 하나라도 있으면 검색 API 사용)
+  const isSearchMode = Boolean(status || investigatorId || keyword.trim());
+
+  // 전체 조사원 목록을 백엔드에서 1회 로드
   const [investigators, setInvestigators] = useState([]);
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        // 프로젝트에 맞는 "전체 조사원" 엔드포인트로 교체 가능
-        const tryUrls = [
-          "/web/building/investigators",              // 권장: 파라미터 없이 전원
-          "/web/api/users?role=INVESTIGATOR"         // 대안
-        ];
-        for (const u of tryUrls) {
-          const r = await fetch(u);
-          if (!r.ok) continue;
-          const data = await r.json();
-          const arr = Array.isArray(data) ? data : (data.content ?? data.rows ?? []);
-          if (!Array.isArray(arr)) continue;
-
-          const normalized = arr.map(x => ({
-            id: String(x.id ?? x.userId ?? x.value ?? ""),
-            label: x.label ?? x.name ?? x.username ?? x.fullName ?? String(x.id ?? x.userId ?? "")
-          })).filter(o => o.id); // id 없는 항목 제거
-          normalized.sort((a, b) => a.label.localeCompare(b.label, "ko"));
-
-          if (!cancelled) setInvestigators(normalized);
-          return;
-        }
-        if (!cancelled) setInvestigators([]);
+        // ✅ CHANGED: 서버 컨트롤러와 맞춘 조사원 목록 API
+        const r = await fetch(`/web/api/approvals/investigators?q=`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const data = await r.json();
+        const arr = Array.isArray(data) ? data : (data.content ?? data.rows ?? []);
+        const normalized = (arr || []).map(x => ({
+          id: String(x.id ?? x.userId ?? x.value ?? ""),
+          label: x.label ?? x.name ?? x.username ?? x.fullName ?? String(x.id ?? x.userId ?? "")
+        })).filter(o => o.id);
+        normalized.sort((a,b)=>a.label.localeCompare(b.label,"ko"));
+        if (!cancelled) setInvestigators(normalized);
       } catch {
         if (!cancelled) setInvestigators([]);
       }
@@ -95,45 +97,42 @@ export default function TotalSurveyList() {
   const load = () => {
     setLoading(true);
 
-    // 빈 값은 쿼리에서 제외 → 서버에서 param= 로 인한 400 방지
-    const params = new URLSearchParams();
-    if (status) params.append("status", status);                    // 상태 필터
-    if (investigatorId) {
-      // 서버 키가 무엇이든 대응하도록 둘 다 전송(필요 시 하나만 남겨도 됨)
-      params.append("assignedUserId", investigatorId);              // 조사원 필터
-      params.append("investigatorId", investigatorId);              // (호환)
-    }
-    if (keyword.trim()) params.append("keyword", keyword.trim());
-    if (sort) params.append("sort", sort);
-    params.append("page", String(page));
-    params.append("size", String(size));
+    // ✅ 공통 파라미터
+    const base = new URLSearchParams({ page: String(page), size: String(size) });
+    if (sort) base.append("sort", sort);
 
-    fetch(`/web/building/surveys?${params.toString()}`)
-        .then(r => {
-          if (!r.ok) throw new Error(`HTTP ${r.status}`);
-          return r.json();
-        })
+    let url;
+    if (isSearchMode) {
+      // ✅ 검색모드 → /web/api/approvals
+      const q = new URLSearchParams(base);
+      if (status) q.append("status", status);
+      if (investigatorId) q.append("investigatorId", investigatorId); // 하나로 고정
+      if (keyword.trim()) q.append("keyword", keyword.trim());
+      url = `/web/api/approvals?${q.toString()}`;
+    } else {
+      // ✅ 전체목록 → /web/building/surveys (필터 제외)
+      url = `/web/building/surveys?${base.toString()}`;
+    }
+
+    fetch(url)
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
         .then(d => {
           const content = d.content ?? d.rows ?? d.data ?? [];
           const totalElements = d.totalElements ?? d.total ?? 0;
           const number0 = (typeof d.number === "number") ? d.number
               : (typeof d.page === "number" ? d.page - 1 : page - 1);
-
           setRows(content.map(adaptRow));
           setTotal(totalElements);
           if (typeof d.number === "number" || typeof d.page === "number") {
             setPage(number0 + 1);
           }
         })
-        .catch(err => {
-          console.error("surveys fetch failed:", err);
-          setRows([]); setTotal(0);
-        })
+        .catch(err => { console.error("fetch failed:", err); setRows([]); setTotal(0); })
         .finally(() => setLoading(false));
   };
 
   // 상태/조사원/정렬/페이지 변경 시 자동 로드
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [status, investigatorId, sort, page]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [status, investigatorId, sort, page, isSearchMode]);
 
   const onSearch = () => { setPage(1); load(); };
 
@@ -143,7 +142,9 @@ export default function TotalSurveyList() {
     load();
   };
 
-  const createSurveyOnClick = () => {}
+  const createSurveyOnClick = () => {
+    navigate('/createSurvey');
+  };
 
   return (
       <div className="container py-4">
@@ -159,7 +160,7 @@ export default function TotalSurveyList() {
             {statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
 
-          {/* 전체 조사원 목록 사용 + 변경 시 page=1 리셋 */}
+          {/* 조사원 변경 시 page=1 리셋 */}
           <select
               className="form-select" style={{maxWidth:220}}
               value={investigatorId}
@@ -168,12 +169,6 @@ export default function TotalSurveyList() {
             <option value="">조사원(선택)</option>
             {investigators.map(u => <option key={u.id} value={u.id}>{u.label}</option>)}
           </select>
-
-          {/* 정렬은 유지/비활성화 선택 */}
-          {/* <select className="form-select" style={{maxWidth:140}} value={sort} onChange={e=>{ setSort(e.target.value); setPage(1); }}>
-          <option value="latest">최신 등록순</option>
-          <option value="oldest">오래된 순</option>
-        </select> */}
 
           <div className="input-group" style={{maxWidth:360}}>
             <input
@@ -211,12 +206,12 @@ export default function TotalSurveyList() {
                   <td>{r.address}</td>
                   <td>{r.investigatorName ?? "-"}</td>
                   <td>
-                  <span className={`badge ${statusBadge(r.status)}`}>
-                    {r.status==='UNASSIGNED'?'미배정'
-                        : r.status==='ASSIGNED'?'배정'
-                            : r.status==='REWORK'?'재조사'
-                                : '승인'}
-                  </span>
+                <span className={`badge ${statusBadge(r.status)}`}>
+                  {r.status==='UNASSIGNED'?'미배정'
+                      : r.status==='ASSIGNED'?'배정'
+                          : r.status==='REWORK'?'재조사'
+                              : '승인'}
+                </span>
                   </td>
                   <td className="d-flex justify-content-between ps-3 pe-3">
                     <button className="btn btn-sm btn-outline-secondary" onClick={()=>alert(`수정: ${r.id ?? r.caseNo}`)}>수정</button>
@@ -228,16 +223,15 @@ export default function TotalSurveyList() {
           </table>
         </div>
 
-        {/* 페이지네이션 */}
         <Pagination
             page={page}
             total={total}
             size={size}
             onChange={setPage}
-            siblings={1}           // 현재 페이지 양옆 1개씩 표시
-            boundaries={1}         // 처음/끝 경계 1개 유지(= 1, 마지막)
+            siblings={1}
+            boundaries={1}
             className="justify-content-center"
-            lastAsLabel={false}     // 마지막 페이지를 '마지막'으로 표기 (원하면 false로)
+            lastAsLabel={false}
         />
       </div>
   );

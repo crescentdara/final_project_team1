@@ -57,29 +57,17 @@
         <activity android:name=".ui.surveyList.RouteActivity" />
         <activity android:name=".ui.surveyList.SurveyListActivity" />
 
-        <!-- 카테고리/상태 -->
-        <activity android:name=".ui.category.CategoryActivity" />
         <activity android:name=".ui.survey.SurveyStatusActivity" />
 
         <!-- 조사 입력 화면 -->
-        <activity android:name=".ui.transmission.SurveyActivity"/>
+        <activity android:name=".ui.SurveyActivity"/>
 
 
         <activity android:name=".ui.transmission.CameraActivity" />
 
         <activity android:name=".ui.transmission.ResultActivity" />
 
-        <activity android:name=".ui.transmission.PurposeActivity" />
-
-        <activity android:name=".ui.transmission.IdleRatioActivity" />
-
-        <activity android:name=".ui.transmission.SafetyGradeActivity" />
-
-        <activity android:name=".ui.transmission.ExternalStatusActivity" />
-
-        <activity android:name=".ui.transmission.InternalStatusActivity" />
-
-        <activity android:name=".ui.transmission.InvestigationActivity" />
+        <activity android:name=".ui.transmission.PhotoEditActivity" />
 
         <activity android:name=".ui.transmission.EditActivity" />
 

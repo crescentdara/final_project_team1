@@ -11,7 +11,7 @@ import android.widget.TextView
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
-import bitc.fullstack502.final_project_team1.ui.transmission.SurveyActivity
+import bitc.fullstack502.final_project_team1.ui.SurveyActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +30,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
     }
 
     private var buildingId: Long = -1
+    private var lotAddress: String? = null   // ✅ 인텐트로 넘길 주소 캐시
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +49,14 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
         val infoContainer = view.findViewById<LinearLayout>(R.id.infoContainer)
 
-        // 🔹 SurveyActivity로 이동
+        // 🔹 조사 시작 → SurveyActivity로 이동 (ID + 주소 같이 전달)
         btnStart.setOnClickListener {
             val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
                 putExtra("buildingId", buildingId)
+                putExtra("lotAddress", lotAddress ?: "") // ✅ 주소 전달 (없으면 빈 문자열)
             }
             startActivity(intent)
-            dismiss() // 바텀시트 닫기
+            dismiss()
         }
 
         // 🔹 건물 정보 불러오기
@@ -62,6 +64,8 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
             runCatching {
                 ApiClient.service.getBuildingDetail(buildingId)
             }.onSuccess { building ->
+                // ✅ 주소 캐시 (인텐트에서 사용)
+                lotAddress = building.lotAddress
                 showBuildingInfo(infoContainer, building)
             }.onFailure {
                 val tv = TextView(requireContext()).apply {

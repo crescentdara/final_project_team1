@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { getDashboardStats } from "../api";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
+    const navigate = useNavigate();
     const [stats, setStats] = useState(null);
 
     useEffect(() => {
@@ -64,6 +66,8 @@ function Dashboard() {
                         fontWeight: "500",
                         marginTop: "10px",
                     }}
+
+                    onClick={() => navigate("/approvals")}
                 >
                     미결재 건 확인 →
                 </button>

@@ -3,21 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:background="@android:color/white"
-    android:padding="24dp">
+    android:orientation="vertical"
+    android:padding="20dp">
 
-    <!-- 다이얼로그 제목 -->
-    <TextView
+    <!-- 제목 + 닫기 -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="조사결과"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="#333333"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <!-- 조사결과 폼 -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="조사결과"
+            android:textColor="#333333"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="닫기"
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+    </LinearLayout>
+
+    <!-- 스크롤 영역 -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,313 +47,224 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
+                android:paddingVertical="6dp">
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="관리번호 :"
-                    android:textSize="14sp"
-                    android:textColor="#333333" />
+                    android:text="관리번호"
+                    android:textColor="#555555"
+                    android:textSize="15sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etManagementNumber"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="관리번호를 입력하세요"
-                    app:boxStrokeColor="#2E7D32"
-                    app:hintTextColor="#2E7D32">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etManagementNumber"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:maxLines="1" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    android:background="@null"
+                    android:hint="입력하세요"
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <!-- 조사 불가 여부 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
+                android:paddingVertical="6dp">
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="조사 불가 여부 :"
-                    android:textSize="14sp"
-                    android:textColor="#333333" />
+                    android:text="조사 불가 여부"
+                    android:textColor="#555555"
+                    android:textSize="15sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSurveyImpossible"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="조사 불가 여부를 입력하세요"
-                    app:boxStrokeColor="#2E7D32"
-                    app:hintTextColor="#2E7D32">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etSurveyImpossible"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:maxLines="1" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    android:background="@null"
+                    android:hint="입력하세요"
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <!-- 행정목적 활용여부 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
+                android:paddingVertical="6dp">
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="행정목적 활용여부:"
-                    android:textSize="14sp"
-                    android:textColor="#333333" />
+                    android:text="행정목적 활용여부"
+                    android:textColor="#555555"
+                    android:textSize="15sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etAdministrativeUse"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="행정목적 활용여부를 입력하세요"
-                    app:boxStrokeColor="#2E7D32"
-                    app:hintTextColor="#2E7D32">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etAdministrativeUse"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:maxLines="1" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    android:background="@null"
+                    android:hint="입력하세요"
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <!-- 활용유형 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
+                android:paddingVertical="6dp">
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="활용유형:"
-                    android:textSize="14sp"
-                    android:textColor="#333333" />
+                    android:text="활용유형"
+                    android:textColor="#555555"
+                    android:textSize="15sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etUtilizationType"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="활용유형을 입력하세요"
-                    app:boxStrokeColor="#2E7D32"
-                    app:hintTextColor="#2E7D32">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etUtilizationType"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:maxLines="1" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    android:background="@null"
+                    android:hint="입력하세요"
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <!-- 유휴비율 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
+                android:paddingVertical="6dp">
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="유휴비율 :"
-                    android:textSize="14sp"
-                    android:textColor="#333333" />
+                    android:text="유휴비율"
+                    android:textColor="#555555"
+                    android:textSize="15sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etIdleRatio"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="유휴비율을 입력하세요"
-                    app:boxStrokeColor="#2E7D32"
-                    app:hintTextColor="#2E7D32">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etIdleRatio"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
-                        android:maxLines="1" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    android:background="@null"
+                    android:hint="입력하세요"
+                    android:inputType="numberDecimal"
+                    android:textSize="15sp" />
             </LinearLayout>
 
-            <!-- 건물 현황 -->
+            <!-- 건물현황 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
+                android:paddingVertical="6dp">
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="건물 현황 :"
-                    android:textSize="14sp"
-                    android:textColor="#333333" />
+                    android:text="건물현황"
+                    android:textColor="#555555"
+                    android:textSize="15sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBuildingStatus"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="건물 현황을 입력하세요"
-                    app:boxStrokeColor="#2E7D32"
-                    app:hintTextColor="#2E7D32">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etBuildingStatus"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:maxLines="1" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    android:background="@null"
+                    android:hint="입력하세요"
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <!-- 안전등급 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
+                android:paddingVertical="6dp">
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="안전등급:"
-                    android:textSize="14sp"
-                    android:textColor="#333333" />
+                    android:text="안전등급"
+                    android:textColor="#555555"
+                    android:textSize="15sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSafetyGrade"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="안전등급을 입력하세요"
-                    app:boxStrokeColor="#2E7D32"
-                    app:hintTextColor="#2E7D32">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etSafetyGrade"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:maxLines="1" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    android:background="@null"
+                    android:hint="입력하세요"
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <!-- 사진 유무 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical">
+                android:paddingVertical="6dp">
 
                 <TextView
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:text="사진 유무 :"
-                    android:textSize="14sp"
-                    android:textColor="#333333" />
+                    android:text="사진 유무"
+                    android:textColor="#555555"
+                    android:textSize="15sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPhotoExistence"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="사진 유무를 입력하세요"
-                    app:boxStrokeColor="#2E7D32"
-                    app:hintTextColor="#2E7D32">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etPhotoExistence"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:maxLines="1" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
+                    android:background="@null"
+                    android:hint="입력하세요"
+                    android:textSize="15sp" />
             </LinearLayout>
-
         </LinearLayout>
-
     </ScrollView>
 
-    <!-- 버튼 영역 -->
+    <!-- 버튼 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="24dp">
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCancel"
+            android:id="@+id/btnEdit"
             android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
+            android:layout_height="44dp"
             android:layout_marginEnd="8dp"
-            android:text="취소"
-            android:textSize="16sp"
-            app:backgroundTint="#F5F5F5"
-            app:cornerRadius="8dp"
-            app:strokeColor="#E0E0E0"
-            app:strokeWidth="1dp" />
+            android:layout_weight="1"
+            android:backgroundTint="#6366F1"
+            android:text="결과수정"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSave"
+            android:id="@+id/btnSend"
             android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
+            android:layout_height="44dp"
             android:layout_marginStart="8dp"
-            android:text="저장"
-            android:textSize="16sp"
-            app:backgroundTint="#2E7D32"
-            app:cornerRadius="8dp" />
-
+            android:layout_weight="1"
+            android:backgroundTint="#6366F1"
+            android:text="전송하기"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
     </LinearLayout>
-
 </LinearLayout>
-
-
-
-

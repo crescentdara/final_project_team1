@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReportPdfModal from "../components/modals/ReportPdfModal.jsx";
+import Pagination from "../components/ui/Pagination.jsx";
 
 /** 결과 보고서 필터 영역 */
 function ReportFilters({ keyword, setKeyword, sort, setSort, onSearch }) {
@@ -59,20 +60,19 @@ export default function ResultReport() {
 
     // 📌 페이지네이션 상태
     const [page, setPage] = useState(1); // 1-based
-    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
+    const size = 10; // ✅ 한 페이지당 개수 (통일)
 
     // 📌 모달 상태
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedReportId, setSelectedReportId] = useState(null);
-
-    const pageSize = 5;
 
     const fetchReports = () => {
         const params = new URLSearchParams({
             keyword: keyword,
             sort: sort,
             page: page - 1, // 백엔드는 0-based
-            size: pageSize,
+            size: size,
         });
 
         fetch(`/web/api/report?${params.toString()}`)
@@ -83,7 +83,7 @@ export default function ResultReport() {
             .then((data) => {
                 // Spring Data Page 응답 가정: { content, totalPages, totalElements ... }
                 setReports(data.content || []);
-                setTotalPages(data.totalPages || 1);
+                setTotal(data.totalElements || 0); // ✅ totalElements 반영
             })
             .catch((e) => console.error(e));
     };
@@ -118,29 +118,22 @@ export default function ResultReport() {
                     표시할 보고서가 없습니다.
                 </div>
             ) : (
-                reports.map((r) => <ReportItem key={r.id} report={r} onOpen={handleOpen} />)
+                reports.map((r) => (
+                    <ReportItem key={r.id} report={r} onOpen={handleOpen} />
+                ))
             )}
 
             {/* 페이지네이션 */}
-            <nav className="mt-3">
-                <ul className="pagination pagination-sm justify-content-center">
-                    <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                        <button className="page-link" onClick={() => setPage(page - 1)}>
-                            이전
-                        </button>
-                    </li>
-                    <li className="page-item">
-            <span className="page-link bg-light">
-              {page} / {totalPages}
-            </span>
-                    </li>
-                    <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                        <button className="page-link" onClick={() => setPage(page + 1)}>
-                            다음
-                        </button>
-                    </li>
-                </ul>
-            </nav>
+            <Pagination
+                page={page}
+                total={total}      // 전체 데이터 개수
+                size={size}        // 한 페이지당 개수
+                onChange={setPage}
+                siblings={1}       // 현재 페이지 양옆 1개씩 표시
+                boundaries={1}     // 처음/끝 경계 1개 유지
+                className="justify-content-center"
+                lastAsLabel={false}
+            />
 
             {/* PDF 모달 */}
             {modalOpen && (

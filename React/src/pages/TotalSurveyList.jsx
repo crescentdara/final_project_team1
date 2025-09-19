@@ -143,39 +143,6 @@ export default function TotalSurveyList() {
     load();
   };
 
-  // // 전체 페이지 수
-  // const totalPages = useMemo(
-  //     () => Math.max(1, Math.ceil(total / size)),
-  //     [total, size]
-  // );
-  //
-  // // 범위 유틸/페이지 아이템(… 포함)
-  // const range = (start, end) =>
-  //     Array.from({ length: Math.max(0, end - start + 1) }, (_, i) => start + i);
-  //
-  // const pageItems = useMemo(() => {
-  //   const siblings = 1;
-  //   const boundary = 1;
-  //
-  //   const startPages = range(1, Math.min(boundary, totalPages));
-  //   const endPages   = range(Math.max(totalPages - boundary + 1, boundary + 1), totalPages);
-  //
-  //   const leftSiblingStart = Math.max(page - siblings, boundary + 1);
-  //   const rightSiblingEnd  = Math.min(page + siblings, totalPages - boundary);
-  //
-  //   const showLeftDots  = leftSiblingStart > boundary + 1;
-  //   const showRightDots = rightSiblingEnd  < totalPages - boundary;
-  //
-  //   const middle = range(leftSiblingStart, rightSiblingEnd);
-  //
-  //   const items = [...startPages];
-  //   if (showLeftDots)  items.push("left-ellipsis");
-  //   items.push(...middle);
-  //   if (showRightDots) items.push("right-ellipsis");
-  //   items.push(...endPages);
-  //   return items;
-  // }, [page, totalPages]);
-
   const createSurveyOnClick = () => {}
 
   return (

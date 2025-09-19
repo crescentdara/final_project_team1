@@ -23,15 +23,7 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    /** 📌 전체 보고서 조회 */
-//    @GetMapping
-//    public List<ReportListDto> getAllReports() {
-//        return reportService.getAllReports()
-//                .stream()
-//                .map(ReportListDto::fromEntity)
-//                .toList();
-//    }
-
+    /** 📌 전체/검색 보고서 조회 */
     @GetMapping
     public Page<ReportListDto> getReports(
             @RequestParam(required = false) String keyword,
@@ -39,7 +31,7 @@ public class ReportController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        // 🔹 정렬 조건 추가
+        // 🔹 정렬 조건
         Sort sortOption = sort.equals("oldest")
                 ? Sort.by("createdAt").ascending()
                 : Sort.by("createdAt").descending();
@@ -47,7 +39,7 @@ public class ReportController {
         Pageable pageable = PageRequest.of(page, size, sortOption);
 
         if (keyword == null || keyword.isBlank()) {
-            // getAllReports() → List<ReportEntity>
+            // 전체 보고서 불러오기
             List<ReportEntity> list = reportService.getAllReports();
 
             // 정렬 직접 적용
@@ -59,14 +51,18 @@ public class ReportController {
                     .map(ReportListDto::fromEntity)
                     .toList();
 
-            return new PageImpl<>(dtoList, pageable, dtoList.size()); // List → Page 변환
+            // ✅ 페이징 적용 (subList 잘라내기)
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), dtoList.size());
+            List<ReportListDto> pageContent = (start < end) ? dtoList.subList(start, end) : List.of();
+
+            return new PageImpl<>(pageContent, pageable, dtoList.size());
         } else {
-            // searchReports() → Page<ReportEntity> (여기는 pageable 안에 sortOption 들어있음)
+            // 검색일 경우, JPA에서 Pageable 처리
             Page<ReportEntity> pageResult = reportService.searchReports(keyword, sort, pageable);
             return pageResult.map(ReportListDto::fromEntity);
         }
     }
-
 
     /** 📌 단일 보고서 조회 */
     @GetMapping("/{id}")
@@ -94,9 +90,7 @@ public class ReportController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + file.getName() + "\"")
                 .contentLength(file.length())
-                .contentType(MediaType.APPLICATION_PDF)   // 👈 이거 반드시!
+                .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
     }
-
 }
-

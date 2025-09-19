@@ -1,16 +1,19 @@
 package bitc.full502.final_project_team1.api.web.controller;
 
+import bitc.full502.final_project_team1.api.web.dto.ReportListDto;
 import bitc.full502.final_project_team1.core.domain.entity.ReportEntity;
 import bitc.full502.final_project_team1.core.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -21,29 +24,64 @@ public class ReportController {
     private final ReportService reportService;
 
     /** 📌 전체 보고서 조회 */
+//    @GetMapping
+//    public List<ReportListDto> getAllReports() {
+//        return reportService.getAllReports()
+//                .stream()
+//                .map(ReportListDto::fromEntity)
+//                .toList();
+//    }
+
     @GetMapping
-    public List<ReportEntity> getAllReports() {
-        return reportService.getAllReports();
+    public Page<ReportListDto> getReports(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "latest") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        // 🔹 정렬 조건 추가
+        Sort sortOption = sort.equals("oldest")
+                ? Sort.by("createdAt").ascending()
+                : Sort.by("createdAt").descending();
+
+        Pageable pageable = PageRequest.of(page, size, sortOption);
+
+        if (keyword == null || keyword.isBlank()) {
+            // getAllReports() → List<ReportEntity>
+            List<ReportEntity> list = reportService.getAllReports();
+
+            // 정렬 직접 적용
+            list.sort(sort.equals("oldest")
+                    ? Comparator.comparing(ReportEntity::getCreatedAt)
+                    : Comparator.comparing(ReportEntity::getCreatedAt).reversed());
+
+            List<ReportListDto> dtoList = list.stream()
+                    .map(ReportListDto::fromEntity)
+                    .toList();
+
+            return new PageImpl<>(dtoList, pageable, dtoList.size()); // List → Page 변환
+        } else {
+            // searchReports() → Page<ReportEntity> (여기는 pageable 안에 sortOption 들어있음)
+            Page<ReportEntity> pageResult = reportService.searchReports(keyword, sort, pageable);
+            return pageResult.map(ReportListDto::fromEntity);
+        }
     }
+
 
     /** 📌 단일 보고서 조회 */
     @GetMapping("/{id}")
-    public ResponseEntity<ReportEntity> getReport(@PathVariable Long id) {
-        return reportService.getAllReports().stream()
-                .filter(r -> r.getId().equals(id))
-                .findFirst()
-                .map(ResponseEntity::ok)
+    public ResponseEntity<ReportListDto> getReport(@PathVariable Long id) {
+        return reportService.getReportById(id)
+                .map(r -> ResponseEntity.ok(ReportListDto.fromEntity(r)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     /** 📌 PDF 다운로드 & 보기 */
     @GetMapping("/pdf/{id}")
-    public ResponseEntity<Resource> downloadReportPdf(@PathVariable Long id) {
-        // ReportEntity 조회
-        ReportEntity report = reportService.getAllReports().stream()
-                .filter(r -> r.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 보고서를 찾을 수 없습니다. id=" + id));
+    public ResponseEntity<Resource> downloadReportPdf(@PathVariable Long id,
+                                                      @RequestParam(defaultValue = "inline") String mode) {
+        var report = reportService.getReportById(id)
+                .orElseThrow(() -> new IllegalArgumentException("보고서를 찾을 수 없습니다. id=" + id));
 
         File file = new File(report.getPdfPath());
         if (!file.exists()) {
@@ -51,11 +89,14 @@ public class ReportController {
         }
 
         Resource resource = new FileSystemResource(file);
+        String disposition = mode.equals("attachment") ? "attachment" : "inline";
 
         return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=\"" + file.getName() + "\"") // inline → 브라우저에서 보기, attachment → 무조건 다운로드
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + file.getName() + "\"")
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_PDF)   // 👈 이거 반드시!
                 .body(resource);
     }
+
 }
+

@@ -1,7 +1,11 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
+import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
+import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "survey_result")
@@ -16,70 +20,83 @@ public class SurveyResultEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 1. 조사불가여부 (1 or 2)
+    @Column(name = "possible")
     private Integer possible;
 
-    // 2. 행정목적활용여부 (1=활용, 2=일부활용, 3=미활용)
+    @Column(name = "admin_use")
     private Integer adminUse;
 
-    // 3. 유휴비율 (1~4)
+    @Column(name = "idle_rate")
     private Integer idleRate;
 
-    // 4. 안전등급 (1~5)
+    @Column(name = "safety")
     private Integer safety;
 
-    // 5. 외부상태 - 외벽 (1~3)
+    @Column(name = "wall")
     private Integer wall;
 
-    // 6. 외부상태 - 옥상 (1~3)
+    @Column(name = "roof")
     private Integer roof;
 
-    // 7. 외부상태 - 창호 (1~3)
+    @Column(name = "window_state")
     private Integer windowState;
 
-    // 8. 외부상태 - 주차 가능 여부 (1 or 2)
+    @Column(name = "parking")
     private Integer parking;
 
-    // 9. 내부상태 - 현관 (1~3)
+    @Column(name = "entrance")
     private Integer entrance;
 
-    // 10. 내부상태 - 천장 (1~3)
+    @Column(name = "ceiling")
     private Integer ceiling;
 
-    // 11. 내부상태 - 바닥 (1~3)
+    @Column(name = "floor")
     private Integer floor;
 
-    // 12. 외부사진 경로
+    @Column(name = "ext_photo")
     private String extPhoto;
 
-    // 13. 외부편집사진 경로
+    @Column(name = "ext_edit_photo")
     private String extEditPhoto;
 
-    // 14. 내부사진 경로
+    @Column(name = "int_photo")
     private String intPhoto;
 
-    // 15. 내부편집사진 경로
+    @Column(name = "int_edit_photo")
     private String intEditPhoto;
 
-    // 16. 상태 (TEMP, SENT 등)
+    @Column(name = "status")
     private String status;
 
-    // ✅ 외부상태 기타사항
     @Column(name = "ext_etc", length = 500)
     private String extEtc;
 
-    // ✅ 내부상태 기타사항
     @Column(name = "int_etc", length = 500)
     private String intEtc;
 
-    // 건물
+    // ✅ 날짜 필드 (중복 제거)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // 관계 매핑
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "building_id")
     private BuildingEntity building;
 
-    // 작성자
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private UserAccountEntity user;
-
 }

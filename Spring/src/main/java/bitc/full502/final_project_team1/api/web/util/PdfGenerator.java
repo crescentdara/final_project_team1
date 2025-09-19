@@ -5,20 +5,18 @@ import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.*;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class PdfGenerator {
 
     public static String generateSurveyReport(ResultDetailDto detail, UserAccountEntity approver) {
         try {
-            // 저장 경로 설정
             String basePath = "reports/";
             File dir = new File(basePath);
             if (!dir.exists()) dir.mkdirs();
@@ -29,62 +27,101 @@ public class PdfGenerator {
             PdfWriter.getInstance(document, new FileOutputStream(fileName));
             document.open();
 
-            // 🔹 제목
-            Font titleFont = new Font(Font.HELVETICA, 20, Font.BOLD, Color.BLACK);
-            Paragraph title = new Paragraph("건축물 현장조사 보고서", titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            title.setSpacingAfter(20);
-            document.add(title);
+            // ✅ 한글 폰트 지정
+            BaseFont bfKorean = BaseFont.createFont("c:/windows/fonts/malgun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            Font coverTitleFont = new Font(bfKorean, 24, Font.BOLD, Color.BLACK);
+            Font coverSubFont = new Font(bfKorean, 14, Font.NORMAL, Color.DARK_GRAY);
+            Font infoFont = new Font(bfKorean, 12, Font.NORMAL, Color.BLACK);
+            Font sectionFont = new Font(bfKorean, 14, Font.BOLD, Color.BLACK);
+            Font keyFont = new Font(bfKorean, 10, Font.BOLD, Color.BLACK);
+            Font valFont = new Font(bfKorean, 10, Font.NORMAL, Color.BLACK);
 
-            // 🔹 기본 정보
-            PdfPTable infoTable = new PdfPTable(2);
-            infoTable.setWidthPercentage(100);
-            infoTable.setSpacingAfter(15);
+// ------------------ 1. 표지 ------------------
 
-            addCell(infoTable, "사례 번호", "M-" + detail.getId());
-            addCell(infoTable, "조사자", detail.getInvestigator());
-            addCell(infoTable, "주소", detail.getAddress());
-            addCell(infoTable, "승인자", approver.getName() + " (" + approver.getUsername() + ")");
-            addCell(infoTable, "승인일시", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(java.time.LocalDateTime.now()));
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(fileName));
+            document.open();
 
-            document.add(infoTable);
+            PdfContentByte cb = writer.getDirectContent();
 
-            // 🔹 점검 항목
-            Paragraph sectionTitle = new Paragraph("점검 항목", new Font(Font.HELVETICA, 14, Font.BOLD));
-            sectionTitle.setSpacingAfter(10);
-            document.add(sectionTitle);
+        // 제목
+            ColumnText.showTextAligned(
+                    cb,
+                    Element.ALIGN_CENTER,
+                    new Phrase("건축물 현장조사 보고서", coverTitleFont),
+                    document.getPageSize().getWidth() / 2,
+                    document.getPageSize().getHeight() / 2 + 60,
+                    0
+            );
 
-            PdfPTable checkTable = new PdfPTable(2);
-            checkTable.setWidthPercentage(100);
+        // 사례 번호
+            ColumnText.showTextAligned(
+                    cb,
+                    Element.ALIGN_CENTER,
+                    new Phrase("사례 번호: M-" + detail.getId(), coverSubFont),
+                    document.getPageSize().getWidth() / 2,
+                    document.getPageSize().getHeight() / 2 + 30,
+                    0
+            );
 
-            addCell(checkTable, "조사 가능 여부", mapPossible(detail.getPossible()));
-            addCell(checkTable, "행정 목적 활용", mapAdminUse(detail.getAdminUse()));
-            addCell(checkTable, "유휴 비율", mapIdleRate(detail.getIdleRate()));
-            addCell(checkTable, "안전 등급", mapSafety(detail.getSafety()));
-            addCell(checkTable, "외벽 상태", mapState(detail.getWall()));
-            addCell(checkTable, "옥상 상태", mapState(detail.getRoof()));
-            addCell(checkTable, "창호 상태", mapState(detail.getWindowState()));
-            addCell(checkTable, "주차 가능", mapState(detail.getParking()));
-            addCell(checkTable, "현관 상태", mapState(detail.getEntrance()));
-            addCell(checkTable, "천장 상태", mapState(detail.getCeiling()));
-            addCell(checkTable, "바닥 상태", mapState(detail.getFloor()));
+        // 조사자 + 승인자 + 승인일시 (여러 줄 처리)
+            Paragraph footerPara = new Paragraph();
+            footerPara.setAlignment(Element.ALIGN_CENTER);
+            footerPara.add(new Phrase("조사자: " + detail.getInvestigator(), infoFont));
+            footerPara.add(Chunk.NEWLINE);
+            footerPara.add(new Phrase("승인자: " + approver.getName() + " (" + approver.getUsername() + ")", infoFont));
+            footerPara.add(Chunk.NEWLINE);
+            footerPara.add(new Phrase("승인일시: " +
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(LocalDateTime.now()), infoFont));
 
-            document.add(checkTable);
+        // 중앙 정렬된 좌표에 직접 추가
+            ColumnText ct = new ColumnText(cb);
+            ct.setSimpleColumn(
+                    document.getPageSize().getWidth() / 2 - 200, // 좌측 x
+                    document.getPageSize().getHeight() / 2 - 80, // y 시작 (중앙보다 아래쪽)
+                    document.getPageSize().getWidth() / 2 + 200, // 우측 x
+                    document.getPageSize().getHeight() / 2 - 10  // y 끝
+            );
+            ct.addElement(footerPara);
+            ct.go();
 
-            // 🔹 사진 (있을 경우만 추가)
-            if (detail.getExtPhoto() != null) {
-                document.add(new Paragraph("외부 사진"));
-                Image img = Image.getInstance(detail.getExtPhoto());
-                img.scaleToFit(400, 300);
-                document.add(img);
-            }
+        // 페이지 넘기기
+            document.newPage();
 
-            if (detail.getIntPhoto() != null) {
-                document.add(new Paragraph("내부 사진"));
-                Image img = Image.getInstance(detail.getIntPhoto());
-                img.scaleToFit(400, 300);
-                document.add(img);
-            }
+
+            // ------------------ 2. 본문 ------------------
+            // 기본 정보 테이블
+            PdfPTable table = new PdfPTable(2);
+            table.setWidthPercentage(100);
+            table.setWidths(new float[]{2.5f, 7.5f});
+
+            addGrayRow(table, "사례 번호", "M-" + detail.getId(), bfKorean);
+            addGrayRow(table, "조사자", detail.getInvestigator(), bfKorean);
+            addGrayRow(table, "주소", detail.getAddress(), bfKorean);
+            addGrayRow(table, "승인자", approver.getName() + "(" + approver.getUsername() + ")", bfKorean);
+            addGrayRow(table, "승인일시", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), bfKorean);
+
+            // 점검 항목
+            addGrayRow(table, "조사 가능 여부", mapPossible(detail.getPossible()), bfKorean);
+            addGrayRow(table, "행정 목적 활용", mapAdminUse(detail.getAdminUse()), bfKorean);
+            addGrayRow(table, "유휴 비율", mapIdleRate(detail.getIdleRate()), bfKorean);
+            addGrayRow(table, "안전 등급", mapSafety(detail.getSafety()), bfKorean);
+            addGrayRow(table, "외벽 상태", mapState(detail.getWall()), bfKorean);
+            addGrayRow(table, "옥상 상태", mapState(detail.getRoof()), bfKorean);
+            addGrayRow(table, "창호 상태", mapState(detail.getWindowState()), bfKorean);
+            addGrayRow(table, "주차 가능", mapParking(detail.getParking()), bfKorean);
+            addGrayRow(table, "현관 상태", mapState(detail.getEntrance()), bfKorean);
+            addGrayRow(table, "천장 상태", mapState(detail.getCeiling()), bfKorean);
+            addGrayRow(table, "바닥 상태", mapState(detail.getFloor()), bfKorean);
+            addGrayRow(table, "외부 기타 사항", detail.getExtEtc(), bfKorean);
+            addGrayRow(table, "내부 기타 사항", detail.getIntEtc(), bfKorean);
+
+            document.add(table);
+
+            // 사진 추가
+            addImageIfExists(document, "외부 사진", detail.getExtPhoto());
+            addImageIfExists(document, "외부 편집본", detail.getExtEditPhoto());
+            addImageIfExists(document, "내부 사진", detail.getIntPhoto());
+            addImageIfExists(document, "내부 편집본", detail.getIntEditPhoto());
 
             document.close();
             return fileName;
@@ -95,17 +132,64 @@ public class PdfGenerator {
         }
     }
 
+
     // ================= 헬퍼 메서드 =================
 
-    private static void addCell(PdfPTable table, String key, String value) {
-        PdfPCell cell1 = new PdfPCell(new Phrase(key));
-        PdfPCell cell2 = new PdfPCell(new Phrase(value != null ? value : "-"));
-        cell1.setBackgroundColor(new Color(230, 230, 250));
-        cell1.setPadding(5);
-        cell2.setPadding(5);
+    private static void addCell(PdfPTable table, String key, String value, Font keyFont, Font valFont) {
+        String safeKey = (key == null || key.isBlank()) ? "-" : key;
+        String safeVal = (value == null || value.isBlank()) ? "-" : value;
+
+        PdfPCell cell1 = new PdfPCell(new Phrase(safeKey, keyFont));
+        PdfPCell cell2 = new PdfPCell(new Phrase(safeVal, valFont));
+
+        cell1.setBackgroundColor(new Color(220, 220, 240));
+        cell1.setPadding(6);
+        cell2.setPadding(6);
+
         table.addCell(cell1);
         table.addCell(cell2);
     }
+
+    private static void addGrayRow(PdfPTable table, String label, String value, BaseFont bf) {
+        Font keyFont = new Font(bf, 11, Font.BOLD, Color.BLACK);
+        Font valFont = new Font(bf, 11, Font.NORMAL, Color.DARK_GRAY);
+
+        // 라벨 셀
+        PdfPCell keyCell = new PdfPCell(new Phrase(label, keyFont));
+        keyCell.setBackgroundColor(new Color(240, 240, 240)); // 옅은 회색
+        keyCell.setPadding(10);
+        keyCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        keyCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+        // 값 셀
+        PdfPCell valCell = new PdfPCell(new Phrase(
+                (value == null || value.isBlank()) ? "-" : value, valFont));
+        valCell.setBackgroundColor(Color.WHITE);
+        valCell.setPadding(10);
+
+        table.addCell(keyCell);
+        table.addCell(valCell);
+    }
+
+
+    private static void addImageIfExists(Document document, String label, String path) throws Exception {
+        if (path == null || path.isBlank()) {
+            document.add(new Paragraph(label + " : 이미지 없음"));
+            return;
+        }
+        File file = new File(path);
+        if (file.exists()) {
+            document.add(new Paragraph(label));
+            Image img = Image.getInstance(file.getAbsolutePath());
+            img.scaleToFit(400, 300);
+            img.setSpacingAfter(10);
+            document.add(img);
+        } else {
+            document.add(new Paragraph(label + " : 이미지 없음"));
+        }
+    }
+
+    // ================= 매핑 메서드 =================
 
     private static String mapPossible(Integer v) {
         return v == null ? "-" : (v == 1 ? "가능" : v == 2 ? "불가" : "-");
@@ -136,11 +220,21 @@ public class PdfGenerator {
             case 2 -> "B";
             case 3 -> "C";
             case 4 -> "D";
+            case 5 -> "E";
             default -> "-";
         };
     }
 
     private static String mapState(Integer v) {
-        return v == null ? "-" : (v == 1 ? "양호" : v == 2 ? "보통" : v == 3 ? "불량" : "-");
+        return v == null ? "-" : switch (v) {
+            case 1 -> "양호";
+            case 2 -> "보통";
+            case 3 -> "불량";
+            default -> "-";
+        };
+    }
+
+    private static String mapParking(Integer v) {
+        return v == null ? "-" : (v == 1 ? "가능" : v == 2 ? "불가" : "-");
     }
 }

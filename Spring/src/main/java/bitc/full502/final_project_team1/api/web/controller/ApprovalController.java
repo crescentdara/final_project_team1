@@ -67,7 +67,7 @@ public class ApprovalController {
     /** 상세 */
     @GetMapping("/approvals/{id}")
     public ResultDetailDto detail(@PathVariable Long id) {
-        var e = repo.findById(id).orElseThrow();
+        var e = repo.findByIdWithUserAndBuilding(id).orElseThrow();
         return ResultDetailDto.from(e);
     }
 

@@ -3,6 +3,8 @@ package bitc.full502.final_project_team1.core.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user_building_assignment", schema = "java502_team1_final_db")

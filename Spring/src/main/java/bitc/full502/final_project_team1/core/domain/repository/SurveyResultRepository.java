@@ -12,22 +12,23 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
     @EntityGraph(attributePaths = {"user", "building"})
     Page<SurveyResultEntity> findAll(Pageable pageable);
 
+    // 결재 대기 중 검색
+    @EntityGraph(attributePaths = {"user", "building"})
+    @Query("""
+        select sr from SurveyResultEntity sr
+        left join sr.user u
+        left join sr.building b
+        where (:status is null or upper(sr.status) = upper(:status))
+        and (
+          :kw is null or LENGTH(TRIM(:kw)) = 0 or
+          lower(concat('m-', sr.id)) like lower(concat('%', TRIM(:kw), '%')) or
+          (u is not null and lower(coalesce(u.name, u.username)) like lower(concat('%', TRIM(:kw), '%'))) or
+          (b is not null and lower(b.lotAddress) like lower(concat('%', TRIM(:kw), '%')))
+        )
+    """)
+    Page<SurveyResultEntity> search(@Param("status") String status,
+                                    @Param("kw") String keyword,
+                                    Pageable pageable);
 
-     @EntityGraph(attributePaths = {"user", "building"})
-     @Query("""
-     select sr from SurveyResultEntity sr
-     left join sr.user u
-     left join sr.building b
-     where (:status is null or upper(sr.status) = upper(:status))
-     and (
-     :kw is null or :kw = '' or
-     lower(concat('m-', sr.id)) like lower(concat('%', :kw, '%')) or
-     (u is not null and lower(coalesce(u.name, u.username)) like lower(concat('%', :kw, '%'))) or
-     (b is not null and lower(b.lotAddress) like lower(concat('%', :kw, '%')))
-     )
-     """)
-     Page<SurveyResultEntity> search(@Param("status") String status,
-     @Param("kw") String keyword,
-     Pageable pageable);
 
 }

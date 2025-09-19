@@ -39,9 +39,9 @@ function App() {
                                 Report 페이지로 이동
                             </Link>
 
-                            <Link to="/web/api/users" className={'btn btn-outline-secondary me-3'}>조사원 상세정보</Link>
-                            <Link to="/web/api/approvals" className={'btn btn-outline-primary me-3'}>결재 대기 중</Link>
-                            <Link to="/web/api/survey" className={'btn btn-outline-info'}>전체 조사 목록</Link>
+                            <Link to="/users" className={'btn btn-outline-secondary mt-3 me-3'}>조사원 상세정보</Link>
+                            <Link to="/approvals" className={'btn btn-outline-primary mt-3 me-3'}>결재 대기 중</Link>
+                            <Link to="/surveys" className={'btn btn-outline-info mt-3 '}>전체 조사 목록</Link>
                         </div>
                     }
                 />
@@ -62,13 +62,13 @@ function App() {
                 <Route path="/resultReport" element={<ResultReport />} />
 
                 {/* 조사원 상세정보 */}
-                <Route path="/web/api/users" element={<UserDetail />} />
+                <Route path="/users" element={<UserDetail />} />
 
                 {/* 결재 대기 중 페이지 */}
-                <Route path="/web/api/approvals" element={<ApprovalFilters />} />
+                <Route path="/approvals" element={<ApprovalFilters />} />
 
                 {/* 전체 조사 목록 페이지 */}
-                <Route path="/web/api/survey" element={<TotalSurveyList />} />
+                <Route path="/surveys" element={<TotalSurveyList />} />
             </Routes>
         </div>
     );

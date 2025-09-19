@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="카테고리"
-                android:textColor="#6366F1"
+                android:textColor="@color/primary_blue"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -55,10 +55,11 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="조사예정 관리"
-            android:textColor="#333333"
+            android:textColor="@color/text_primary"
             app:icon="@android:drawable/ic_menu_agenda"
             app:iconGravity="textStart"
-            app:iconTint="#6366F1" />
+            app:iconTint="@color/primary_blue"
+            app:strokeColor="@color/primary_blue" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnResurveyTarget"
@@ -67,10 +68,11 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="재조사 대상"
-            android:textColor="#333333"
+            android:textColor="@color/text_primary"
             app:icon="@android:drawable/ic_menu_manage"
             app:iconGravity="textStart"
-            app:iconTint="#6366F1" />
+            app:iconTint="@color/primary_blue"
+            app:strokeColor="@color/primary_blue" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSurveyHistory"
@@ -79,10 +81,11 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="조사내역 조회"
-            android:textColor="#333333"
+            android:textColor="@color/text_primary"
             app:icon="@android:drawable/ic_menu_edit"
             app:iconGravity="textStart"
-            app:iconTint="#6366F1" />
+            app:iconTint="@color/primary_blue"
+            app:strokeColor="@color/primary_blue" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNotTransmitted"
@@ -90,9 +93,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="미전송 내역"
-            android:textColor="#333333"
+            android:textColor="@color/text_primary"
             app:icon="@android:drawable/ic_menu_upload"
             app:iconGravity="textStart"
-            app:iconTint="#6366F1" />
+            app:iconTint="@color/primary_blue"
+            app:strokeColor="@color/primary_blue" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

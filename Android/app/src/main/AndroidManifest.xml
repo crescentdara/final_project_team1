@@ -12,12 +12,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.CAMERA" />
+    
+    <!-- 하드웨어 기능 -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
-
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -58,7 +55,6 @@
         <activity android:name=".ui.surveyList.SurveyListActivity" />
 
         <!-- 카테고리/상태 -->
-        <activity android:name=".ui.category.CategoryActivity" />
         <activity android:name=".ui.survey.SurveyStatusActivity" />
 
         <!-- 조사 입력 화면 -->
@@ -69,19 +65,9 @@
 
         <activity android:name=".ui.transmission.ResultActivity" />
 
-        <activity android:name=".ui.transmission.PurposeActivity" />
-
-        <activity android:name=".ui.transmission.IdleRatioActivity" />
-
-        <activity android:name=".ui.transmission.SafetyGradeActivity" />
-
-        <activity android:name=".ui.transmission.ExternalStatusActivity" />
-
-        <activity android:name=".ui.transmission.InternalStatusActivity" />
-
-        <activity android:name=".ui.transmission.InvestigationActivity" />
-
         <activity android:name=".ui.transmission.EditActivity" />
+
+        <activity android:name=".ui.transmission.PhotoEditActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

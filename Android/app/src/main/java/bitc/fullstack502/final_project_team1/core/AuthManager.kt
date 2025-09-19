@@ -1,4 +1,3 @@
-// core/AuthManager.kt
 package bitc.fullstack502.final_project_team1.core
 
 import android.content.Context
@@ -21,7 +20,7 @@ object AuthManager {
         p.putString(KEY_USERNAME, resp.user?.username)
         p.putString(KEY_NAME, resp.name)
         p.putString(KEY_ROLE, resp.role)
-        p.putString(KEY_EMP_NO, resp.user?.empno)   // ✅ 사번 저장
+        p.putString(KEY_EMP_NO, resp.user?.emp_no)   // ✅ 사번 저장
         p.putLong(KEY_LOGIN_TIME, System.currentTimeMillis())   // ✅ 로그인 시간 기록
         p.apply()
     }
@@ -59,8 +58,7 @@ object AuthManager {
     fun role(context: Context): String? =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_ROLE, null)
 
-    fun empNo(context: Context): String? =
+    fun empNo(context: Context): String =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
-            .getString(KEY_EMP_NO, null) // ✅ 사번 불러오기
+            .getString(KEY_EMP_NO, "-") ?: "-"   // ✅ 사번 불러오기 (없으면 "-")
 }
-

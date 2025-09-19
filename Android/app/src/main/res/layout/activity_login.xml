@@ -94,10 +94,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
                         android:hint="@string/login_id_hint"
-                        app:boxStrokeColor="#6366F1"
-                        app:hintTextColor="#6366F1"
+                        app:boxStrokeColor="@color/primary_blue"
+                        app:hintTextColor="@color/primary_blue"
                         app:startIconDrawable="@drawable/ic_person"
-                        app:startIconTint="#6366F1"
+                        app:startIconTint="@color/primary_blue"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -116,12 +116,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:hint="@string/login_password_hint"
-                        app:boxStrokeColor="#6366F1"
-                        app:hintTextColor="#6366F1"
+                        app:boxStrokeColor="@color/primary_blue"
+                        app:hintTextColor="@color/primary_blue"
                         app:startIconDrawable="@drawable/ic_lock"
-                        app:startIconTint="#6366F1"
+                        app:startIconTint="@color/primary_blue"
                         app:passwordToggleEnabled="true"
-                        app:passwordToggleTint="#6366F1"
+                        app:passwordToggleTint="@color/primary_blue"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -159,7 +159,7 @@
                 android:text="@string/login_button"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:backgroundTint="#6366F1"
+                app:backgroundTint="@color/primary_blue"
                 app:cornerRadius="30dp"
                 app:elevation="8dp" />
 

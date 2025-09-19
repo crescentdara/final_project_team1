@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 기본 색상 -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- 새로운 디자인 색상 팔레트 -->
+    <color name="primary_blue">#6898FF</color>
+    <color name="primary_blue_dark">#5478E6</color>
+    <color name="primary_blue_light">#8AB4FF</color>
+    
+    <!-- 상태 색상 -->
+    <color name="green">#28A745</color>
+    <color name="red">#DC3545</color>
+    <color name="orange">#FD7E14</color>
+    
+    <!-- White 계열 배경 -->
+    <color name="background_white">#FFFFFF</color>
+    <color name="background_light_gray">#F8F9FA</color>
+    <color name="background_very_light_gray">#FAFBFC</color>
+    
+    <!-- 텍스트 색상 -->
+    <color name="text_primary">#212529</color>
+    <color name="text_secondary">#6C757D</color>
+    <color name="text_light">#ADB5BD</color>
+    
+    <!-- 카드 및 테두리 -->
+    <color name="card_background">#FFFFFF</color>
+    <color name="border_light">#E9ECEF</color>
+    <color name="shadow_light">#F1F3F4</color>
 </resources>

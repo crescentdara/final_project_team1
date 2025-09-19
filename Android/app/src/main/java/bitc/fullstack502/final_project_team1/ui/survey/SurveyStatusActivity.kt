@@ -63,7 +63,7 @@ class SurveyStatusActivity : AppCompatActivity() {
         dialog.setContentView(view)
 
         view.findViewById<MaterialButton>(R.id.btnSurveyScheduled)?.setOnClickListener {
-            startActivity(Intent(this, SurveyStatusActivity::class.java))
+            startActivity(Intent(this, SurveyListActivity::class.java))
             dialog.dismiss()
         }
         view.findViewById<MaterialButton>(R.id.btnResurveyTarget)?.setOnClickListener {

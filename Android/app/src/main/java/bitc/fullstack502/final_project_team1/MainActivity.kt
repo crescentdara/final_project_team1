@@ -47,34 +47,33 @@ class MainActivity : AppCompatActivity() {
 
         val tvUserName = findViewById<TextView>(R.id.tvUserName)
         val tvEmpNo = findViewById<TextView>(R.id.tvEmpNo)
+        val tvProgress = findViewById<TextView>(R.id.tvProgress)
+        val tvTotalCount = findViewById<TextView>(R.id.tvTotalCount)
+        val tvTodayCount = findViewById<TextView>(R.id.tvTodayCount)
 
         tvUserName.text = "${userName} 조사원님"
         tvEmpNo.text = "사번 : $empNo"
+
+        // ✅ 통계 데이터 표시 (추후 서버 연동 시 실제 데이터로 교체)
+        tvProgress.text = "65%"
+        tvTotalCount.text = "24"
+        tvTodayCount.text = "3"
 
         // ✅ 환영 토스트 메시지 출력
         Toast.makeText(this, "${userName}님, 환영합니다!", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupToolbar() {
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-
-        // ✅ 햄버거 클릭 → 카테고리 팝업 열기
-        toolbar.setNavigationOnClickListener { view ->
+        // ✅ 햄버거 메뉴 클릭 → 카테고리 팝업 열기
+        findViewById<ImageView>(R.id.ivHamburger)?.setOnClickListener { view ->
             showCategoryPopup(view)
         }
 
-        // ✅ 툴바 메뉴 클릭 (로그아웃 처리)
-        toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_logout -> {
-                    // ✅ 로그아웃 시 인증정보 삭제 후 로그인 화면으로 이동
-                    AuthManager.clear(this)
-                    gotoLoginAndFinish()
-                    true
-                }
-
-                else -> false
-            }
+        // ✅ 로그아웃 버튼 클릭 → 로그아웃 처리
+        findViewById<TextView>(R.id.tvLogout)?.setOnClickListener {
+            // ✅ 로그아웃 시 인증정보 삭제 후 로그인 화면으로 이동
+            AuthManager.clear(this)
+            gotoLoginAndFinish()
         }
     }
 
@@ -101,7 +100,7 @@ class MainActivity : AppCompatActivity() {
 
         // ✅ 메뉴 버튼들
         popupView.findViewById<MaterialButton>(R.id.btnSurveyScheduled)?.setOnClickListener {
-            startActivity(Intent(this, SurveyStatusActivity::class.java))
+            startActivity(Intent(this, SurveyListActivity::class.java))
             popupWindow.dismiss()
         }
         popupView.findViewById<MaterialButton>(R.id.btnResurveyTarget)?.setOnClickListener {

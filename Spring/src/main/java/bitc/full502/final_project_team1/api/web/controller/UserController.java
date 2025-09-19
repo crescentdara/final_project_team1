@@ -28,13 +28,34 @@ public class UserController {
 
     private final UserAccountRepository repo;
 
-    // 조사원 목록 조회
+//    // 조사원 목록 조회
+//    @GetMapping("/users/search")
+//    public List<UserSimpleDto> list(@RequestParam(required = false) String keyword) {
+//        List<UserAccountEntity> list = (keyword != null && !keyword.isBlank())
+//                ? repo.findTop100ByNameContainingOrUsernameContainingOrderByUserId(keyword, keyword)
+//                : repo.findAll(Sort.by(Sort.Direction.ASC, "userId"));
+//        return list.stream().map(UserSimpleDto::from).toList();
+//    }
+
+    // 전체 조회 + 검색 (keyword 파라미터 optional)
     @GetMapping("/users/search")
     public List<UserSimpleDto> list(@RequestParam(required = false) String keyword) {
-        List<UserAccountEntity> list = (keyword != null && !keyword.isBlank())
-                ? repo.findTop100ByNameContainingOrUsernameContainingOrderByUserId(keyword, keyword)
-                : repo.findAll(Sort.by(Sort.Direction.ASC, "userId"));
-        return list.stream().map(UserSimpleDto::from).toList();
+        List<UserAccountEntity> users;
+
+        if (keyword != null && !keyword.isBlank()) {
+            // 🔍 EDITOR만 검색
+            users = repo.findByRoleAndNameContainingOrRoleAndUsernameContaining(
+                    UserAccountEntity.Role.EDITOR, keyword,
+                    UserAccountEntity.Role.EDITOR, keyword
+            );
+        } else {
+            // 📋 전체 조회 (EDITOR만)
+            users = repo.findByRole(UserAccountEntity.Role.EDITOR);
+        }
+
+        return users.stream()
+                .map(UserSimpleDto::from)
+                .toList();
     }
 
     @GetMapping("/users")

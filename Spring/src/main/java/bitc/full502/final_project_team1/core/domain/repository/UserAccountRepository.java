@@ -14,6 +14,15 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
             String nameKeyword, String usernameKeyword
     );
 
+    // 🔍 role=EDITOR 전체 조회
+    List<UserAccountEntity> findByRole(UserAccountEntity.Role role);
+
+    // 🔍 role=EDITOR + 이름/username 검색
+    List<UserAccountEntity> findByRoleAndNameContainingOrRoleAndUsernameContaining(
+            UserAccountEntity.Role role1, String name,
+            UserAccountEntity.Role role2, String username
+    );
+
     List<UserAccountEntity> findTop200ByOrderByUserIdAsc();
 
     // (기존) 이름/아이디 contains ignore case

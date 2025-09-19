@@ -76,4 +76,13 @@
     <string name="label_dashboard">조사현황</string> <!-- 대시보드 제목 -->
     <string name="label_detail">자세히 보기</string> <!-- 대시보드 오른쪽 링크 -->
     <string name="placeholder_graph">그래프 영역</string> <!-- 그래프 자리 안내 -->
+
+        <string name="reinspect_start">재조사 시작</string>
+        <string name="survey_start">조사 시작</string>
+        <string name="reject_reason_fmt">반려사유: %1$s</string>
+        <string name="rejected_at_fmt">반려일자: %1$s</string>
+        <string name="building_load_failed_fmt">건물 정보를 불러오지 못했습니다: %1$s</string>
+        <string name="reinspect_start_failed_fmt">재조사 시작 실패: %1$s</string>
+        <string name="invalid_survey">유효하지 않은 설문입니다.</string>
+
 </resources>

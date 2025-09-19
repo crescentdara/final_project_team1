@@ -5,13 +5,31 @@
     android:layout_height="wrap_content"
     android:padding="16dp">
 
-    <!-- 조사시작 버튼 -->
+    <!-- (선택) 반려 정보 -->
+    <TextView
+        android:id="@+id/tvRejectReason"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="#B00020"
+        android:textStyle="bold"
+        android:visibility="visible"
+        android:paddingBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tvRejectedAt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:paddingBottom="12dp" />
+
+    <!-- 조사시작 / 재조사 시작 버튼 (코드에서 텍스트 변경) -->
     <Button
         android:id="@+id/btnStartSurvey"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="조사결과 입력하기"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <!-- 건물 정보 -->
     <ScrollView
@@ -23,7 +41,6 @@
             android:id="@+id/infoContainer"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
+            android:layout_height="wrap_content" />
     </ScrollView>
 </LinearLayout>

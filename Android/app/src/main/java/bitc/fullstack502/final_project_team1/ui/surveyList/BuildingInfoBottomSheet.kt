@@ -3,8 +3,15 @@ package bitc.fullstack502.final_project_team1.ui.surveyList
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
@@ -12,8 +19,6 @@ import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
 import bitc.fullstack502.final_project_team1.ui.SurveyActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
-import androidx.lifecycle.lifecycleScope
-import androidx.core.os.bundleOf
 
 class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
@@ -45,7 +50,6 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
             )
         }
 
-        // (참고) 신규 조사 용도로도 재사용하고 싶으면:
         fun newInstanceForNew(buildingId: Long): BuildingInfoBottomSheet =
             BuildingInfoBottomSheet().apply {
                 arguments = bundleOf(
@@ -78,19 +82,22 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
         val info = view.findViewById<LinearLayout>(R.id.infoContainer)
 
-        // 상단에 반려사유/반려일자 간단히 표시 (레이아웃에 TextView 두 개 추가해두면 좋음)
-        val tvReason = view.findViewById<TextView?>(R.id.tvRejectReason)
-        val tvDate   = view.findViewById<TextView?>(R.id.tvRejectedAt)
-
-        tvReason?.text = arguments?.getString(ARG_REJECT_REASON)?.let { "반려사유: $it" } ?: ""
-        tvDate?.text   = arguments?.getString(ARG_REJECTED_AT)?.let { "반려일자: $it" } ?: ""
+        // (선택) 반려정보 영역이 레이아웃에 있으면 채워줌(없어도 에러 안 남)
+        view.findViewById<TextView?>(R.id.tvRejectReason)?.let { tv ->
+            val reason = arguments?.getString(ARG_REJECT_REASON).orEmpty()
+            if (reason.isNotBlank()) tv.text = getString(R.string.reject_reason_fmt, reason)
+        }
+        view.findViewById<TextView?>(R.id.tvRejectedAt)?.let { tv ->
+            val dt = arguments?.getString(ARG_REJECTED_AT).orEmpty()
+            if (dt.isNotBlank()) tv.text = getString(R.string.rejected_at_fmt, dt)
+        }
 
         // 버튼 라벨/동작 분기
         if (mode == "REINSPECT") {
-            btnStart.text = "재조사 시작"
+            btnStart.text = getString(R.string.reinspect_start)
             btnStart.setOnClickListener { startReinspectThenOpenEditor() }
         } else {
-            btnStart.text = "조사 시작"
+            btnStart.text = getString(R.string.survey_start)
             btnStart.setOnClickListener { openEditorNew() }
         }
 
@@ -103,7 +110,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                 }
                 .onFailure {
                     info.addView(TextView(requireContext()).apply {
-                        text = "건물 정보를 불러오지 못했습니다: ${it.message}"
+                        text = getString(R.string.building_load_failed_fmt, it.message ?: "")
                     })
                 }
         }
@@ -111,13 +118,14 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
     private fun startReinspectThenOpenEditor() {
         if (surveyId <= 0) {
-            Toast.makeText(requireContext(), "유효하지 않은 설문입니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.invalid_survey, Toast.LENGTH_SHORT).show()
             return
         }
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val token = AuthManager.getTokenOrThrow()
-                ApiClient.service.startRedo("Bearer $token", surveyId) // TEMP 전환
+                val auth = AuthManager.bearerOrThrow(requireContext()) // ← context 필요
+                ApiClient.service.startRedo(auth, surveyId) // TEMP 전환
+
                 // 같은 surveyId로 수정 모드 진입
                 val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
                     putExtra("surveyId", surveyId)
@@ -127,7 +135,8 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                 startActivity(intent)
                 dismiss()
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "재조사 시작 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),
+                    getString(R.string.reinspect_start_failed_fmt, e.message ?: ""), Toast.LENGTH_SHORT).show()
             }
         }
     }

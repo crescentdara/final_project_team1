@@ -1,6 +1,5 @@
 package bitc.fullstack502.final_project_team1.ui.transmission
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -10,37 +9,19 @@ import bitc.fullstack502.final_project_team1.R
 
 class PhotoEditActivity : AppCompatActivity() {
 
-    companion object {
-        lateinit var photoBitmap: Bitmap
-    }
-
-    private lateinit var photoTypeText: TextView
-    private lateinit var photoPreview: ImageView
-    private lateinit var btnSaveEdit: Button
+    companion object { var photoLabel: String = "사진 편집" }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_photo_edit)
+        setContentView(R.layout.activity_photo_edit) // 둘째 XML 파일명
 
-        photoTypeText = findViewById(R.id.photo_type_text)
-        photoPreview = findViewById(R.id.photo_preview)
-        btnSaveEdit = findViewById(R.id.btn_save_edit)
+        val photoTypeText: TextView = findViewById(R.id.photo_type_text)
+        val photoPreview: ImageView = findViewById(R.id.photo_preview)
+        val btnSaveEdit: Button = findViewById(R.id.btn_save_edit)
 
-        // 전달받은 사진 타입 (EXTERNAL / INTERNAL)
-        val photoType = intent.getStringExtra("photo_type") ?: "UNKNOWN"
-        photoTypeText.text = when(photoType) {
-            "EXTERNAL" -> "외부 사진 편집"
-            "INTERNAL" -> "내부 사진 편집"
-            else -> "사진 편집"
-        }
+        photoTypeText.text = photoLabel
+        // 필요 시 photoPreview.setImageBitmap(...) 호출해서 외부에서 넘긴 비트맵 보여주기
 
-        // 이미지 표시
-        photoPreview.setImageBitmap(photoBitmap)
-
-        // 편집 완료 버튼
-        btnSaveEdit.setOnClickListener {
-            // TODO: 편집 저장 로직 추가 가능 (현재는 그냥 종료)
-            finish()
-        }
+        btnSaveEdit.setOnClickListener { finish() }
     }
 }

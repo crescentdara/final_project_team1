@@ -1,111 +1,113 @@
 package bitc.fullstack502.final_project_team1.ui.transmission
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import java.util.*
+import java.util.Stack
 
 class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     enum class Mode { FREE, RECT, CIRCLE, LINE }
 
-    private var drawPath: Path? = null
-    private var drawPaint: Paint = Paint()
-    private var canvasPaint: Paint = Paint(Paint.DITHER_FLAG)
-    private lateinit var drawCanvas: Canvas
-    private lateinit var canvasBitmap: Bitmap
-    private var mode: Mode = Mode.FREE
-
+    private var tempPath: Path? = null
     private val paths = Stack<Pair<Path, Paint>>()
-    private val undonePaths = Stack<Pair<Path, Paint>>()
+    private val undone = Stack<Pair<Path, Paint>>()
 
-    private var startX = 0f
-    private var startY = 0f
-
-    init {
-        drawPaint.color = Color.BLACK
-        drawPaint.isAntiAlias = true
-        drawPaint.strokeWidth = 8f
-        drawPaint.style = Paint.Style.STROKE
-        drawPaint.strokeJoin = Paint.Join.ROUND
-        drawPaint.strokeCap = Paint.Cap.ROUND
+    private val drawPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.RED
+        strokeWidth = 8f
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
+        strokeCap = Paint.Cap.ROUND
     }
 
-    fun setMode(m: Mode) { mode = m }
-    fun setColor(color: Int) { drawPaint.color = color }
+    // 투명한 드로잉 버퍼 (뷰 크기와 동일)
+    private lateinit var strokeBitmap: Bitmap
+    private lateinit var strokeCanvas: Canvas
+    private val bmpPaint = Paint(Paint.DITHER_FLAG)
 
+    private var mode: Mode = Mode.FREE
+    private var startX = 0f
+    private var startY = 0f
+    private var lastX = 0f
+    private var lastY = 0f
+
+    fun setMode(m: Mode) { mode = m }
+    fun setColor(color: Int) { if (drawPaint.xfermode == null) drawPaint.color = color }
     fun enableEraser(enable: Boolean) {
-        if (enable) {
-            drawPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-            drawPaint.strokeWidth = 50f
-        } else {
-            drawPaint.xfermode = null
-            drawPaint.strokeWidth = 8f
+        if (enable) { drawPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR); drawPaint.strokeWidth = 50f }
+        else { drawPaint.xfermode = null; drawPaint.strokeWidth = 8f }
+    }
+
+    fun clearAll() {
+        if (::strokeBitmap.isInitialized) {
+            strokeBitmap.eraseColor(Color.TRANSPARENT)
+            paths.clear()
+            undone.clear()
+            tempPath = null
+            invalidate()
         }
     }
 
-    fun undo() { if (paths.isNotEmpty()) { undonePaths.push(paths.pop()); invalidate() } }
-    fun redo() { if (undonePaths.isNotEmpty()) { paths.push(undonePaths.pop()); invalidate() } }
+    fun undo() { if (paths.isNotEmpty()) { undone.push(paths.pop()); invalidate() } }
+    fun redo() { if (undone.isNotEmpty()) { paths.push(undone.pop()); invalidate() } }
 
-    fun setBackgroundBitmap(bitmap: Bitmap) {
-        canvasBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-        drawCanvas = Canvas(canvasBitmap)
-        invalidate()
-    }
-
-    fun getBitmap(): Bitmap = canvasBitmap
-
-    fun mergePathToBitmap() {
-        drawPath?.let { drawCanvas.drawPath(it, drawPaint) }
-        for ((p, paint) in paths) drawCanvas.drawPath(p, paint)
-        paths.clear()
-        drawPath = null
-        invalidate()
+    /** 현재 드로잉 레이어(투명 포함)를 비트맵으로 반환 */
+    fun getStrokeBitmap(): Bitmap {
+        val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val c = Canvas(result)
+        // 누적된 path들
+        for ((p, paint) in paths) c.drawPath(p, paint)
+        // 진행 중 path
+        tempPath?.let { c.drawPath(it, drawPaint) }
+        return result
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        if (!::canvasBitmap.isInitialized) {
-            canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-            drawCanvas = Canvas(canvasBitmap)
-        }
+        if (w <= 0 || h <= 0) return
+        strokeBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        strokeCanvas = Canvas(strokeBitmap)
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas.drawBitmap(canvasBitmap, 0f, 0f, canvasPaint)
-        for ((path, paint) in paths) canvas.drawPath(path, paint)
-        drawPath?.let { canvas.drawPath(it, drawPaint) }
+        // 이미지는 Activity 쪽 editImageView에 그려짐. 여기선 드로잉만.
+        for ((p, paint) in paths) canvas.drawPath(p, paint)
+        tempPath?.let { canvas.drawPath(it, drawPaint) }
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        val x = event.x
-        val y = event.y
-
-        when (event.action) {
+    override fun onTouchEvent(e: MotionEvent): Boolean {
+        val x = e.x; val y = e.y
+        when (e.action) {
             MotionEvent.ACTION_DOWN -> {
-                startX = x
-                startY = y
-                drawPath = Path().apply { moveTo(x, y) }
-                undonePaths.clear()
+                startX = x; startY = y
+                lastX = x; lastY = y
+                tempPath = Path().apply { moveTo(x, y) }
+                undone.clear()
             }
             MotionEvent.ACTION_MOVE -> {
-                drawPath = Path()
                 when (mode) {
-                    Mode.FREE -> drawPath?.lineTo(x, y)
-                    Mode.RECT -> drawPath?.addRect(startX, startY, x, y, Path.Direction.CW)
-                    Mode.CIRCLE -> {
-                        val radius = Math.hypot((x - startX).toDouble(), (y - startY).toDouble()).toFloat()
-                        drawPath?.addCircle(startX, startY, radius, Path.Direction.CW)
+                    Mode.FREE -> {
+                        tempPath?.quadTo(lastX, lastY, (x + lastX) / 2f, (y + lastY) / 2f)
+                        lastX = x; lastY = y
                     }
-                    Mode.LINE -> { drawPath?.moveTo(startX, startY); drawPath?.lineTo(x, y) }
+                    Mode.RECT -> tempPath = Path().apply { addRect(startX, startY, x, y, Path.Direction.CW) }
+                    Mode.CIRCLE -> {
+                        val r = Math.hypot((x - startX).toDouble(), (y - startY).toDouble()).toFloat()
+                        tempPath = Path().apply { addCircle(startX, startY, r, Path.Direction.CW) }
+                    }
+                    Mode.LINE -> tempPath = Path().apply { moveTo(startX, startY); lineTo(x, y) }
                 }
             }
-            MotionEvent.ACTION_UP -> {
-                drawPath?.let { paths.push(it to Paint(drawPaint)) }
-                drawPath = null
-            }
+            MotionEvent.ACTION_UP -> { tempPath?.let { paths.push(it to Paint(drawPaint)) }; tempPath = null }
         }
         invalidate()
         return true

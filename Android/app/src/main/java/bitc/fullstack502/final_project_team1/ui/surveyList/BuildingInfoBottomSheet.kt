@@ -11,7 +11,7 @@ import android.widget.TextView
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
-import bitc.fullstack502.final_project_team1.ui.EnterActivity
+import bitc.fullstack502.final_project_team1.ui.transmission.SurveyActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,15 +48,16 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
         val infoContainer = view.findViewById<LinearLayout>(R.id.infoContainer)
 
+        // 🔹 SurveyActivity로 이동
         btnStart.setOnClickListener {
-            val intent = Intent(requireContext(), EnterActivity::class.java).apply {
-                putExtra("buildingId", buildingId) // 필요하면 건물 ID 전달
+            val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
+                putExtra("buildingId", buildingId)
             }
             startActivity(intent)
             dismiss() // 바텀시트 닫기
         }
 
-
+        // 🔹 건물 정보 불러오기
         CoroutineScope(Dispatchers.Main).launch {
             runCatching {
                 ApiClient.service.getBuildingDetail(buildingId)

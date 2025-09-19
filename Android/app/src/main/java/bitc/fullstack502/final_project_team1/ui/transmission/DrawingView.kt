@@ -5,137 +5,109 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import java.util.*
 
-class DrawingView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
-    enum class Mode { FREE, RECT, CIRCLE, LINE, ERASER }
+    enum class Mode { FREE, RECT, CIRCLE, LINE }
 
-    data class DrawItem(
-        val shapeType: Mode,
-        val path: Path? = null,
-        val rect: RectF? = null,
-        val paint: Paint
-    )
+    private var drawPath: Path? = null
+    private var drawPaint: Paint = Paint()
+    private var canvasPaint: Paint = Paint(Paint.DITHER_FLAG)
+    private lateinit var drawCanvas: Canvas
+    private lateinit var canvasBitmap: Bitmap
+    private var mode: Mode = Mode.FREE
 
-    private var currentMode = Mode.FREE
-    private var drawPath = Path()
+    private val paths = Stack<Pair<Path, Paint>>()
+    private val undonePaths = Stack<Pair<Path, Paint>>()
+
     private var startX = 0f
     private var startY = 0f
-    private var tempRect: RectF? = null
-
-    private var drawPaint = Paint()
-    private var currentPaint = Paint(drawPaint)
-
-    private val items = mutableListOf<DrawItem>()
-    private var backgroundBitmap: Bitmap? = null
 
     init {
-        drawPaint.apply {
-            color = Color.RED
-            isAntiAlias = true
-            strokeWidth = 8f
-            style = Paint.Style.STROKE
-            strokeJoin = Paint.Join.ROUND
-            strokeCap = Paint.Cap.ROUND
-        }
-        currentPaint = Paint(drawPaint)
+        drawPaint.color = Color.BLACK
+        drawPaint.isAntiAlias = true
+        drawPaint.strokeWidth = 8f
+        drawPaint.style = Paint.Style.STROKE
+        drawPaint.strokeJoin = Paint.Join.ROUND
+        drawPaint.strokeCap = Paint.Cap.ROUND
     }
 
+    fun setMode(m: Mode) { mode = m }
+    fun setColor(color: Int) { drawPaint.color = color }
+
+    fun enableEraser(enable: Boolean) {
+        if (enable) {
+            drawPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+            drawPaint.strokeWidth = 50f
+        } else {
+            drawPaint.xfermode = null
+            drawPaint.strokeWidth = 8f
+        }
+    }
+
+    fun undo() { if (paths.isNotEmpty()) { undonePaths.push(paths.pop()); invalidate() } }
+    fun redo() { if (undonePaths.isNotEmpty()) { paths.push(undonePaths.pop()); invalidate() } }
+
     fun setBackgroundBitmap(bitmap: Bitmap) {
-        backgroundBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        canvasBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        drawCanvas = Canvas(canvasBitmap)
         invalidate()
     }
 
-    fun setMode(mode: Mode) { currentMode = mode }
+    fun getBitmap(): Bitmap = canvasBitmap
+
+    fun mergePathToBitmap() {
+        drawPath?.let { drawCanvas.drawPath(it, drawPaint) }
+        for ((p, paint) in paths) drawCanvas.drawPath(p, paint)
+        paths.clear()
+        drawPath = null
+        invalidate()
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (!::canvasBitmap.isInitialized) {
+            canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            drawCanvas = Canvas(canvasBitmap)
+        }
+    }
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        backgroundBitmap?.let { canvas.drawBitmap(it, 0f, 0f, null) }
-        for (item in items) {
-            when (item.shapeType) {
-                Mode.FREE -> canvas.drawPath(item.path!!, item.paint)
-                Mode.RECT -> canvas.drawRect(item.rect!!, item.paint)
-                Mode.CIRCLE -> canvas.drawOval(item.rect!!, item.paint)
-                Mode.LINE -> canvas.drawLine(
-                    item.rect!!.left, item.rect!!.top,
-                    item.rect!!.right, item.rect!!.bottom,
-                    item.paint
-                )
-                Mode.ERASER -> canvas.drawPath(item.path!!, item.paint)
-            }
-        }
-        // 드래그 중일 때 미리보기 도형
-        tempRect?.let {
-            when (currentMode) {
-                Mode.RECT -> canvas.drawRect(it, currentPaint)
-                Mode.CIRCLE -> canvas.drawOval(it, currentPaint)
-                Mode.LINE -> canvas.drawLine(it.left, it.top, it.right, it.bottom, currentPaint)
-                else -> {}
-            }
-        }
-        if (currentMode == Mode.FREE || currentMode == Mode.ERASER) {
-            canvas.drawPath(drawPath, currentPaint)
-        }
+        canvas.drawBitmap(canvasBitmap, 0f, 0f, canvasPaint)
+        for ((path, paint) in paths) canvas.drawPath(path, paint)
+        drawPath?.let { canvas.drawPath(it, drawPaint) }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
+
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 startX = x
                 startY = y
-                if (currentMode == Mode.FREE || currentMode == Mode.ERASER) {
-                    drawPath.moveTo(x, y)
-                }
+                drawPath = Path().apply { moveTo(x, y) }
+                undonePaths.clear()
             }
             MotionEvent.ACTION_MOVE -> {
-                when (currentMode) {
-                    Mode.FREE, Mode.ERASER -> drawPath.lineTo(x, y)
-                    Mode.RECT, Mode.CIRCLE, Mode.LINE -> tempRect = RectF(startX, startY, x, y)
+                drawPath = Path()
+                when (mode) {
+                    Mode.FREE -> drawPath?.lineTo(x, y)
+                    Mode.RECT -> drawPath?.addRect(startX, startY, x, y, Path.Direction.CW)
+                    Mode.CIRCLE -> {
+                        val radius = Math.hypot((x - startX).toDouble(), (y - startY).toDouble()).toFloat()
+                        drawPath?.addCircle(startX, startY, radius, Path.Direction.CW)
+                    }
+                    Mode.LINE -> { drawPath?.moveTo(startX, startY); drawPath?.lineTo(x, y) }
                 }
             }
             MotionEvent.ACTION_UP -> {
-                when (currentMode) {
-                    Mode.FREE, Mode.ERASER -> {
-                        items.add(DrawItem(currentMode, Path(drawPath), null, Paint(currentPaint)))
-                        drawPath.reset()
-                    }
-                    Mode.RECT, Mode.CIRCLE, Mode.LINE -> {
-                        items.add(DrawItem(currentMode, null, RectF(startX, startY, x, y), Paint(currentPaint)))
-                        tempRect = null
-                    }
-                }
+                drawPath?.let { paths.push(it to Paint(drawPaint)) }
+                drawPath = null
             }
         }
         invalidate()
         return true
-    }
-
-    fun setColor(color: Int) { currentPaint.color = color }
-
-    fun setStrokeWidth(width: Float) { currentPaint.strokeWidth = width }
-
-    fun enableEraser(enable: Boolean) {
-        if (enable) {
-            currentMode = Mode.ERASER
-            currentPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-        } else {
-            currentPaint.xfermode = null
-        }
-    }
-
-    fun clear() {
-        items.clear()
-        drawPath.reset()
-        tempRect = null
-        invalidate()
-    }
-
-    fun getBitmap(): Bitmap {
-        val b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val c = Canvas(b)
-        draw(c)
-        return b
     }
 }

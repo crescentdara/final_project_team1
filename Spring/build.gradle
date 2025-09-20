@@ -45,6 +45,9 @@ dependencies {
 
     implementation 'com.opencsv:opencsv:5.9'
 
+    // PDF
+    implementation 'com.github.librepdf:openpdf:1.3.39'
+
 }
 
 tasks.named('test') {

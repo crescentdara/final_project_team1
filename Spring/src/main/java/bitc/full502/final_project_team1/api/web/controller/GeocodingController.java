@@ -10,7 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/geocode")
+@RequestMapping("/web/api/geocode")
 @RequiredArgsConstructor
 public class GeocodingController {
 

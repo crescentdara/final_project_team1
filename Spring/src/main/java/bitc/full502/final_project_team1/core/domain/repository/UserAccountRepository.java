@@ -1,6 +1,17 @@
+// src/main/java/bitc/full502/final_project_team1/core/domain/repository/UserAccountRepository.java
 package bitc.full502.final_project_team1.core.domain.repository;
 
+<<<<<<< HEAD
 import java.util.Optional;
+=======
+import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+>>>>>>> origin/web/his/MergedTotalSurveyListSearch
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
@@ -12,4 +23,76 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
     List<UserAccountEntity> findTop100ByNameContainingOrUsernameContainingOrderByUserId(
             String nameKeyword, String usernameKeyword
     );
+
+    // 🔍 role=EDITOR 전체 조회
+    List<UserAccountEntity> findByRole(UserAccountEntity.Role role);
+
+    // 🔍 role=EDITOR + 이름/username 검색
+    List<UserAccountEntity> findByRoleAndNameContainingOrRoleAndUsernameContaining(
+            UserAccountEntity.Role role1, String name,
+            UserAccountEntity.Role role2, String username
+    );
+
+    List<UserAccountEntity> findTop200ByOrderByUserIdAsc();
+
+    // (기존) 이름/아이디 contains ignore case
+    List<UserAccountEntity>
+    findTop200ByNameContainingIgnoreCaseOrUsernameContainingIgnoreCaseOrderByUserIdAsc(
+            String nameKeyword, String usernameKeyword);
+
+    /* ---------- 부분일치 + 대소문자 무시 쿼리들 ---------- */
+
+    /** 전체 필드(any): userId(문자열 비교), username, name, role */
+    @Query("select u from UserAccountEntity u " +
+            "where str(u.userId) like concat('%', :kw, '%') " +
+            "   or lower(u.username) like lower(concat('%', :kw, '%')) " +
+            "   or lower(u.name)     like lower(concat('%', :kw, '%')) " +
+            "   or lower(str(u.role)) like lower(concat('%', :kw, '%'))")
+    List<UserAccountEntity> searchAllLikeIgnoreCase(@Param("kw") String kw, Pageable pageable);
+
+    /** ID 부분일치 (숫자를 문자열로 변환해서 비교) */
+    @Query("select u from UserAccountEntity u " +
+            "where str(u.userId) like concat('%', :kw, '%')")
+    List<UserAccountEntity> searchByIdLike(@Param("kw") String kw, Pageable pageable);
+
+    /** username 부분일치 (대소문자 무시) */
+    @Query("select u from UserAccountEntity u " +
+            "where lower(u.username) like lower(concat('%', :kw, '%'))")
+    List<UserAccountEntity> searchByUsernameLikeIgnoreCase(@Param("kw") String kw, Pageable pageable);
+
+    /** name 부분일치 (대소문자 무시) */
+    @Query("select u from UserAccountEntity u " +
+            "where lower(u.name) like lower(concat('%', :kw, '%'))")
+    List<UserAccountEntity> searchByNameLikeIgnoreCase(@Param("kw") String kw, Pageable pageable);
+
+    /** role 부분일치 (대소문자 무시, enum을 문자열로 비교) */
+    @Query("select u from UserAccountEntity u " +
+            "where lower(str(u.role)) like lower(concat('%', :kw, '%'))")
+    List<UserAccountEntity> searchByRoleLikeIgnoreCase(@Param("kw") String kw, Pageable pageable);
+
+    // 조사자 상세 정보
+    List<UserAccountEntity> findAllByRoleOrderByUserIdAsc(UserAccountEntity.Role role);
+
+    // 페이징 - 개별 검색
+    Page<UserAccountEntity> findByRole(UserAccountEntity.Role role, Pageable pageable);
+
+    Page<UserAccountEntity> findByRoleAndNameContainingIgnoreCase(
+            UserAccountEntity.Role role, String name, Pageable pageable);
+
+    Page<UserAccountEntity> findByRoleAndUsernameContainingIgnoreCase(
+            UserAccountEntity.Role role, String username, Pageable pageable);
+
+    Page<UserAccountEntity> findByRoleAndEmpNoContainingIgnoreCase(
+            UserAccountEntity.Role role, String empNo, Pageable pageable);
+
+    // 전체 검색 (이름 + 아이디 + 사번)
+    @Query("SELECT u FROM UserAccountEntity u " +
+            "WHERE u.role = :role " +
+            "AND (LOWER(u.name) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "OR LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "OR LOWER(u.empNo) LIKE LOWER(CONCAT('%', :kw, '%')))")
+    Page<UserAccountEntity> searchAllFields(@Param("role") UserAccountEntity.Role role,
+                                            @Param("kw") String keyword,
+                                            Pageable pageable);
+
 }

@@ -1,5 +1,10 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
+<<<<<<< HEAD
+=======
+import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
+import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
+>>>>>>> origin/web/his/MergedTotalSurveyListSearch
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +23,7 @@ public class SurveyResultEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+<<<<<<< HEAD
     // 1. 조사불가여부 (1 or 2)
     private Integer possible;
 
@@ -89,6 +95,66 @@ public class SurveyResultEntity {
     private LocalDateTime createdAt;
 
     // 수정일 (null 허용)
+=======
+    @Column(name = "possible")
+    private Integer possible;
+
+    @Column(name = "admin_use")
+    private Integer adminUse;
+
+    @Column(name = "idle_rate")
+    private Integer idleRate;
+
+    @Column(name = "safety")
+    private Integer safety;
+
+    @Column(name = "wall")
+    private Integer wall;
+
+    @Column(name = "roof")
+    private Integer roof;
+
+    @Column(name = "window_state")
+    private Integer windowState;
+
+    @Column(name = "parking")
+    private Integer parking;
+
+    @Column(name = "entrance")
+    private Integer entrance;
+
+    @Column(name = "ceiling")
+    private Integer ceiling;
+
+    @Column(name = "floor")
+    private Integer floor;
+
+    @Column(name = "ext_photo")
+    private String extPhoto;
+
+    @Column(name = "ext_edit_photo")
+    private String extEditPhoto;
+
+    @Column(name = "int_photo")
+    private String intPhoto;
+
+    @Column(name = "int_edit_photo")
+    private String intEditPhoto;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "ext_etc", length = 500)
+    private String extEtc;
+
+    @Column(name = "int_etc", length = 500)
+    private String intEtc;
+
+    // ✅ 날짜 필드 (중복 제거)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+>>>>>>> origin/web/his/MergedTotalSurveyListSearch
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -102,5 +168,16 @@ public class SurveyResultEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
+<<<<<<< HEAD
 
+=======
+    // 관계 매핑
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "building_id")
+    private BuildingEntity building;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id")
+    private UserAccountEntity user;
+>>>>>>> origin/web/his/MergedTotalSurveyListSearch
 }

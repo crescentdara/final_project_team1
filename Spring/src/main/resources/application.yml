@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # === App ===
 spring:
   application:
@@ -34,10 +35,25 @@ spring:
           batch_versioned_data: true
         order_inserts: true
         order_updates: true
+=======
+spring:
+  datasource:
+    url: jdbc:mysql://58.239.58.243:3306/java502_team1_final_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: java502_team1_final
+    password: java502_team1_final_1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+    defer-datasource-initialization: true
+>>>>>>> origin/web/his/MergedTotalSurveyListSearch
 
   sql:
     init:
       mode: always
+<<<<<<< HEAD
 
 # === 서버 ===
 server:
@@ -52,3 +68,7 @@ naver:
   client:
     id: ${NAVER_CLIENT_ID}
     secret: ${NAVER_CLIENT_SECRET}
+=======
+server:
+  port: 8080
+>>>>>>> origin/web/his/MergedTotalSurveyListSearch

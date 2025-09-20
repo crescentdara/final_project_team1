@@ -1,6 +1,9 @@
 package bitc.full502.final_project_team1.api.web.controller;
 
 import bitc.full502.final_project_team1.api.web.dto.AssignRequestDTO;
+import bitc.full502.final_project_team1.api.web.dto.BuildingDTO;
+import bitc.full502.final_project_team1.api.web.dto.BuildingListItemDto;
+import bitc.full502.final_project_team1.api.web.dto.PageResponseDto;
 import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmentEntity;
@@ -9,6 +12,8 @@ import bitc.full502.final_project_team1.core.domain.repository.UserAccountReposi
 import bitc.full502.final_project_team1.core.domain.repository.UserBuildingAssignmentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -154,4 +159,42 @@ public class BuildingController {
 
         return ResponseEntity.ok(Map.of("success", true, "assignedCount", assignments.size()));
     }
+
+    // 조사 목록 리스트 생성 부분
+    @PostMapping
+    public ResponseEntity<String> createBuilding(@RequestBody BuildingDTO dto) {
+        BuildingEntity entity = new BuildingEntity();
+
+        entity.setLotAddress(dto.getLotAddress());
+        entity.setLatitude(dto.getLatitude());
+        entity.setLongitude(dto.getLongitude());
+        entity.setBuildingName(dto.getBuildingName());
+        entity.setMainUseName(dto.getMainUseName());
+        entity.setStructureName(dto.getStructureName());
+        entity.setGroundFloors(dto.getGroundFloors());
+        entity.setBasementFloors(dto.getBasementFloors());
+        entity.setLandArea(dto.getLandArea());
+        entity.setBuildingArea(dto.getBuildingArea());
+
+        entity.setStatus(0);
+
+        buildingRepo.save(entity);
+
+        return ResponseEntity.ok("저장 완료");
+    }
+
+    @GetMapping("/surveys")
+    public PageResponseDto<BuildingListItemDto> list(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "ALL") String filter,
+            @RequestParam(defaultValue = "1")  int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        var pageable = PageRequest.of(Math.max(0, page-1), Math.max(1, size), Sort.by(Sort.Direction.DESC, "id"));
+        var data = buildingRepo.searchBuildings(keyword, filter, pageable); // ← 메서드 사용
+        var items = data.getContent().stream().map(BuildingListItemDto::from).toList();
+        return new PageResponseDto<>(items, data.getTotalElements(), data.getTotalPages(), data.getNumber()+1, data.getSize());
+    }
+
+    
 }

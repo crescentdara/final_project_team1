@@ -1,9 +1,12 @@
 package bitc.fullstack502.final_project_team1.ui.surveyList
 
 import android.app.Dialog
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.Button
+import androidx.core.os.bundleOf
 import bitc.fullstack502.final_project_team1.R
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -23,11 +26,14 @@ class MapBottomSheetFragment : BottomSheetDialogFragment(), OnMapReadyCallback {
         private const val ARG_LNG = "lng"
         private const val ARG_ADDR = "addr"
 
-        fun newInstance(lat: Double, lng: Double, addr: String) = MapBottomSheetFragment().apply {
-            arguments = Bundle().apply {
-                putDouble(ARG_LAT, lat); putDouble(ARG_LNG, lng); putString(ARG_ADDR, addr)
+        fun newInstance(lat: Double, lng: Double, addr: String): MapBottomSheetFragment =
+            MapBottomSheetFragment().apply {
+                arguments = bundleOf(
+                    ARG_LAT to lat,
+                    ARG_LNG to lng,
+                    ARG_ADDR to addr
+                )
             }
-        }
     }
 
     private lateinit var mapView: MapView
@@ -39,8 +45,11 @@ class MapBottomSheetFragment : BottomSheetDialogFragment(), OnMapReadyCallback {
     override fun getTheme(): Int = R.style.AppBottomSheetDialogTheme
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = BottomSheetDialog(requireContext(), theme)
-        val content = layoutInflater.inflate(R.layout.dialog_map, null, false)
+        // theme 프로퍼티 인식 이슈를 피하려면 style을 직접 지정해도 됩니다.
+        val dialog = BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialogTheme)
+
+        val content = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_map, null, false)
         dialog.setContentView(content)
 
         mapView = content.findViewById(R.id.mapView)
@@ -50,12 +59,14 @@ class MapBottomSheetFragment : BottomSheetDialogFragment(), OnMapReadyCallback {
         mapView.getMapAsync(this)
 
         content.findViewById<Button>(R.id.btnRadius1).setOnClickListener {
-            // 전체화면 맵으로 넘어가서 반경 필터 사용
-            startActivity(FullMapActivity.newIntent(requireContext(),
-                lat = arguments?.getDouble(ARG_LAT),
-                lng = arguments?.getDouble(ARG_LNG),
-                address = arguments?.getString(ARG_ADDR)
-            ))
+            val args = requireArguments()
+            val intent: Intent = FullMapActivity.newIntent(
+                /* context = */ requireContext(),
+                lat = args.getDouble(ARG_LAT),
+                lng = args.getDouble(ARG_LNG),
+                address = args.getString(ARG_ADDR)
+            )
+            startActivity(intent)
             dismiss()
         }
         return dialog
@@ -66,12 +77,15 @@ class MapBottomSheetFragment : BottomSheetDialogFragment(), OnMapReadyCallback {
         map.locationSource = locationSource
         map.uiSettings.isLocationButtonEnabled = true
 
-        // 타겟 마커 표시
-        val lat = arguments?.getDouble(ARG_LAT)
-        val lng = arguments?.getDouble(ARG_LNG)
-        val addr = arguments?.getString(ARG_ADDR) ?: "조사지"
+        val args = requireArguments()
+        val hasLat = args.containsKey(ARG_LAT)
+        val hasLng = args.containsKey(ARG_LNG)
 
-        if (lat != null && lng != null) {
+        if (hasLat && hasLng) {
+            val lat = args.getDouble(ARG_LAT)
+            val lng = args.getDouble(ARG_LNG)
+            val addr = args.getString(ARG_ADDR) ?: "조사지"
+
             val pos = LatLng(lat, lng)
             Marker(pos).apply {
                 captionText = addr

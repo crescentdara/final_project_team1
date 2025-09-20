@@ -18,7 +18,7 @@
     <string name="menu_survey_input">조사결과 입력</string>
     <string name="menu_data_transmission">데이터 전송</string>
 
-    <!-- 로그인 화면에서 참조하는 문자열 (activity_login.xml, activity_main.xml) -->
+    <!-- 로그인 화면 -->
     <string name="login_title">로그인</string>
     <string name="login_subtitle">계정 정보를 입력하세요</string>
     <string name="login_id_hint">아이디</string>
@@ -30,7 +30,7 @@
     <string name="category_survey_list">조사목록 관리</string>
     <string name="category_survey_input">조사결과 입력</string>
     <string name="category_data_transmission">데이터 전송</string>
-    
+
     <!-- 조사현황 -->
     <string name="survey_scheduled">조사 예정</string>
     <string name="survey_resurvey_target">재조사 대상</string>
@@ -38,21 +38,21 @@
     <string name="survey_not_transmitted">미전송</string>
     <string name="survey_list_management">조사목록 관리 페이지로 이동</string>
     <string name="data_transmission_page">데이터 전송 페이지로 이동</string>
-    
+
     <!-- 데이터 전송 -->
     <string name="data_transmission_title">데이터 전송</string>
     <string name="survey_result">조사 결과</string>
     <string name="transmit">전송하기</string>
     <string name="sort_latest">최신순</string>
     <string name="sort_oldest">과거순</string>
-    
+
     <!-- 전송완료 -->
     <string name="transmission_complete_title">전송 완료</string>
     <string name="approval_complete">결재 완료</string>
     <string name="filter_all">전체</string>
     <string name="filter_approval_complete">결재완료</string>
     <string name="filter_processing">처리중</string>
-    
+
     <!-- 조사결과 -->
     <string name="survey_result_title">조사결과</string>
     <string name="management_number">관리번호</string>
@@ -66,23 +66,27 @@
     <string name="save">저장</string>
     <string name="cancel">취소</string>
 
-    <!-- ✅ 메인페이지용 새로 추가한 부분 -->
-    <string name="title_main">부동산 실태조사</string> <!-- 툴바 제목 -->
-    <string name="placeholder_username">조사원명 자리</string> <!-- 사용자 이름 기본 -->
-    <string name="placeholder_progress">진행률: -%</string> <!-- 진행률 기본 -->
-    <string name="placeholder_total">총 조사 건수: -</string> <!-- 총 건수 기본 -->
-    <string name="placeholder_today">금일 완료: -</string> <!-- 금일 완료 기본 -->
-    <string name="btn_survey_list">조사목록 보기</string> <!-- 버튼 -->
-    <string name="label_dashboard">조사현황</string> <!-- 대시보드 제목 -->
-    <string name="label_detail">자세히 보기</string> <!-- 대시보드 오른쪽 링크 -->
-    <string name="placeholder_graph">그래프 영역</string> <!-- 그래프 자리 안내 -->
+    <!-- 메인페이지/대시보드 -->
+    <string name="title_main">부동산 실태조사</string>
+    <string name="placeholder_username">조사원명 자리</string>
+    <string name="placeholder_progress">진행률: -%</string>
+    <string name="placeholder_total">총 조사 건수: -</string>
+    <string name="placeholder_today">금일 완료: -</string>
+    <string name="btn_survey_list">조사목록 보기</string>
+    <string name="label_dashboard">조사현황</string>
+    <string name="label_detail">자세히 보기</string>
+    <string name="placeholder_graph">그래프 영역</string>
 
-        <string name="reinspect_start">재조사 시작</string>
-        <string name="survey_start">조사 시작</string>
-        <string name="reject_reason_fmt">반려사유: %1$s</string>
-        <string name="rejected_at_fmt">반려일자: %1$s</string>
-        <string name="building_load_failed_fmt">건물 정보를 불러오지 못했습니다: %1$s</string>
-        <string name="reinspect_start_failed_fmt">재조사 시작 실패: %1$s</string>
-        <string name="invalid_survey">유효하지 않은 설문입니다.</string>
+    <!-- BottomSheet/상세 관련 -->
+    <string name="reinspect_start">재조사 시작</string>
+    <string name="survey_start">조사 시작</string>
+    <string name="reject_reason_fmt">반려사유: %1$s</string>
+    <string name="rejected_at_fmt">반려일자: %1$s</string>
+    <string name="building_load_failed_fmt">건물 정보를 불러오지 못했습니다: %1$s</string>
+    <string name="reinspect_start_failed_fmt">재조사 시작 실패: %1$s</string>
+    <string name="invalid_survey">유효하지 않은 설문입니다.</string>
+    <string name="login_required">로그인이 필요합니다.</string>
+
+    <!-- Spinner 등에서 쓰는 배열 (오류 방지) -->
 
 </resources>

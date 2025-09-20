@@ -19,6 +19,8 @@ import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
 import bitc.fullstack502.final_project_team1.ui.SurveyActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+
 
 class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
@@ -166,13 +168,14 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
     private fun renderBuilding(container: LinearLayout, b: BuildingDetailDto) {
         container.removeAllViews()
+
         fun add(label: String, value: String?) {
             container.addView(TextView(requireContext()).apply {
                 text = "$label : ${value ?: "-"}"
                 textSize = 14f
             })
         }
-        add("번지주소", b.lotAddress)
+
         add("도로명주소", b.roadAddress)
         add("건물명", b.buildingName)
         add("지상층수", b.groundFloors?.toString())
@@ -185,4 +188,5 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         add("구조", b.structureName)
         add("높이(m)", b.height?.toString())
     }
+
 }

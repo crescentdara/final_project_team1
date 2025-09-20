@@ -4,56 +4,44 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import bitc.fullstack502.final_project_team1.MainActivity
-import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.core.AuthManager
+import bitc.fullstack502.final_project_team1.databinding.ActivityLoginBinding
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.LoginRequest
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var etId: TextInputEditText
-    private lateinit var etPw: TextInputEditText
-    private lateinit var btnLogin: MaterialButton
-    private lateinit var tvError: TextView
-    private lateinit var progress: ProgressBar
+    private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 이미 로그인되어 있으면 바로 메인으로 (레이아웃 세팅 전에)
+        // 이미 로그인되어 있으면 즉시 메인
         if (AuthManager.isLoggedIn(this) && !AuthManager.isExpired(this)) {
             goMain()
             return
         }
 
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        etId = findViewById(R.id.etId)
-        etPw = findViewById(R.id.etPw)
-        btnLogin = findViewById(R.id.btnLogin)
-        tvError = findViewById(R.id.tvError)
-        progress = findViewById(R.id.progress)
+        with(binding) {
+            tvError.isVisible = false
 
-        tvError.isVisible = false
-
-        etPw.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) { doLogin(); true } else false
+            etPw.setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) { doLogin(); true } else false
+            }
+            btnLogin.setOnClickListener { doLogin() }
         }
-        btnLogin.setOnClickListener { doLogin() }
     }
 
-
-    private fun doLogin() {
+    private fun doLogin() = with(binding) {
         val id = etId.text?.toString()?.trim().orEmpty()
         val pw = etPw.text?.toString()?.trim().orEmpty()
 
@@ -93,22 +81,23 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun goMain() {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        startActivity(intent)
+        startActivity(
+            Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        )
     }
 
-    private fun setLoading(loading: Boolean) {
+    private fun setLoading(loading: Boolean) = with(binding) {
         progress.visibility = if (loading) View.VISIBLE else View.GONE
         btnLogin.isEnabled = !loading
         etId.isEnabled = !loading
         etPw.isEnabled = !loading
     }
 
-    private fun showError(msg: String) {
+    private fun showError(msg: String) = with(binding) {
         tvError.isVisible = true
         tvError.text = msg
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@LoginActivity, msg, Toast.LENGTH_SHORT).show()
     }
 }

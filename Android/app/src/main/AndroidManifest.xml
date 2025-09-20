@@ -12,12 +12,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.CAMERA" />
+    
+    <!-- 하드웨어 기능 -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
-
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -60,8 +57,11 @@
 <<<<<<< HEAD
 =======
         <!-- 카테고리/상태 -->
+<<<<<<< HEAD
 
 >>>>>>> origin/app/hsm/ResultDign
+=======
+>>>>>>> app/shs/DesignFeature
         <activity android:name=".ui.survey.SurveyStatusActivity" />
         <activity android:name=".ui.surveyList.ReinspectListActivity" />
 
@@ -73,12 +73,17 @@
         <activity android:name=".ui.transmission.ResultActivity" />
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         <activity android:name=".ui.transmission.PhotoEditActivity" />
 =======
 
 >>>>>>> origin/app/hsm/ResultDign
 
+=======
+>>>>>>> app/shs/DesignFeature
         <activity android:name=".ui.transmission.EditActivity" />
+
+        <activity android:name=".ui.transmission.PhotoEditActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

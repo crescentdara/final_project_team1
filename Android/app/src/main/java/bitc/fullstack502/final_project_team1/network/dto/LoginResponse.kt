@@ -16,5 +16,5 @@ data class UserInfo(
     val username: String,      // 사용자 계정 ID
     val name: String,          // 사용자 이름
     val role: String,          // 사용자 역할
-    val empno: String?         // ✅ 추가: 사번 (없으면 null)
+    val emp_no: String?         // ✅ 추가: 사번 (없으면 null)
 )

@@ -1,12 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Final_Project_Team1" parent="Theme.Material3.DayNight.NoActionBar">
+<<<<<<< HEAD
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="colorPrimary">@color/my_blue</item>      <!-- M3 Primary 색상 -->
         <item name="colorSecondary">@color/my_blue</item>    <!-- 보조 색상 -->
         <item name="colorControlActivated">@color/my_blue</item>
 
+=======
+        <!-- 새로운 색상 테마 적용 -->
+        <item name="colorPrimary">@color/primary_blue</item>
+        <item name="colorPrimaryVariant">@color/primary_blue_dark</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorSurface">@color/background_white</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:colorBackground">@color/background_light_gray</item>
+        <item name="android:windowBackground">@color/background_light_gray</item>
+>>>>>>> app/shs/DesignFeature
     </style>
 
     <style name="Theme.Final_Project_Team1" parent="Base.Theme.Final_Project_Team1" />

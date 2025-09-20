@@ -3,17 +3,67 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginBottom="12dp"
+    android:backgroundTint="@android:color/white"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    app:strokeColor="@color/border_light"
+    app:strokeWidth="1dp">
 
-    <TextView
-        android:id="@+id/txtAddress"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="주소"
-        android:textColor="#333333"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="10dp">
+
+
+        <!-- 주소 정보 -->
+        <TextView
+                android:id="@+id/txtAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="주소"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+        <!-- 전송 일시 -->
+        <TextView
+                android:id="@+id/txtDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="전송일시: 2024-01-15 14:30"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:drawableStart="@drawable/ic_clock"
+                android:drawablePadding="4dp"
+                android:gravity="center_vertical" />
+
+        <!-- 상단: 상태 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal"
+            android:gravity="end|center_vertical">
+
+            <!-- 여백 -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- 상태 표시 -->
+            <TextView
+                android:id="@+id/txtStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="결재완료"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:padding="4dp" />
+        </LinearLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

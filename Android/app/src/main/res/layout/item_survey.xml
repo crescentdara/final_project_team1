@@ -1,33 +1,109 @@
 <!-- res/layout/item_survey.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="8dp"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:background="@android:drawable/dialog_holo_light_frame"
-    android:layout_marginBottom="8dp">
-
-    <TextView
-        android:id="@+id/tvAddress"
-        android:layout_width="wrap_content"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="주소"
-        android:textStyle="bold"
-        android:textSize="16sp"/>
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/card_background"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:strokeColor="@color/border_light"
+        app:strokeWidth="1dp">
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp">
-        <Button
-            android:id="@+id/btnMap"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="지도보기"/>
-        <Button
-            android:id="@+id/btnRoute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="길찾기"
-            android:layout_marginStart="8dp"/>
+            android:orientation="vertical"
+            android:padding="20dp">
+
+        <!-- 조사 상태 표시 -->
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/primary_blue"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
+                    android:text="조사예정"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp" />
+
+            <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+            <!-- 상태 표시 -->
+            <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="대기중"
+                    android:textColor="@color/text_light"
+                    android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- 주소 표시 -->
+        <TextView
+                android:id="@+id/tvAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="주소"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        <!-- 조사 정보 (배정일자) -->
+        <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="배정일자: 미정"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+        <!-- 액션 버튼들 -->
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMap"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="지도보기"
+                    android:textColor="@color/primary_blue"
+                    android:textSize="12sp"
+                    app:cornerRadius="8dp"
+                    app:strokeColor="@color/primary_blue" />
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRoute"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="길찾기"
+                    android:textColor="@color/primary_blue"
+                    android:textSize="12sp"
+                    app:cornerRadius="8dp"
+                    app:strokeColor="@color/primary_blue" />
+        </LinearLayout>
+
     </LinearLayout>
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

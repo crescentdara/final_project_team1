@@ -3,6 +3,10 @@
     <style name="Base.Theme.Final_Project_Team1" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/my_blue</item>      <!-- M3 Primary 색상 -->
+        <item name="colorSecondary">@color/my_blue</item>    <!-- 보조 색상 -->
+        <item name="colorControlActivated">@color/my_blue</item>
+
     </style>
 
     <style name="Theme.Final_Project_Team1" parent="Base.Theme.Final_Project_Team1" />

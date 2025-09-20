@@ -6,6 +6,7 @@ import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
 import bitc.fullstack502.final_project_team1.network.dto.ListWithStatusResponse
 import bitc.fullstack502.final_project_team1.network.dto.LoginRequest
 import bitc.fullstack502.final_project_team1.network.dto.LoginResponse
+<<<<<<< HEAD
 import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
 import bitc.fullstack502.final_project_team1.network.dto.SurveyResultResponse
 import okhttp3.MultipartBody
@@ -15,6 +16,14 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+=======
+import bitc.fullstack502.final_project_team1.network.dto.SurveyResultResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.GET
+>>>>>>> origin/app/hsm/ResultDign
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -62,6 +71,10 @@ interface ApiService {
         @Part intEditPhoto: MultipartBody.Part?
     ): Response<SurveyResultResponse>
 
+<<<<<<< HEAD
+=======
+    // (옵션) 수정 => PUT /app/survey/result/edit/{id}
+>>>>>>> origin/app/hsm/ResultDign
     @Multipart
     @PUT("survey/result/edit/{id}")
     suspend fun updateSurvey(
@@ -73,6 +86,7 @@ interface ApiService {
         @Part intEditPhoto: MultipartBody.Part?
     ): Response<SurveyResultResponse>
 
+<<<<<<< HEAD
     @GET("survey/result/{id}")
     suspend fun getSurvey(@Path("id") id: Long): Response<SurveyResultResponse>
 
@@ -108,5 +122,11 @@ interface ApiService {
         @Header("X-USER-ID") userId: Int,  // ← Int
         @Path("surveyId") surveyId: Long
     ): ResponseBody
+=======
+    // (옵션) 단건 조회
+    @GET("survey/result/{id}")
+    suspend fun getSurvey(@Path("id") id: Long): Response<SurveyResultResponse>
+
+>>>>>>> origin/app/hsm/ResultDign
 
 }

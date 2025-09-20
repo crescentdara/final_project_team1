@@ -62,10 +62,14 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
     }
 
     private var buildingId: Long = -1
+<<<<<<< HEAD
     private var surveyId: Long = -1
     private var mode: String = "NEW"
 
     private var lotAddress: String? = null // 서버에서 받은 번지주소 캐시
+=======
+    private var lotAddress: String? = null   // ✅ 인텐트로 넘길 주소 캐시
+>>>>>>> origin/app/hsm/ResultDign
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +88,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
         val info = view.findViewById<LinearLayout>(R.id.infoContainer)
 
+<<<<<<< HEAD
         // (선택) 반려정보 영역이 레이아웃에 있으면 채워줌(없어도 에러 안 남)
         view.findViewById<TextView?>(R.id.tvRejectReason)?.let { tv ->
             val reason = arguments?.getString(ARG_REJECT_REASON).orEmpty()
@@ -109,6 +114,29 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                 .onSuccess { building ->
                     lotAddress = building.lotAddress
                     renderBuilding(info, building)
+=======
+        // 🔹 조사 시작 → SurveyActivity로 이동 (ID + 주소 같이 전달)
+        btnStart.setOnClickListener {
+            val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
+                putExtra("buildingId", buildingId)
+                putExtra("lotAddress", lotAddress ?: "") // ✅ 주소 전달 (없으면 빈 문자열)
+            }
+            startActivity(intent)
+            dismiss()
+        }
+
+        // 🔹 건물 정보 불러오기
+        CoroutineScope(Dispatchers.Main).launch {
+            runCatching {
+                ApiClient.service.getBuildingDetail(buildingId)
+            }.onSuccess { building ->
+                // ✅ 주소 캐시 (인텐트에서 사용)
+                lotAddress = building.lotAddress
+                showBuildingInfo(infoContainer, building)
+            }.onFailure {
+                val tv = TextView(requireContext()).apply {
+                    text = "건물 정보를 불러오지 못했습니다: ${it.message}"
+>>>>>>> origin/app/hsm/ResultDign
                 }
                 .onFailure {
                     info.addView(TextView(requireContext()).apply {

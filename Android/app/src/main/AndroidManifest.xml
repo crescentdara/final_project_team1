@@ -57,6 +57,11 @@
         <activity android:name=".ui.surveyList.RouteActivity" />
         <activity android:name=".ui.surveyList.SurveyListActivity" />
 
+<<<<<<< HEAD
+=======
+        <!-- 카테고리/상태 -->
+
+>>>>>>> origin/app/hsm/ResultDign
         <activity android:name=".ui.survey.SurveyStatusActivity" />
         <activity android:name=".ui.surveyList.ReinspectListActivity" />
 
@@ -67,7 +72,11 @@
 
         <activity android:name=".ui.transmission.ResultActivity" />
 
+<<<<<<< HEAD
         <activity android:name=".ui.transmission.PhotoEditActivity" />
+=======
+
+>>>>>>> origin/app/hsm/ResultDign
 
         <activity android:name=".ui.transmission.EditActivity" />
 

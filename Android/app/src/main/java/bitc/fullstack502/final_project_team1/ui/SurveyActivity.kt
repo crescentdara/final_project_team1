@@ -2,7 +2,13 @@ package bitc.fullstack502.final_project_team1.ui
 
 import android.app.Activity
 import android.content.Intent
+<<<<<<< HEAD
 import android.graphics.BitmapFactory
+=======
+import android.content.res.ColorStateList
+import android.graphics.BitmapFactory
+import android.graphics.Color
+>>>>>>> origin/app/hsm/ResultDign
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -95,8 +101,13 @@ class SurveyActivity : AppCompatActivity() {
         backButton = findViewById(R.id.back_button)
         nextButton = findViewById(R.id.next_button)
         submitButton = findViewById(R.id.submit_button)
+<<<<<<< HEAD
         tempButton = findViewById(R.id.save_temp_button) // ✅ XML 아이디와 맞춤
         submitButton.visibility = View.GONE // 모든 항목 완료 전 숨김
+=======
+        tempButton = findViewById(R.id.save_temp_button)
+        submitButton.visibility = View.GONE
+>>>>>>> origin/app/hsm/ResultDign
         tempButton.visibility   = View.GONE
 
         backButton.setOnClickListener { if (currentStage > 0) showStage(currentStage - 1) }
@@ -116,6 +127,7 @@ class SurveyActivity : AppCompatActivity() {
         tabButtons.forEach { (btn, idx) -> btn.setOnClickListener { showStage(idx) } }
 
         // ===== 사진 버튼 =====
+<<<<<<< HEAD
         // 외부 - 촬영
         findViewById<ImageButton>(R.id.btn_extPhoto).setOnClickListener {
             startCamera(REQ_CAPTURE_EXT)
@@ -152,6 +164,29 @@ class SurveyActivity : AppCompatActivity() {
             }
         }
 
+=======
+        findViewById<ImageButton>(R.id.btn_extPhoto).setOnClickListener { startCamera(REQ_CAPTURE_EXT) }
+        findViewById<ImageButton>(R.id.btn_extEditPhoto).setOnClickListener {
+            val src = extPhotoFile
+            if (src == null) { Toast.makeText(this, "외부 사진을 먼저 촬영하세요.", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+            startEdit(REQ_EDIT_EXT, src)
+        }
+        findViewById<ImageButton>(R.id.btn_intPhoto).setOnClickListener { startCamera(REQ_CAPTURE_INT) }
+        findViewById<ImageButton>(R.id.btn_intEditPhoto).setOnClickListener {
+            val src = intPhotoFile
+            if (src == null) { Toast.makeText(this, "내부 사진을 먼저 촬영하세요.", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+            startEdit(REQ_EDIT_INT, src)
+        }
+
+        // 라디오 변화 감지 → 다음/제출 버튼 상태 갱신
+        allRadioGroups().forEach { rg ->
+            rg.setOnCheckedChangeListener { _, _ ->
+                updateNextButton()
+                updateSubmitVisibility()
+            }
+        }
+
+>>>>>>> origin/app/hsm/ResultDign
         showStage(0)
         updateSubmitVisibility()
     }
@@ -161,15 +196,27 @@ class SurveyActivity : AppCompatActivity() {
         stages.forEach { it.visibility = View.GONE }
         currentStage = index
         stages[currentStage].visibility = View.VISIBLE
+<<<<<<< HEAD
         updateTabs()
+=======
+        updateTabs()          // ✅ 탭 색상 업데이트
+>>>>>>> origin/app/hsm/ResultDign
         updateNextButton()
         updateSubmitVisibility()
     }
 
+    // ===== 상단 탭 색상 변경 =====
     private fun updateTabs() {
         tabButtons.forEach { (button, idx) ->
             val selected = idx == currentStage
+<<<<<<< HEAD
             button.alpha = if (selected) 1f else 0.6f
+=======
+            button.backgroundTintList = ColorStateList.valueOf(
+                if (selected) Color.parseColor("#6898FF") else Color.parseColor("#CCCCCC")
+            )
+            button.setTextColor(Color.WHITE)
+>>>>>>> origin/app/hsm/ResultDign
         }
     }
 
@@ -181,7 +228,10 @@ class SurveyActivity : AppCompatActivity() {
         nextButton.alpha = if (nextButton.isEnabled) 1f else 0.5f
     }
 
+<<<<<<< HEAD
     /** 모든 필수 항목이 입력되었는지(라디오 11개 + 외/내 원본 2장 + 외/내 편집본 2장) */
+=======
+>>>>>>> origin/app/hsm/ResultDign
     private fun allCompleted(): Boolean {
         val requiredGroups = listOf(
             R.id.radioGroup_possible,
@@ -196,6 +246,7 @@ class SurveyActivity : AppCompatActivity() {
             R.id.radioGroup_ceiling,
             R.id.radioGroup_floor
         )
+<<<<<<< HEAD
         val radiosOk = requiredGroups.all { rgId ->
             findViewById<RadioGroup>(rgId).checkedRadioButtonId != -1
         }
@@ -203,13 +254,21 @@ class SurveyActivity : AppCompatActivity() {
                 intPhotoFile != null &&
                 extEditPhotoFile != null &&
                 intEditPhotoFile != null
+=======
+        val radiosOk = requiredGroups.all { rgId -> findViewById<RadioGroup>(rgId).checkedRadioButtonId != -1 }
+        val photosOk = extPhotoFile != null && intPhotoFile != null && extEditPhotoFile != null && intEditPhotoFile != null
+>>>>>>> origin/app/hsm/ResultDign
         return radiosOk && photosOk
     }
 
     private fun updateSubmitVisibility() {
         val visible = if (allCompleted()) View.VISIBLE else View.GONE
         submitButton.visibility = visible
+<<<<<<< HEAD
         tempButton.visibility   = visible   // ← 추가
+=======
+        tempButton.visibility   = visible
+>>>>>>> origin/app/hsm/ResultDign
     }
 
     // ===== 유틸 =====
@@ -258,7 +317,10 @@ class SurveyActivity : AppCompatActivity() {
         if (resultCode != Activity.RESULT_OK) return
 
         when (requestCode) {
+<<<<<<< HEAD
             // ---- 촬영 결과 (원본 2장) ----
+=======
+>>>>>>> origin/app/hsm/ResultDign
             REQ_CAPTURE_EXT -> {
                 extPhotoFile = pendingOutputFile
                 pendingOutputFile = null
@@ -277,13 +339,19 @@ class SurveyActivity : AppCompatActivity() {
                     }
                 }
             }
+<<<<<<< HEAD
 
             // ---- 편집 결과 (편집본 2장) ----
+=======
+>>>>>>> origin/app/hsm/ResultDign
             REQ_EDIT_EXT -> {
                 val uriStr = data?.getStringExtra(EditActivity.EXTRA_EDITED_IMAGE_URI) ?: return
                 val file = File(Uri.parse(uriStr).path!!)
                 extEditPhotoFile = file
+<<<<<<< HEAD
                 // ✅ 편집본을 같은 이미지뷰에 덮어 표시 (별도 편집 이미지뷰 없음)
+=======
+>>>>>>> origin/app/hsm/ResultDign
                 BitmapFactory.decodeFile(file.absolutePath)?.also { bmp ->
                     findViewById<ImageView>(R.id.img_extPhoto).setImageBitmap(bmp)
                 }
@@ -292,7 +360,10 @@ class SurveyActivity : AppCompatActivity() {
                 val uriStr = data?.getStringExtra(EditActivity.EXTRA_EDITED_IMAGE_URI) ?: return
                 val file = File(Uri.parse(uriStr).path!!)
                 intEditPhotoFile = file
+<<<<<<< HEAD
                 // ✅ 편집본을 같은 이미지뷰에 덮어 표시
+=======
+>>>>>>> origin/app/hsm/ResultDign
                 BitmapFactory.decodeFile(file.absolutePath)?.also { bmp ->
                     findViewById<ImageView>(R.id.img_intPhoto).setImageBitmap(bmp)
                 }
@@ -301,14 +372,20 @@ class SurveyActivity : AppCompatActivity() {
         updateSubmitVisibility()
     }
 
+<<<<<<< HEAD
     // ===== 라디오 인덱스(1부터) =====
+=======
+>>>>>>> origin/app/hsm/ResultDign
     private fun idxOfChecked(rgId: Int): Int {
         val rg = findViewById<RadioGroup>(rgId)
         if (rg.checkedRadioButtonId == -1) return 0
         return rg.indexOfChild(findViewById(rg.checkedRadioButtonId)) + 1
     }
 
+<<<<<<< HEAD
     // 파일 → Multipart
+=======
+>>>>>>> origin/app/hsm/ResultDign
     private fun File.toPart(name: String): MultipartBody.Part {
         val body = this.asRequestBody("image/jpeg".toMediaTypeOrNull())
         return MultipartBody.Part.createFormData(name, this.name, body)
@@ -335,8 +412,12 @@ class SurveyActivity : AppCompatActivity() {
                 userId      = 1
             )
 
+<<<<<<< HEAD
             val dtoBody = Gson().toJson(dto)
                 .toRequestBody("application/json".toMediaTypeOrNull())
+=======
+            val dtoBody = Gson().toJson(dto).toRequestBody("application/json".toMediaTypeOrNull())
+>>>>>>> origin/app/hsm/ResultDign
 
             val res = ApiClient.service.submitSurvey(
                 dto = dtoBody,
@@ -376,8 +457,12 @@ class SurveyActivity : AppCompatActivity() {
                 userId      = 1
             )
 
+<<<<<<< HEAD
             val dtoBody = Gson().toJson(dto)
                 .toRequestBody("application/json".toMediaTypeOrNull())
+=======
+            val dtoBody = Gson().toJson(dto).toRequestBody("application/json".toMediaTypeOrNull())
+>>>>>>> origin/app/hsm/ResultDign
 
             val res = ApiClient.service.saveTemp(
                 dto = dtoBody,

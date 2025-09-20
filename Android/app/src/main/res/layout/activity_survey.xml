@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+<<<<<<< HEAD
     android:layout_height="match_parent">
+=======
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+>>>>>>> origin/app/hsm/ResultDign
 
     <!-- 스크롤 가능한 본문 -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+<<<<<<< HEAD
         android:paddingBottom="80dp">
+=======
+        android:paddingBottom="250dp"> <!-- 하단 버튼과 겹치지 않게 패딩 -->
+>>>>>>> origin/app/hsm/ResultDign
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,42 +40,78 @@
                         android:id="@+id/btn_investigation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="조사불가" />
+=======
+                        android:backgroundTint="#6898FF"
+                        android:text="조사불가"
+                        android:textColor="#FFFFFF" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <Button
                         android:id="@+id/btn_purpose"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+<<<<<<< HEAD
                         android:text="행정목적" />
+=======
+                        android:backgroundTint="#6898FF"
+                        android:text="행정목적"
+                        android:textColor="#FFFFFF" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <Button
                         android:id="@+id/btn_idle_ratio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+<<<<<<< HEAD
                         android:text="유휴비율" />
+=======
+                        android:backgroundTint="#6898FF"
+                        android:text="유휴비율"
+                        android:textColor="#FFFFFF" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <Button
                         android:id="@+id/btn_safety"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+<<<<<<< HEAD
                         android:text="안전등급" />
+=======
+                        android:backgroundTint="#6898FF"
+                        android:text="안전등급"
+                        android:textColor="#FFFFFF" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <Button
                         android:id="@+id/btn_external_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+<<<<<<< HEAD
                         android:text="외부상태" />
+=======
+                        android:backgroundTint="#6898FF"
+                        android:text="외부상태"
+                        android:textColor="#FFFFFF" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <Button
                         android:id="@+id/btn_internal_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+<<<<<<< HEAD
                         android:text="내부상태" />
+=======
+                        android:backgroundTint="#6898FF"
+                        android:text="내부상태"
+                        android:textColor="#FFFFFF" />
+>>>>>>> origin/app/hsm/ResultDign
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -78,6 +123,11 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="12dp"
                 android:text="조사중: -"
+<<<<<<< HEAD
+=======
+                android:layout_marginBottom="16dp"
+                android:textColor="#333333"
+>>>>>>> origin/app/hsm/ResultDign
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -88,28 +138,55 @@
                 android:id="@+id/stage_investigation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:orientation="vertical">
+=======
+                android:layout_marginBottom="8dp"
+                android:background="#FFFFFF"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="12dp">
+>>>>>>> origin/app/hsm/ResultDign
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="조사불가 여부"
+<<<<<<< HEAD
+=======
+                    android:textColor="#333333"
+>>>>>>> origin/app/hsm/ResultDign
                     android:textStyle="bold" />
 
                 <RadioGroup
                     android:id="@+id/radioGroup_possible"
                     android:layout_width="match_parent"
+<<<<<<< HEAD
                     android:layout_height="wrap_content">
+=======
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+>>>>>>> origin/app/hsm/ResultDign
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="가능" />
+=======
+                        android:text="가능"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="불가" />
+=======
+                        android:text="불가"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
             </LinearLayout>
 
@@ -118,34 +195,66 @@
                 android:id="@+id/stage_purpose"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:orientation="vertical"
+=======
+                android:layout_marginBottom="8dp"
+                android:background="#FFFFFF"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="12dp"
+>>>>>>> origin/app/hsm/ResultDign
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="행정목적 활용여부"
+<<<<<<< HEAD
+=======
+                    android:textColor="#333333"
+>>>>>>> origin/app/hsm/ResultDign
                     android:textStyle="bold" />
 
                 <RadioGroup
                     android:id="@+id/radioGroup_adminUse"
                     android:layout_width="match_parent"
+<<<<<<< HEAD
                     android:layout_height="wrap_content">
+=======
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+>>>>>>> origin/app/hsm/ResultDign
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="활용" />
+=======
+                        android:text="활용"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="일부 활용" />
+=======
+                        android:text="일부 활용"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="미활용" />
+=======
+                        android:text="미활용"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
             </LinearLayout>
 
@@ -154,39 +263,76 @@
                 android:id="@+id/stage_idle_ratio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:orientation="vertical"
+=======
+                android:layout_marginBottom="8dp"
+                android:background="#FFFFFF"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="12dp"
+>>>>>>> origin/app/hsm/ResultDign
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="유휴비율"
+<<<<<<< HEAD
+=======
+                    android:textColor="#333333"
+>>>>>>> origin/app/hsm/ResultDign
                     android:textStyle="bold" />
 
                 <RadioGroup
                     android:id="@+id/radioGroup_idleRate"
                     android:layout_width="match_parent"
+<<<<<<< HEAD
                     android:layout_height="wrap_content">
+=======
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+>>>>>>> origin/app/hsm/ResultDign
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="0~10%" />
+=======
+                        android:text="0~10%"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="10~30%" />
+=======
+                        android:text="10~30%"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="30~50%" />
+=======
+                        android:text="30~50%"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+<<<<<<< HEAD
                         android:text="50% 이상" />
+=======
+                        android:text="50% 이상"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
             </LinearLayout>
 
@@ -195,18 +341,31 @@
                 android:id="@+id/stage_safety"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:orientation="vertical"
+=======
+                android:layout_marginBottom="8dp"
+                android:background="#FFFFFF"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="12dp"
+>>>>>>> origin/app/hsm/ResultDign
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="안전등급"
+<<<<<<< HEAD
+=======
+                    android:textColor="#333333"
+>>>>>>> origin/app/hsm/ResultDign
                     android:textStyle="bold" />
 
                 <RadioGroup
                     android:id="@+id/radioGroup_safety"
                     android:layout_width="match_parent"
+<<<<<<< HEAD
                     android:layout_height="wrap_content">
 
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="A"/>
@@ -214,6 +373,40 @@
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="C"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="D"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="E"/>
+=======
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="B"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="C"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="D"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="E"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
             </LinearLayout>
 
@@ -222,87 +415,211 @@
                 android:id="@+id/stage_external_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:orientation="vertical"
+=======
+                android:layout_marginBottom="8dp"
+                android:background="#FFFFFF"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="12dp"
+>>>>>>> origin/app/hsm/ResultDign
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="외부상태"
+<<<<<<< HEAD
+=======
+                    android:textColor="#333333"
+>>>>>>> origin/app/hsm/ResultDign
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
                     android:text="외벽" />
+=======
+                    android:text="외벽"
+                    android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                 <RadioGroup
                     android:id="@+id/radioGroup_wall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+<<<<<<< HEAD
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="양호"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="보통"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="불량"/>
+=======
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="양호"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="보통"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="불량"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
                     android:text="옥상" />
+=======
+                    android:text="옥상"
+                    android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                 <RadioGroup
                     android:id="@+id/radioGroup_roof"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+<<<<<<< HEAD
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="양호"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="보통"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="불량"/>
+=======
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="양호"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="보통"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="불량"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
                     android:text="창호" />
+=======
+                    android:text="창호"
+                    android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                 <RadioGroup
                     android:id="@+id/radioGroup_window"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+<<<<<<< HEAD
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="양호"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="보통"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="불량"/>
+=======
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="양호"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="보통"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="불량"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
                     android:text="주차" />
+=======
+                    android:text="주차"
+                    android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                 <RadioGroup
                     android:id="@+id/radioGroup_parking"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+<<<<<<< HEAD
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="가능"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="불가"/>
+=======
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="가능"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="불가"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
 
                 <EditText
                     android:id="@+id/input_extEtc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
                     android:hint="외부 기타사항 입력" />
 
                 <!-- 외부: 이미지 + 카메라/편집 버튼(한 줄) -->
+=======
+                    android:background="#EEEEEE"
+                    android:layout_marginTop="16dp"
+                    android:hint="외부 기타사항 입력"
+                    android:layout_marginBottom="16dp"
+                    android:textColor="#333333" />
+
+>>>>>>> origin/app/hsm/ResultDign
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="외부 사진"
+<<<<<<< HEAD
+=======
+                    android:textColor="#333333"
+>>>>>>> origin/app/hsm/ResultDign
                     android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/img_extPhoto"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
+<<<<<<< HEAD
                     android:background="#CCCCCC"
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop" />
@@ -318,14 +635,47 @@
                         android:layout_height="48dp"
                         android:src="@drawable/ic_camera"
                         android:contentDescription="외부 촬영" />
+=======
+                    android:adjustViewBounds="true"
+                    android:background="#CCCCCC"
+                    android:scaleType="centerCrop" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp">
+
+                    <!-- 카메라 버튼: 가운데 정렬 -->
+                    <ImageButton
+                        android:id="@+id/btn_extPhoto"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/circle_border"
+                        android:padding="8dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_camera" />
+
+                    <!-- 편집 버튼: 오른쪽 끝 정렬 -->
+>>>>>>> origin/app/hsm/ResultDign
                     <ImageButton
                         android:id="@+id/btn_extEditPhoto"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+<<<<<<< HEAD
                         android:layout_marginStart="8dp"
                         android:src="@drawable/ic_edit"
                         android:contentDescription="외부 편집" />
                 </LinearLayout>
+=======
+                        android:layout_gravity="end|center_vertical"
+                        android:backgroundTint="#C5C7CA"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_edit"
+                        android:layout_marginEnd="12dp" />
+
+                </FrameLayout>
+>>>>>>> origin/app/hsm/ResultDign
             </LinearLayout>
 
             <!-- 6. 내부상태 -->
@@ -333,74 +683,178 @@
                 android:id="@+id/stage_internal_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+<<<<<<< HEAD
                 android:orientation="vertical"
+=======
+                android:layout_marginBottom="8dp"
+                android:background="#FFFFFF"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="12dp"
+>>>>>>> origin/app/hsm/ResultDign
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="내부상태"
+<<<<<<< HEAD
+=======
+                    android:textColor="#333333"
+>>>>>>> origin/app/hsm/ResultDign
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
                     android:text="현관" />
+=======
+                    android:text="현관"
+                    android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                 <RadioGroup
                     android:id="@+id/radioGroup_entrance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+<<<<<<< HEAD
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="양호"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="보통"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="불량"/>
+=======
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="양호"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="보통"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="불량"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
                     android:text="천장" />
+=======
+                    android:text="천장"
+                    android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                 <RadioGroup
                     android:id="@+id/radioGroup_ceiling"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+<<<<<<< HEAD
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="양호"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="보통"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="불량"/>
+=======
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="양호"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="보통"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="불량"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
                     android:text="바닥" />
+=======
+                    android:text="바닥"
+                    android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
 
                 <RadioGroup
                     android:id="@+id/radioGroup_floor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+<<<<<<< HEAD
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="양호"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="보통"/>
                     <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="불량"/>
+=======
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="양호"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="보통"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="불량"
+                        android:textColor="#333333" />
+>>>>>>> origin/app/hsm/ResultDign
                 </RadioGroup>
 
                 <EditText
                     android:id="@+id/input_intEtc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
                     android:hint="내부 기타사항 입력" />
 
                 <!-- 내부: 이미지 + 카메라/편집 버튼(한 줄) -->
+=======
+                    android:background="#EEEEEE"
+                    android:layout_marginTop="16dp"
+                    android:hint="내부 기타사항 입력"
+                    android:layout_marginBottom="16dp"
+                    android:textColor="#333333" />
+
+>>>>>>> origin/app/hsm/ResultDign
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="내부 사진"
+<<<<<<< HEAD
+=======
+                    android:textColor="#333333"
+>>>>>>> origin/app/hsm/ResultDign
                     android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/img_intPhoto"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
+<<<<<<< HEAD
                     android:background="#CCCCCC"
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop" />
@@ -416,10 +870,34 @@
                         android:layout_height="48dp"
                         android:src="@drawable/ic_camera"
                         android:contentDescription="내부 촬영" />
+=======
+                    android:adjustViewBounds="true"
+                    android:background="#CCCCCC"
+                    android:scaleType="centerCrop" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp">
+
+                    <!-- 카메라 버튼: 가운데 정렬 + 원형 테두리 -->
+                    <ImageButton
+                        android:id="@+id/btn_intPhoto"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/circle_border"
+                        android:padding="8dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_camera" />
+
+                    <!-- 편집 버튼: 오른쪽 끝 정렬 -->
+>>>>>>> origin/app/hsm/ResultDign
                     <ImageButton
                         android:id="@+id/btn_intEditPhoto"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+<<<<<<< HEAD
                         android:layout_marginStart="8dp"
                         android:src="@drawable/ic_edit"
                         android:contentDescription="내부 편집" />
@@ -432,25 +910,58 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="12dp">
+=======
+                        android:layout_gravity="end|center_vertical"
+                        android:backgroundTint="#C5C7CA"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_edit"
+                        android:layout_marginEnd="12dp" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- 제출 / 임시저장 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:gravity="center">
+>>>>>>> origin/app/hsm/ResultDign
 
                 <Button
                     android:id="@+id/save_temp_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+<<<<<<< HEAD
                     android:text="임시저장" />
+=======
+                    android:backgroundTint="#6898FF"
+                    android:text="임시저장"
+                    android:textColor="#FFFFFF" />
+>>>>>>> origin/app/hsm/ResultDign
 
                 <Button
                     android:id="@+id/submit_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+<<<<<<< HEAD
                     android:text="제출" />
+=======
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="#6898FF"
+                    android:text="제출"
+                    android:textColor="#FFFFFF" />
+>>>>>>> origin/app/hsm/ResultDign
             </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
 
+<<<<<<< HEAD
     <!-- 하단 네비게이션 -->
     <Button
         android:id="@+id/back_button"
@@ -467,4 +978,32 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:text="다음" />
+=======
+    <!-- 이전 / 다음 버튼 고정 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:orientation="horizontal"
+        android:layout_margin="16dp">
+
+        <Button
+            android:id="@+id/back_button"
+            android:layout_width="80dp"
+            android:layout_height="48dp"
+            android:text="이전"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#6898FF" />
+
+        <Button
+            android:id="@+id/next_button"
+            android:layout_width="80dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:text="다음"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#6898FF" />
+    </LinearLayout>
+
+>>>>>>> origin/app/hsm/ResultDign
 </FrameLayout>

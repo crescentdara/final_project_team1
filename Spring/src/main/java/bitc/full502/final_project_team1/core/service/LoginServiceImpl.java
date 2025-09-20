@@ -44,7 +44,8 @@ public class LoginServiceImpl implements LoginService {
                 u.getUserId(),
                 u.getUsername(),
                 u.getName(),
-                u.getRole().name() // enum → 문자열
+                u.getRole().name(),
+                u.getEmpNo()
         );
 
         return new LoginResponse(true, "로그인 성공",

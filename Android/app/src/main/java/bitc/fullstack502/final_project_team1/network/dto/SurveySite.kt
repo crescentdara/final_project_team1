@@ -24,7 +24,7 @@ data class SurveyListItemDto(
     val buildingId: Long,
     val address: String?,
     val buildingName: String?,
-    val status: String,         // APPROVED / SENT / REJECTED / TEMP
+    val status: String,
     val updatedAtIso: String?,
     val rejectReason: String?
 )

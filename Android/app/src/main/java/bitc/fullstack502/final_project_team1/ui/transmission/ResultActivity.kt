@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import bitc.fullstack502.final_project_team1.R
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
-import bitc.fullstack502.final_project_team1.ui.transmission.SurveyActivity
+import bitc.fullstack502.final_project_team1.ui.SurveyActivity
 class ResultActivity : AppCompatActivity() {
 
     private lateinit var btnClose: ImageView

@@ -14,16 +14,17 @@ object AuthManager {
     private const val KEY_EMP_NO = "emp_no"   // ✅ 사번 키 추가
 
     fun save(context: Context, resp: LoginResponse) {
-        val p = context.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit()
-        p.putString(KEY_TOKEN, resp.token)
-        p.putInt(KEY_USER_ID, resp.user?.id ?: -1)
-        p.putString(KEY_USERNAME, resp.user?.username)
-        p.putString(KEY_NAME, resp.name)
-        p.putString(KEY_ROLE, resp.role)
-        p.putString(KEY_EMP_NO, resp.user?.emp_no)   // ✅ 사번 저장
-        p.putLong(KEY_LOGIN_TIME, System.currentTimeMillis())   // ✅ 로그인 시간 기록
-        p.apply()
+        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().apply {
+            putString(KEY_TOKEN, resp.token)
+            putInt(KEY_USER_ID, resp.user?.id ?: -1)
+            putString(KEY_USERNAME, resp.user?.username)
+            putString(KEY_NAME, resp.name)
+            putString(KEY_ROLE, resp.role)
+            putString(KEY_EMP_NO, resp.user?.emp_no)
+            putLong(KEY_LOGIN_TIME, System.currentTimeMillis())
+        }.apply()
     }
+
 
     fun clear(context: Context) {
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).edit().clear().apply()

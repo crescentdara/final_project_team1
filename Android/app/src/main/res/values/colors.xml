@@ -3,12 +3,10 @@
     <!-- 기본 색상 -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-<<<<<<< HEAD
-    <color name="my_blue">#6898FF</color>
-=======
     
     <!-- 새로운 디자인 색상 팔레트 -->
     <color name="primary_blue">#6898FF</color>
+    <color name="my_blue">#6898FF</color>
     <color name="primary_blue_dark">#5478E6</color>
     <color name="primary_blue_light">#8AB4FF</color>
     
@@ -31,5 +29,4 @@
     <color name="card_background">#FFFFFF</color>
     <color name="border_light">#E9ECEF</color>
     <color name="shadow_light">#F1F3F4</color>
->>>>>>> app/shs/DesignFeature
 </resources>

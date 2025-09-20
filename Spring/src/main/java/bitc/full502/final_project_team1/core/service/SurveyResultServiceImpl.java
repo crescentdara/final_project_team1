@@ -1,6 +1,5 @@
 package bitc.full502.final_project_team1.core.service;
 
-<<<<<<< HEAD
 import bitc.full502.final_project_team1.api.app.dto.AppSurveyResultRequest;
 import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
@@ -9,6 +8,10 @@ import bitc.full502.final_project_team1.core.domain.repository.BuildingRepositor
 import bitc.full502.final_project_team1.core.domain.repository.SurveyResultRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SurveyResultServiceImpl implements SurveyResultService {
 
-    private final SurveyResultRepository surveyResultRepository;
+    private final SurveyResultRepository surveyResultRepository; // 단일 사용으로 통일
     private final BuildingRepository buildingRepository;
     private final UserAccountRepository userAccountRepository;
     private final FileStorageService fileStorageService;
@@ -50,6 +53,7 @@ public class SurveyResultServiceImpl implements SurveyResultService {
     }
 
     @Override
+    @Transactional
     public SurveyResultEntity saveSurvey(AppSurveyResultRequest dto) {
         BuildingEntity building = buildingRepository.findById(dto.getBuildingId())
                 .orElseThrow(() -> new IllegalArgumentException("건물 ID가 존재하지 않습니다."));
@@ -83,6 +87,7 @@ public class SurveyResultServiceImpl implements SurveyResultService {
     }
 
     @Override
+    @Transactional // ← 쓰기 트랜잭션
     public SurveyResultEntity updateSurvey(Long id, AppSurveyResultRequest dto,
                                            MultipartFile extPhoto, MultipartFile extEditPhoto,
                                            MultipartFile intPhoto, MultipartFile intEditPhoto) {
@@ -106,34 +111,27 @@ public class SurveyResultServiceImpl implements SurveyResultService {
         entity.setIntEtc(dto.getIntEtc());
         entity.setStatus(dto.getStatus());
 
-        // 파일이 새로 업로드되면 교체
-        if (extPhoto != null) entity.setExtPhoto(fileStorageService.storeFile(extPhoto, "ext"));
-        if (extEditPhoto != null) entity.setExtEditPhoto(fileStorageService.storeFile(extEditPhoto, "ext-edit"));
-        if (intPhoto != null) entity.setIntPhoto(fileStorageService.storeFile(intPhoto, "int"));
-        if (intEditPhoto != null) entity.setIntEditPhoto(fileStorageService.storeFile(intEditPhoto, "int-edit"));
+        // 파일이 새로 업로드되면 교체 (null/empty 모두 방어)
+        if (extPhoto != null && !extPhoto.isEmpty()) {
+            entity.setExtPhoto(fileStorageService.storeFile(extPhoto, "ext"));
+        }
+        if (extEditPhoto != null && !extEditPhoto.isEmpty()) {
+            entity.setExtEditPhoto(fileStorageService.storeFile(extEditPhoto, "ext-edit"));
+        }
+        if (intPhoto != null && !intPhoto.isEmpty()) {
+            entity.setIntPhoto(fileStorageService.storeFile(intPhoto, "int"));
+        }
+        if (intEditPhoto != null && !intEditPhoto.isEmpty()) {
+            entity.setIntEditPhoto(fileStorageService.storeFile(intEditPhoto, "int-edit"));
+        }
 
         return surveyResultRepository.save(entity);
-=======
-import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
-import bitc.full502.final_project_team1.core.domain.repository.SurveyResultRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+    }
 
-import java.util.List;
-
-@Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class SurveyResultServiceImpl implements SurveyResultService {
-
-    private final SurveyResultRepository repo;
+    // ===== 관리자/웹 검색 =====
 
     @Override
+    @Transactional(readOnly = true)
     public Page<SurveyResultEntity> search(String status, String rawKw, Pageable pageable) {
         String normStatus = (status == null || status.isBlank()) ? null : status.trim();
 
@@ -147,32 +145,26 @@ public class SurveyResultServiceImpl implements SurveyResultService {
         }
 
         if (normKw == null && normStatus == null) {
-            return repo.findAll(pageable); // 완전 무필터
+            return surveyResultRepository.findAll(pageable); // 완전 무필터
         }
-        return repo.search(normStatus, normKw, pageable); // 상태만/상태+키워드
->>>>>>> origin/web/his/MergedTotalSurveyListSearch
+        return surveyResultRepository.search(normStatus, normKw, pageable); // 상태만/상태+키워드
     }
 
-
     @Override
-<<<<<<< HEAD
     @Transactional(readOnly = true)
     public List<SurveyResultEntity> findTempByUser(Integer userId) {
         return surveyResultRepository.findByUser_UserIdAndStatus(userId, "TEMP");
     }
 
-
-
-
-=======
+    @Transactional(readOnly = true)
     public SurveyResultEntity findByIdOrThrow(Long id) {
-        return repo.findById(id).orElseThrow();
+        return surveyResultRepository.findById(id).orElseThrow();
     }
 
     @Override
     @Transactional // 쓰기 트랜잭션
     public int approveBulk(List<Long> ids) {
-        var list = repo.findAllById(ids);
+        var list = surveyResultRepository.findAllById(ids);
         int count = 0;
         for (var e : list) {
             if (!"APPROVED".equalsIgnoreCase(e.getStatus())) {
@@ -186,7 +178,7 @@ public class SurveyResultServiceImpl implements SurveyResultService {
     @Override
     @Transactional // 쓰기 트랜잭션
     public int rejectBulk(List<Long> ids) {
-        var list = repo.findAllById(ids);
+        var list = surveyResultRepository.findAllById(ids);
         int count = 0;
         for (var e : list) {
             if (!"REJECTED".equalsIgnoreCase(e.getStatus())) {
@@ -198,10 +190,10 @@ public class SurveyResultServiceImpl implements SurveyResultService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<SurveyResultEntity> pageSample(int size) {
-        return repo.findAll(
+        return surveyResultRepository.findAll(
                 PageRequest.of(0, Math.max(1, size), Sort.by(Sort.Direction.DESC, "id"))
         );
     }
->>>>>>> origin/web/his/MergedTotalSurveyListSearch
 }

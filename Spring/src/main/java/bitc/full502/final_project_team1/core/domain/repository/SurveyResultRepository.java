@@ -1,13 +1,15 @@
 package bitc.full502.final_project_team1.core.domain.repository;
 
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
-<<<<<<< HEAD
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.EntityGraph;
+import java.util.Optional;
+
 
 import java.util.List;
 
@@ -46,19 +48,6 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
             Pageable pageable
     );
 
-
-
-}
-
-=======
-import org.springframework.data.domain.*;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.repository.query.Param;
-
-import java.util.Optional;
-
-public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity, Long> {
-
     /** 무필터 전체 로딩에서도 user, building 같이 가져오기 (N+1 방지) */
     @Override
     @EntityGraph(attributePaths = {"user", "building"})
@@ -86,5 +75,9 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
     @EntityGraph(attributePaths = {"user", "building"})
     @Query("select sr from SurveyResultEntity sr where sr.id = :id")
     Optional<SurveyResultEntity> findByIdWithUserAndBuilding(@Param("id") Long id);
+
+
+
 }
->>>>>>> origin/web/his/MergedTotalSurveyListSearch
+
+

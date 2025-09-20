@@ -1,9 +1,6 @@
 // src/main/java/bitc/full502/final_project_team1/core/domain/repository/UserAccountRepository.java
 package bitc.full502.final_project_team1.core.domain.repository;
 
-<<<<<<< HEAD
-import java.util.Optional;
-=======
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,10 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
->>>>>>> origin/web/his/MergedTotalSurveyListSearch
 import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
+import java.util.Optional;
 
 public interface UserAccountRepository extends JpaRepository<UserAccountEntity, Integer> {
     

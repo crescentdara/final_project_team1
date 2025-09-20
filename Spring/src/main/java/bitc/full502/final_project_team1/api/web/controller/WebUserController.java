@@ -11,10 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-<<<<<<< HEAD:Spring/src/main/java/bitc/full502/final_project_team1/api/web/controller/WebUserController.java
-=======
 import org.springframework.http.ResponseEntity;
->>>>>>> origin/web/his/MergedTotalSurveyListSearch:Spring/src/main/java/bitc/full502/final_project_team1/api/web/controller/UserController.java
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;

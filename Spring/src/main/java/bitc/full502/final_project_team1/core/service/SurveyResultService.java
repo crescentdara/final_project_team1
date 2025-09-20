@@ -1,10 +1,10 @@
-<<<<<<< HEAD
 package bitc.full502.final_project_team1.core.service;
 
 import bitc.full502.final_project_team1.api.app.dto.AppSurveyResultRequest;
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,17 +19,6 @@ public interface SurveyResultService {
                                     MultipartFile extPhoto, MultipartFile extEditPhoto,
                                     MultipartFile intPhoto, MultipartFile intEditPhoto);
     List<SurveyResultEntity> findTempByUser(Integer userId);
-=======
-// src/main/java/bitc/full502/final_project_team1/core/service/SurveyResultService.java
-package bitc.full502.final_project_team1.core.service;
-
-import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
-
-public interface SurveyResultService {
 
     /** 상태/키워드 검색 (키워드가 공백/빈문자면 전체 검색) */
     Page<SurveyResultEntity> search(String status, String rawKw, Pageable pageable);
@@ -43,5 +32,4 @@ public interface SurveyResultService {
 
     /** 디버그용 첫 페이지 */
     Page<SurveyResultEntity> pageSample(int size);
->>>>>>> origin/web/his/MergedTotalSurveyListSearch
 }

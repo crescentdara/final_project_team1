@@ -40,10 +40,7 @@ public class UserAccountEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;            // DATETIME 매핑
 
-<<<<<<< HEAD
-=======
     @Column(name = "emp_no", length = 50, nullable = false, unique = true)
-    private String empNo;  // 사번
+    private String empNo;
 
->>>>>>> origin/web/his/MergedTotalSurveyListSearch
 }

@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.Gravity
 import android.view.View
 import android.widget.AdapterView
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.Spinner
@@ -178,12 +179,12 @@ class SurveyListActivity : AppCompatActivity() {
 
             else -> assignedList
         }
-<<<<<<< HEAD
         bindList(sorted)
     }
 
     /** 리스트 바인딩 */
     private fun bindList(list: List<AssignedBuilding>) {
+        adapter.updateData(list)
         container.removeAllViews()
         val inf = LayoutInflater.from(this)
 
@@ -233,9 +234,7 @@ class SurveyListActivity : AppCompatActivity() {
 
             container.addView(row)
         }
-=======
         adapter.updateData(sorted)
->>>>>>> app/shs/DesignFeature
     }
 
 

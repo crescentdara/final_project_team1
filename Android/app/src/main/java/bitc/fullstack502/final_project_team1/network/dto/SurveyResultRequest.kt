@@ -16,8 +16,5 @@ data class SurveyResultRequest(
     val intEtc: String?,
     val buildingId: Long,
     val userId: Int
-<<<<<<< HEAD
 )
-=======
-)
->>>>>>> origin/app/hsm/ResultDign
+

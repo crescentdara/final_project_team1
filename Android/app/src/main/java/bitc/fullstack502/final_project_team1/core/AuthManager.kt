@@ -89,13 +89,7 @@ object AuthManager {
     fun role(context: Context): String? =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_ROLE, null)
 
-<<<<<<< HEAD
     fun empNo(context: Context): String? =
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getString(KEY_EMP_NO, null) // ✅ 사번 불러오기
 }
-=======
-    fun empNo(context: Context): String =
-        context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
-            .getString(KEY_EMP_NO, "-") ?: "-"   // ✅ 사번 불러오기 (없으면 "-")
-}
->>>>>>> app/shs/DesignFeature
+

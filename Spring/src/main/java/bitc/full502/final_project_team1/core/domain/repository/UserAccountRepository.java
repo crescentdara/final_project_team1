@@ -93,4 +93,41 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
 
     // 중복 확인
     boolean existsByUsername(String username);
+
+    // 🔍 role=RESEARCHER + preferredRegion 부분일치
+    @Query("SELECT u FROM UserAccountEntity u " +
+            "WHERE u.role = :role " +
+            "AND u.preferredRegion LIKE CONCAT('%', :region, '%')")
+    List<UserAccountEntity> findByRoleAndPreferredRegionLike(
+            @Param("role") Role role,
+            @Param("region") String region
+    );
+
+
+    // 🔍 role=RESEARCHER + preferredRegion + keyword (부분일치)
+    @Query("SELECT u FROM UserAccountEntity u " +
+            "WHERE u.role = :role " +
+            "AND u.preferredRegion LIKE CONCAT('%', :region, '%') " +
+            "AND (LOWER(u.name) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "     OR LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "     OR LOWER(u.empNo) LIKE LOWER(CONCAT('%', :kw, '%')))")
+    List<UserAccountEntity> findByRoleAndPreferredRegionAndKeyword(
+            @Param("role") Role role,
+            @Param("region") String region,
+            @Param("kw") String keyword
+    );
+
+    // 🔍 role=RESEARCHER + 이름/username 검색 (부분일치)
+    @Query("SELECT u FROM UserAccountEntity u " +
+            "WHERE u.role = :role " +
+            "AND (LOWER(u.name) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+            "     OR LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%')))")
+    List<UserAccountEntity> findByRoleAndKeyword(
+            @Param("role") Role role,
+            @Param("kw") String keyword
+    );
+
+
+
+
 }

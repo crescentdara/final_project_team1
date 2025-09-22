@@ -137,5 +137,12 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
     List<String> findDistinctRegions(@Param("city") String city);
 
 
+    // 📌 미배정(status=0) + region 조건 (없으면 전체) - 전체 리스트 반환
+    @Query(value = """
+    SELECT * FROM building
+    WHERE status = 0
+      AND (:region IS NULL OR :region = '' OR lot_address LIKE %:region%)
+    """, nativeQuery = true)
+    List<BuildingEntity> findUnassignedByRegion(@Param("region") String region);
 
 }

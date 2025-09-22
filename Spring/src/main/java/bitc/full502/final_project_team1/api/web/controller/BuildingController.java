@@ -7,11 +7,13 @@ import bitc.full502.final_project_team1.api.web.dto.PageResponseDto;
 import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmentEntity;
+import bitc.full502.final_project_team1.core.domain.enums.Role;
 import bitc.full502.final_project_team1.core.domain.repository.BuildingRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserBuildingAssignmentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -196,5 +198,33 @@ public class BuildingController {
         return new PageResponseDto<>(items, data.getTotalElements(), data.getTotalPages(), data.getNumber()+1, data.getSize());
     }
 
-    
+    // 📌 [수정] 미배정 조사지 + 조사원 목록 조회 (전체 리스트 반환)
+    @GetMapping("/unassigned")
+    public Map<String, Object> getUnassignedBuildings(
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String keyword
+    ) {
+        // 1. 미배정 건물(status=0)
+        List<BuildingEntity> results = buildingRepo.findUnassignedByRegion(region);
+
+        // 2. 조사원 조회 (region + keyword 반영)
+        List<UserAccountEntity> investigators;
+        if (region == null || region.isBlank()) {
+            investigators = (keyword == null || keyword.isBlank())
+                    ? userRepo.findByRole(Role.RESEARCHER)
+                    : userRepo.findByRoleAndKeyword(Role.RESEARCHER, keyword);
+        } else {
+            investigators = (keyword == null || keyword.isBlank())
+                    ? userRepo.findByRoleAndPreferredRegionLike(Role.RESEARCHER, region)
+                    : userRepo.findByRoleAndPreferredRegionAndKeyword(Role.RESEARCHER, region, keyword);
+        }
+
+        // 3. 응답
+        return Map.of(
+                "results", results,
+                "totalResults", results.size(),
+                "investigators", investigators
+        );
+    }
+
 }

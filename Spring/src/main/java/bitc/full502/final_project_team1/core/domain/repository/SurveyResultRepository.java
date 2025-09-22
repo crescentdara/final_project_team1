@@ -76,6 +76,8 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
     @Query("select sr from SurveyResultEntity sr where sr.id = :id")
     Optional<SurveyResultEntity> findByIdWithUserAndBuilding(@Param("id") Long id);
 
+    Optional<SurveyResultEntity>
+    findTopByUser_UserIdAndBuilding_IdOrderByUpdatedAtDescCreatedAtDesc(Integer userId, Long buildingId);
 
 
 }

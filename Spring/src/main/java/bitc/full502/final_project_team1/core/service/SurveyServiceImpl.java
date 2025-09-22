@@ -3,6 +3,7 @@ package bitc.full502.final_project_team1.core.service;
 import bitc.full502.final_project_team1.api.app.dto.*;
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
 import bitc.full502.final_project_team1.core.domain.repository.AppAssignmentQueryRepository;
+import bitc.full502.final_project_team1.core.domain.repository.ApprovalRepository;
 import bitc.full502.final_project_team1.core.domain.repository.SurveyResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ public class SurveyServiceImpl implements SurveyService {
 
     private final AppAssignmentQueryRepository appAssignmentQueryRepository;
     private final SurveyResultRepository surveyResultRepository;
+    private final ApprovalRepository approvalRepository;
 
     @Override
     public List<AssignedBuildingDto> assigned(Integer userId) {
@@ -94,8 +96,20 @@ public class SurveyServiceImpl implements SurveyService {
         Page<SurveyResultEntity> p = surveyResultRepository.findByUserAndStatusPage(
                 userId, status, PageRequest.of(page, size));
 
+        // ① 이번 페이지의 survey_result_id 모으기
+        var ids = p.getContent().stream().map(SurveyResultEntity::getId).toList();
+
+        // ② approval에서 각 sr_id별 최신 반려사유 한번에 조회 → Map<srId, reason>
+        var latestReasons = approvalRepository.findLatestRejectReasons(ids).stream()
+                .collect(Collectors.toMap(
+                        r -> ((Number) r[0]).longValue(),  // survey_result_id
+                        r -> (String) r[1]                 // reject_reason
+                ));
+
+        // ③ DTO 변환 시 rejectReason 주입
         var items = p.getContent().stream()
-                .map(this::toItem).toList();
+                .map(sr -> toItemWithReason(sr, latestReasons.get(sr.getId())))
+                .toList();
 
         var state = getStatus(userId);
 
@@ -112,10 +126,19 @@ public class SurveyServiceImpl implements SurveyService {
                 .build();
     }
 
-    private SurveyListItemDto toItem(SurveyResultEntity s) {
+
+    private SurveyListItemDto toItemWithReason(SurveyResultEntity s, String latestRejectReason) {
         var b = s.getBuilding();
         String address = (b.getRoadAddress() != null && !b.getRoadAddress().isBlank())
                 ? b.getRoadAddress() : b.getLotAddress();
+
+        // REJECTED일 때만 노출하고, 없으면 null(또는 폴백으로 s.getIntEtc())
+        String rejectReason = null;
+        if ("REJECTED".equalsIgnoreCase(s.getStatus())) {
+            rejectReason = (latestRejectReason != null && !latestRejectReason.isBlank())
+                    ? latestRejectReason
+                    : s.getIntEtc(); // 폴백(선택)
+        }
 
         return SurveyListItemDto.builder()
                 .surveyId(s.getId())
@@ -124,9 +147,38 @@ public class SurveyServiceImpl implements SurveyService {
                 .buildingName(b.getBuildingName())
                 .status(s.getStatus())
                 .updatedAtIso(s.getUpdatedAt() != null ? s.getUpdatedAt().toString() : null)
-                // 반려 사유 전용 컬럼이 있으면 교체
-                .rejectReason(s.getIntEtc())
+                .rejectReason(rejectReason)
                 .build();
     }
+
+    private AppSurveyResultDetailDto toDetail(SurveyResultEntity s) {
+        return AppSurveyResultDetailDto.builder()
+                .id(s.getId())
+                .possible(s.getPossible())
+                .adminUse(s.getAdminUse())
+                .idleRate(s.getIdleRate())
+                .safety(s.getSafety())
+                .wall(s.getWall())
+                .roof(s.getRoof())
+                .windowState(s.getWindowState())
+                .parking(s.getParking())
+                .entrance(s.getEntrance())
+                .ceiling(s.getCeiling())
+                .floor(s.getFloor())
+                .extEtc(s.getExtEtc())
+                .intEtc(s.getIntEtc())
+                .extPhoto(s.getExtPhoto())
+                .extEditPhoto(s.getExtEditPhoto())
+                .intPhoto(s.getIntPhoto())
+                .intEditPhoto(s.getIntEditPhoto())
+                .status(s.getStatus())
+                .buildingId(s.getBuilding().getId())
+                .userId(s.getUser().getUserId())
+                .createdAt(s.getCreatedAt())
+                .updatedAt(s.getUpdatedAt())
+                .build();
+    }
+
+
 
 }

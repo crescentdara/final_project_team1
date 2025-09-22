@@ -117,43 +117,22 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    // BuildingInfoBottomSheet.kt
     private fun startReinspectThenOpenEditor() {
-        if (surveyId <= 0) {
+        if (buildingId <= 0 || surveyId <= 0) {
             Toast.makeText(requireContext(), R.string.invalid_survey, Toast.LENGTH_SHORT).show()
             return
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                // 1) 토큰 말고 uid 사용
-                val uid = AuthManager.userId(requireContext())
-                if (uid <= 0) {
-                    Toast.makeText(requireContext(), R.string.login_required, Toast.LENGTH_SHORT).show()
-                    return@launch
-                }
-
-                // 2) 헤더: X-USER-ID(Int)
-                ApiClient.service.startRedo(uid, surveyId)
-
-                // 3) 성공 → 에디터 진입
-                val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
-                    putExtra("surveyId", surveyId)
-                    putExtra("buildingId", buildingId)
-                    putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
-                }
-                startActivity(intent)
-                dismiss()
-            } catch (e: Exception) {
-                val msg = if (e is retrofit2.HttpException) {
-                    "HTTP ${e.code()}"
-                } else e.message ?: ""
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.reinspect_start_failed_fmt, msg),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
+            putExtra(SurveyActivity.EXTRA_MODE, "REINSPECT")
+            putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
+            putExtra(SurveyActivity.EXTRA_SURVEY_ID, surveyId)   // ✅ 꼭 넘김
+            putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
+        startActivity(intent)
+        dismiss()
     }
+
 
 
     private fun openEditorNew() {

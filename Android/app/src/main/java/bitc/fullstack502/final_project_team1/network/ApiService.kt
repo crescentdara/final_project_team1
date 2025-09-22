@@ -7,6 +7,7 @@ import bitc.fullstack502.final_project_team1.network.dto.ListWithStatusResponse
 import bitc.fullstack502.final_project_team1.network.dto.LoginRequest
 import bitc.fullstack502.final_project_team1.network.dto.LoginResponse
 import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
+import bitc.fullstack502.final_project_team1.network.dto.SurveyResultDetailDto
 import bitc.fullstack502.final_project_team1.network.dto.SurveyResultResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -110,5 +111,18 @@ interface ApiService {
         @Header("X-USER-ID") userId: Int,  // ← Int
         @Path("surveyId") surveyId: Long
     ): ResponseBody
+
+    // network/ApiService.kt (추가)
+    @GET("surveys/{id}")
+    suspend fun getSurveyDetail(
+        @Header("X-USER-ID") userId: Int,
+        @Path("id") id: Long
+    ): SurveyResultDetailDto
+
+    @GET("surveys/latest")
+    suspend fun getSurveyLatest(
+        @Header("X-USER-ID") userId: Int,
+        @Query("buildingId") buildingId: Long
+    ): SurveyResultDetailDto?
 
 }

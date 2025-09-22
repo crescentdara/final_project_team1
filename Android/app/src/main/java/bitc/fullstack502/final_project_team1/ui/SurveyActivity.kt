@@ -41,6 +41,16 @@ import java.util.Locale
 
 class SurveyActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_MODE = "mode"            // "CREATE" | "EDIT" | "REINSPECT"
+        const val EXTRA_SURVEY_ID = "surveyId"   // Long? (EDIT에서 사용)
+        const val EXTRA_BUILDING_ID = "buildingId" // Long (모든 모드 기본)
+    }
+
+    private var mode: String = "CREATE"
+    private var editingSurveyId: Long? = null
+
+
     // ---- request codes ----
     private val REQ_CAPTURE_EXT = 101
     private val REQ_CAPTURE_INT = 102
@@ -66,12 +76,25 @@ class SurveyActivity : AppCompatActivity() {
     private var intPhotoFile: File? = null
     private var intEditPhotoFile: File? = null
 
+    // SurveyActivity.kt (필드 영역에 추가)
+    private var hasExtPhotoRemote = false
+    private var hasExtEditPhotoRemote = false
+    private var hasIntPhotoRemote = false
+    private var hasIntEditPhotoRemote = false
+
+
     // 카메라 촬영 시 output 파일 임시 보관
     private var pendingOutputFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mode = intent.getStringExtra(EXTRA_MODE) ?: "CREATE"
+        assignedBuildingId = intent.getLongExtra("buildingId", -1L)
+        editingSurveyId = if (intent.hasExtra(EXTRA_SURVEY_ID))
+            intent.getLongExtra(EXTRA_SURVEY_ID, -1L).takeIf { it > 0 } else null
+
         setContentView(R.layout.activity_survey)
+
 
         // 주소 표시
         tvAddress = findViewById(R.id.tv_address)
@@ -155,6 +178,7 @@ class SurveyActivity : AppCompatActivity() {
         }
 
         showStage(0)
+        prefillIfPossible()
         updateSubmitVisibility()
     }
 
@@ -204,10 +228,11 @@ class SurveyActivity : AppCompatActivity() {
         val radiosOk = requiredGroups.all { rgId ->
             findViewById<RadioGroup>(rgId).checkedRadioButtonId != -1
         }
-        val photosOk = extPhotoFile != null &&
-                intPhotoFile != null &&
-                extEditPhotoFile != null &&
-                intEditPhotoFile != null
+        val photosOk =
+            (extPhotoFile != null || hasExtPhotoRemote) &&
+                    (extEditPhotoFile != null || hasExtEditPhotoRemote) &&
+                    (intPhotoFile != null || hasIntPhotoRemote) &&
+                    (intEditPhotoFile != null || hasIntEditPhotoRemote)
         return radiosOk && photosOk
     }
 
@@ -216,6 +241,8 @@ class SurveyActivity : AppCompatActivity() {
         submitButton.visibility = visible
         tempButton.visibility   = visible
     }
+
+
 
     // ===== 유틸 =====
     private fun <T> View.findViewsByType(clazz: Class<T>): List<T> {
@@ -392,4 +419,69 @@ class SurveyActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun prefillIfPossible() {
+        lifecycleScope.launch {
+            try {
+                val uid = bitc.fullstack502.final_project_team1.core.AuthManager.userId(this@SurveyActivity)
+                if (uid <= 0) return@launch
+
+                val detail = when {
+                    // ✅ surveyId가 있으면 모드와 무관하게 “그 건”을 단건 조회
+                    editingSurveyId != null ->
+                        ApiClient.service.getSurveyDetail(uid, editingSurveyId!!)
+                    // (옵션) surveyId 없이 건물만 주고 재조사 시작한 경우에만 최신 1건 사용
+                    mode == "REINSPECT" ->
+                        ApiClient.service.getSurveyLatest(uid, assignedBuildingId)
+                    else -> null
+                } ?: return@launch
+
+                // 라디오/텍스트 채우기
+                setRadioByIndex(R.id.radioGroup_possible,    detail.possible)
+                setRadioByIndex(R.id.radioGroup_adminUse,    detail.adminUse)
+                setRadioByIndex(R.id.radioGroup_idleRate,    detail.idleRate)
+                setRadioByIndex(R.id.radioGroup_safety,      detail.safety)
+                setRadioByIndex(R.id.radioGroup_wall,        detail.wall)
+                setRadioByIndex(R.id.radioGroup_roof,        detail.roof)
+                setRadioByIndex(R.id.radioGroup_window,      detail.windowState)
+                setRadioByIndex(R.id.radioGroup_parking,     detail.parking)
+                setRadioByIndex(R.id.radioGroup_entrance,    detail.entrance)
+                setRadioByIndex(R.id.radioGroup_ceiling,     detail.ceiling)
+                setRadioByIndex(R.id.radioGroup_floor,       detail.floor)
+
+                findViewById<EditText>(R.id.input_extEtc).setText(detail.extEtc ?: "")
+                findViewById<EditText>(R.id.input_intEtc).setText(detail.intEtc ?: "")
+
+                // 기존 사진 URL이 있으면 "완료로 인정"하도록 플래그 세움
+                loadRemotePhotoFlag(detail.extPhoto)     { hasExtPhotoRemote = it }
+                loadRemotePhotoFlag(detail.extEditPhoto) { hasExtEditPhotoRemote = it }
+                loadRemotePhotoFlag(detail.intPhoto)     { hasIntPhotoRemote = it }
+                loadRemotePhotoFlag(detail.intEditPhoto) { hasIntEditPhotoRemote = it }
+
+            } catch (e: Exception) {
+                val msg = if (e is retrofit2.HttpException) "HTTP ${e.code()}" else e.message ?: ""
+                Toast.makeText(this@SurveyActivity, "이전 결과 불러오기 실패: $msg", Toast.LENGTH_SHORT).show()
+            } finally {
+                updateSubmitVisibility()
+            }
+        }
+    }
+
+
+    private fun setRadioByIndex(rgId: Int, idx1based: Int?) {
+        if (idx1based == null || idx1based <= 0) return
+        val rg = findViewById<RadioGroup>(rgId)
+        val child = rg.getChildAt(idx1based - 1) ?: return
+        rg.check(child.id)
+    }
+
+    private fun loadRemotePhotoFlag(url: String?, onHas: (Boolean)->Unit) {
+        if (!url.isNullOrBlank()) {
+            onHas(true)
+            // 필요하면 Glide 등으로 미리보기까지 표시 가능
+            // Glide.with(this).load(url).into(imageView)
+        }
+    }
+
+
 }

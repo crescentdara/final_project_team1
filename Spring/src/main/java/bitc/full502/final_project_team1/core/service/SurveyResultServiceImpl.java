@@ -196,4 +196,22 @@ public class SurveyResultServiceImpl implements SurveyResultService {
                 PageRequest.of(0, Math.max(1, size), Sort.by(Sort.Direction.DESC, "id"))
         );
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<SurveyResultEntity> findByIdWithUserAndBuilding(Long id) {
+        // 레포에 이미 있는 @EntityGraph 메서드 사용
+        return surveyResultRepository.findByIdWithUserAndBuilding(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<SurveyResultEntity> findLatestByUserAndBuilding(Integer userId, Long buildingId) {
+        // 최신(updatedAt 우선, 없으면 createdAt) 1건
+        return surveyResultRepository
+                .findTopByUser_UserIdAndBuilding_IdOrderByUpdatedAtDescCreatedAtDesc(userId, buildingId);
+    }
+
+
 }

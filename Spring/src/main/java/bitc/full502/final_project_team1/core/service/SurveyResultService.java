@@ -32,4 +32,8 @@ public interface SurveyResultService {
 
     /** 디버그용 첫 페이지 */
     Page<SurveyResultEntity> pageSample(int size);
+
+    Optional<SurveyResultEntity> findByIdWithUserAndBuilding(Long id);
+
+    Optional<SurveyResultEntity> findLatestByUserAndBuilding(Integer userId, Long buildingId);
 }

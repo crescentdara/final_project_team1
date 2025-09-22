@@ -98,4 +98,9 @@ public class SurveyResultEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private UserAccountEntity user;
+
+    /** 승인한 사람 */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approver_id", foreignKey = @ForeignKey(name = "fk_sr_approver_user"))
+    private UserAccountEntity approver;
 }

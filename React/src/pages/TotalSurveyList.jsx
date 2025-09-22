@@ -47,7 +47,7 @@ function adaptRow(x) {
   const address = firstNonBlank(x.address, x.roadAddress, x.lotAddress) ?? "-";
   const investigatorId = firstNonBlank(x.assignedUserId, x.investigatorId, x.userId);
   const investigatorName = firstNonBlank(
-      x.assignedUserName, x.investigatorName, x.investigator, x.userName
+      x.assignedUsername, x.investigatorName, x.investigator, x.username
   ) ?? "-";
 
   return { ...x, id, caseNo, address, investigatorId, investigatorName, status: normalizeStatus(x) };
@@ -197,9 +197,9 @@ export default function TotalSurveyList() {
             </thead>
             <tbody className="text-center">
             {loading ? (
-                <tr><td colSpan={5} className="text-center text-muted py-5">로딩중…</td></tr>
+                <tr><td colSpan={5} className="text-center text-muted py-3">로딩중…</td></tr>
             ) : rows.length===0 ? (
-                <tr><td colSpan={5} className="text-center text-muted py-5">표시할 데이터가 없습니다.</td></tr>
+                <tr><td colSpan={5} className="text-center text-muted py-3">표시할 데이터가 없습니다.</td></tr>
             ) : rows.map(r => (
                 <tr key={r.id ?? r.caseNo}>
                   <td className="fw-semibold">{r.caseNo}</td>
@@ -213,7 +213,7 @@ export default function TotalSurveyList() {
                               : '승인'}
                 </span>
                   </td>
-                  <td className="d-flex justify-content-between ps-3 pe-3">
+                  <td className="d-flex justify-content-between ps-3 pe-3 py-3">
                     <button className="btn btn-sm btn-outline-secondary" onClick={()=>alert(`수정: ${r.id ?? r.caseNo}`)}>수정</button>
                     <button className="btn btn-sm btn-outline-danger" onClick={()=>del(r.id ?? r.caseNo)}>삭제</button>
                   </td>

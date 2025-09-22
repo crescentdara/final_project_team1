@@ -1,13 +1,15 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Table(name = "building")
+@Table(
+    name = "building",
+    indexes = {
+        @Index(name = "idx_building_assigned_user", columnList = "assigned_user_id")
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,57 +20,91 @@ public class BuildingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 순번
 
-    private String lotAddress;          // 번지주소
-    private String lotMainNo;           // 번
-    private String lotSubNo;            // 지
-    private String roadAddress;         // 도로명주소
+    private String lotAddress;
+    private String lotMainNo;
+    private String lotSubNo;
+    private String roadAddress;
 
-    private String ledgerDivisionName;  // 대장구분코드명
-    private String ledgerTypeName;      // 대장종류코드명
-    private String buildingName;        // 건물명
-    private Integer extraLotCount;      // 외필지수
+    private String ledgerDivisionName;
+    private String ledgerTypeName;
+    private String buildingName;
+    private Integer extraLotCount;
 
-    private String newRoadCode;         // 새주소도로코드
-    private String newLegalDongCode;    // 새주소법정동코드
-    private String newMainNo;           // 새주소본번
-    private String newSubNo;            // 새주소부번
+    private String newRoadCode;
+    private String newLegalDongCode;
+    private String newMainNo;
+    private String newSubNo;
 
-    private String mainSubCode;         // 주부속구분코드
-    private String mainSubName;         // 주부속구분코드명
+    private String mainSubCode;
+    private String mainSubName;
 
-    private Double landArea;            // 대지면적(㎡)
-    private Double buildingArea;        // 건축면적(㎡)
-    private Double buildingCoverage;    // 건폐율(%)
-    private Double totalFloorArea;      // 연면적(㎡)
-    private Double floorAreaForRatio;   // 용적률산정연면적(㎡)
-    private Double floorAreaRatio;      // 용적률(%)
+    private Double landArea;
+    private Double buildingArea;
+    private Double buildingCoverage;
+    private Double totalFloorArea;
+    private Double floorAreaForRatio;
+    private Double floorAreaRatio;
 
-    private String structureCode;       // 구조코드
-    private String structureName;       // 구조코드명
-    private String etcStructure;        // 기타구조
+    private String structureCode;
+    private String structureName;
+    private String etcStructure;
 
-    private String mainUseCode;         // 주용도코드
-    private String mainUseName;         // 주용도코드명
-    private String etcUse;              // 기타용도
+    private String mainUseCode;
+    private String mainUseName;
+    private String etcUse;
 
-    private String roofCode;            // 지붕코드
-    private String roofName;            // 지붕코드명
-    private String etcRoof;             // 기타지붕
+    private String roofCode;
+    private String roofName;
+    private String etcRoof;
 
-    private Double height;              // 높이(m)
-    private Integer groundFloors;       // 지상층수
-    private Integer basementFloors;     // 지하층수
-    private Integer passengerElevators; // 승용승강기수
-    private Integer emergencyElevators; // 비상용승강기수
+    private Double height;
+    private Integer groundFloors;
+    private Integer basementFloors;
+    private Integer passengerElevators;
+    private Integer emergencyElevators;
 
-    private Integer annexCount;         // 부속건축물수
-    private Double annexArea;           // 부속건축물면적(㎡)
-    private Double totalBuildingArea;   // 총동연면적(㎡)
+    private Integer annexCount;
+    private Double annexArea;
+    private Double totalBuildingArea;
 
-    private Double latitude;            // 위도
-    private Double longitude;           // 경도
+    private Double latitude;
+    private Double longitude;
 
     @Column(nullable = false)
     private Integer status;  // 0 = 미배정, 1 = 배정됨
 
+    /** ✅ 결재자(배정 사용자) : null이면 미배정 */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(
+        name = "assigned_user_id", // FK 컬럼명 (INT)
+        foreignKey = @ForeignKey(name = "fk_building_assigned_user")
+    )
+    @ToString.Exclude
+    private UserAccountEntity assignedUser;
+
+    /** ✅ 편의: 배정 여부 */
+    @Transient
+    public boolean isAssigned() {
+        return assignedUser != null;
+    }
+
+    /** ✅ 편의: 배정자 PK (null-safe) */
+    @Transient
+    public Integer getAssignedUserIdSafe() {
+        return (assignedUser != null) ? assignedUser.getUserId() : null;
+    }
+
+    /** ✅ 편의: 배정자 표시명 (null-safe) */
+    @Transient
+    public String getAssignedUserNameSafe() {
+        if (assignedUser == null) return null;
+        String n = assignedUser.getName();
+        return (n != null && !n.isBlank()) ? n : assignedUser.getUsername();
+    }
+
+    /** ✅ status(0/1)와 자동 동기화(선택) */
+    @PrePersist @PreUpdate
+    public void syncStatus() {
+        this.status = (this.assignedUser != null) ? 1 : 0;
+    }
 }

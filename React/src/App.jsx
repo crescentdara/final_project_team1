@@ -6,7 +6,8 @@ import ApprovalFilters from "./pages/ApprovalFilters.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ResultReport from "./pages/ResultReport.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
-import TotalSurveyList from "./pages/TotalSurveyList.jsx"; // ✅ 추가
+import TotalSurveyList from "./pages/TotalSurveyList.jsx";
+import ApproverAssignment from "./pages/ApproverAssignment.jsx"; // ✅ 추가
 
 function App() {
     return (
@@ -19,23 +20,23 @@ function App() {
                         <div>
                             <h2>메인 페이지</h2>
 
-                            <Link to="/surveyList" className="btn btn-primary mt-3">
+                            <Link to="/surveyList" className="btn btn-primary me-3">
                                 SurveyList 페이지로 이동
                             </Link>
 
-                            <Link to="/createSurvey" className="btn btn-primary mt-3">
+                            <Link to="/createSurvey" className="btn btn-primary me-3">
                                 CreateSurvey 페이지로 이동
                             </Link>
 
-                            <Link to="/createUser" className="btn btn-primary mt-3">
+                            <Link to="/createUser" className="btn btn-primary me-3">
                                 CreateUser 페이지로 이동
                             </Link>
 
-                            <Link to="/dashboard" className="btn btn-primary mt-3">
+                            <Link to="/dashboard" className="btn btn-primary me-3">
                                 Dashboard 페이지로 이동
                             </Link>
 
-                            <Link to="/resultReport" className="btn btn-primary mt-3">
+                            <Link to="/resultReport" className="btn btn-primary me-3">
                                 Report 페이지로 이동
                             </Link>
 
@@ -43,16 +44,20 @@ function App() {
                                 조사원 상세정보
                             </Link>
 
-                            <Link to="/approvals" className={'btn btn-outline-primary me-3'}>
+                            <Link to="/approvals" className={'btn btn-outline-primary mt-3 me-3'}>
                                 결재 대기 중
                             </Link>
 
-                            <Link to="/survey" className={'btn btn-outline-info'}>
+                            <Link to="/survey" className={'btn btn-outline-info mt-3 me-3'}>
                                 전체 조사 목록
                             </Link>
 
-                            <Link to="/resultReport" className={'btn btn-outline-info'}>
+                            <Link to="/resultReport" className={'btn btn-outline-info mt-3 me-3'}>
                                 resultReport 페이지로 이동
+                            </Link>
+
+                            <Link to="/approverAssignment" className={'btn btn-outline-primary mt-3 me-3'}>
+                                결재자 등록 페이지
                             </Link>
                         </div>
                     }
@@ -84,6 +89,9 @@ function App() {
 
                 {/* 전체 조사 목록 페이지 */}
                 <Route path="/resultReport" element={<ResultReport />} />
+
+                {/* 결재자 등록 페이지 */}
+                <Route path="/approverAssignment" element={<ApproverAssignment />} />
             </Routes>
         </div>
     );

@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "user_account", schema = "java502_team1_final_db")
 @Getter
@@ -28,7 +27,7 @@ public class UserAccountEntity {
     private String password;
 
     @Column(name = "name", length = 100, nullable = false)
-    private String name;                        //  사람 이름 컬럼
+    private String name;                        // 사람 이름 컬럼
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", length = 20, nullable = false)
@@ -43,4 +42,7 @@ public class UserAccountEntity {
     @Column(name = "emp_no", length = 50, nullable = false, unique = true)
     private String empNo;
 
+    /** 선호 지역 컬럼 추가 */
+    @Column(name = "preferred_region", length = 200)
+    private String preferredRegion;
 }

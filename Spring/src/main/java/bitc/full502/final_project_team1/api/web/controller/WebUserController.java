@@ -5,6 +5,7 @@ import bitc.full502.final_project_team1.api.web.dto.UserDetailDto;
 import bitc.full502.final_project_team1.api.web.dto.UserSimpleDto;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.enums.Role;
+import bitc.full502.final_project_team1.core.domain.repository.BuildingRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
 import bitc.full502.final_project_team1.core.service.AssignmentService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class WebUserController {
     private final UserAccountRepository repo;
     private final UserAccountRepository userRepo;
     private final AssignmentService assignmentService;
+    private final BuildingRepository buildingRepository; // 선호지역 뽑기
 
     /** 전체 조회 + 검색 (keyword 파라미터 optional) */
     @GetMapping("/users/search")
@@ -98,6 +100,7 @@ public class WebUserController {
                 .empNo(generateEmpNo())                 // 사번 자동 생성
                 .role(Role.RESEARCHER)                  // 무조건 조사원
                 .status(1)                              // 무조건 활성
+                .preferredRegion(dto.getPreferredRegion()) // 선호지역 매핑
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -201,5 +204,14 @@ public class WebUserController {
     public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
         boolean exists = userRepo.existsByUsername(username);
         return ResponseEntity.ok(exists);
+    }
+
+    /** 선호 지역 리스트 API (읍/면/동까지만 추출) */
+    @GetMapping("/users/preferred-regions")
+    public List<String> getPreferredRegions(@RequestParam(defaultValue = "김해시") String city) {
+        return buildingRepository.findDistinctRegions(city).stream()
+                .filter(addr -> addr != null && !addr.isBlank())
+                .sorted()
+                .toList();
     }
 }

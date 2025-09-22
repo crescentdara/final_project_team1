@@ -15,6 +15,7 @@ public class UserSimpleDto {
     private String empNo;
     private String role;
     private Integer status;
+    private String preferredRegion;   // 선호 지역 추가
 
     public static UserSimpleDto from(UserAccountEntity u) {
         return new UserSimpleDto(
@@ -23,7 +24,8 @@ public class UserSimpleDto {
                 u.getName(),
                 u.getEmpNo(),
                 u.getRole() != null ? u.getRole().name() : null,
-                u.getStatus()
+                u.getStatus(),
+                u.getPreferredRegion()   // 매핑 추가
         );
     }
 }

@@ -26,6 +26,10 @@ import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import android.util.Log
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
+import android.location.Location
 
 class SurveyListActivity : AppCompatActivity() {
 
@@ -44,17 +48,49 @@ class SurveyListActivity : AppCompatActivity() {
     private var myLat: Double? = null
     private var myLng: Double? = null
 
-    // 서버에서 내려오는 assignedAt 파싱용 포맷터 (ISO-8601 가정)
-    private val formatter = DateTimeFormatter.ISO_DATE_TIME
+    // 여러 날짜 포맷 지원 (DB 스샷 포함)
+    private val parsePatterns = listOf(
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"), // 2025-09-22 09:36:26
+        DateTimeFormatter.ISO_DATE_TIME,                    // 2025-09-22T09:36:26 (or millis)
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME              // 2025-09-22T09:36:26+09:00
+    )
+    private val outFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
+
+    private fun parseDateFlexible(dateStr: String?): LocalDateTime? {
+        if (dateStr.isNullOrBlank()) return null
+        for (fmt in parsePatterns) {
+            try { return LocalDateTime.parse(dateStr, fmt) } catch (_: Exception) {}
+        }
+        // 타임존 포함 문자열 대응
+        return try {
+            val zdt = java.time.ZonedDateTime.parse(dateStr)
+            zdt.toLocalDateTime()
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun formatAssignedAt(dateStr: String?): String {
+        val dt = parseDateFlexible(dateStr) ?: return "미정"
+        return outFormatter.format(dt)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_survey_list)
 
+        // 정렬 스피너 리스너
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p: AdapterView<*>, v: android.view.View?, pos: Int, id: Long) {
+                sortAndBind(pos)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
         // 내 위치 (거리순 정렬용)
         loadMyLocation()
 
-        // 리스트 채우기
+        // 목록 불러오기
         CoroutineScope(Dispatchers.Main).launch {
             val uid = AuthManager.userId(this@SurveyListActivity)
             if (uid <= 0) {
@@ -65,21 +101,8 @@ class SurveyListActivity : AppCompatActivity() {
             runCatching { ApiClient.service.getAssigned(uid) }
                 .onSuccess { list ->
                     assignedList = list
-                    bindList(assignedList)
-
-                    // 스피너 리스너 연결
-                    spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            parent: AdapterView<*>,
-                            view: android.view.View?,
-                            position: Int,
-                            id: Long
-                        ) {
-                            sortAndBind(position)
-                        }
-
-                        override fun onNothingSelected(parent: AdapterView<*>) {}
-                    }
+                    bindList(assignedList)                    // 1차 표시
+                    sortAndBind(spinner.selectedItemPosition) // 현재 선택 기준으로 재정렬
                 }
                 .onFailure {
                     Toast.makeText(this@SurveyListActivity, "목록 조회 실패: ${it.message}", Toast.LENGTH_SHORT).show()
@@ -105,11 +128,40 @@ class SurveyListActivity : AppCompatActivity() {
         }
 
         val fused = LocationServices.getFusedLocationProviderClient(this)
+
+        // 1차: 빠른 lastLocation
         fused.lastLocation.addOnSuccessListener { loc ->
-            myLat = loc?.latitude
-            myLng = loc?.longitude
+            if (loc != null) {
+                myLat = loc.latitude
+                myLng = loc.longitude
+                Log.d("SurveyList", "lastLocation lat=$myLat, lng=$myLng")
+                sortAndBind(spinner.selectedItemPosition)   // ✅ 위치 들어오는 즉시 재정렬
+            } else {
+                // 2차: 한 번만 현재 위치 요청
+                val cts = CancellationTokenSource()
+                fused.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
+                    .addOnSuccessListener { cur ->
+                        if (cur != null) {
+                            myLat = cur.latitude
+                            myLng = cur.longitude
+                            Log.d("SurveyList", "getCurrentLocation lat=$myLat, lng=$myLng")
+                            sortAndBind(spinner.selectedItemPosition)
+                        } else {
+                            Log.w("SurveyList", "getCurrentLocation returned null")
+                            Toast.makeText(this, "내 위치를 가져오지 못했습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("SurveyList", "getCurrentLocation failed: ${e.message}")
+                        Toast.makeText(this, "내 위치 확인 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }.addOnFailureListener { e ->
+            Log.e("SurveyList", "lastLocation failed: ${e.message}")
+            Toast.makeText(this, "내 위치 확인 실패: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     /** 권한 요청 결과 처리 */
     override fun onRequestPermissionsResult(
@@ -126,20 +178,11 @@ class SurveyListActivity : AppCompatActivity() {
         }
     }
 
-    /** 문자열 → LocalDateTime 변환 */
-    private fun parseDate(dateStr: String?): LocalDateTime? {
-        return try {
-            if (dateStr != null) LocalDateTime.parse(dateStr, formatter) else null
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    /** 정렬 */
+    /** 정렬 + 바인딩 */
     private fun sortAndBind(sortType: Int) {
         val sorted = when (sortType) {
-            0 -> assignedList.sortedByDescending { parseDate(it.assignedAt) } // 최신등록순
-            1 -> assignedList.sortedBy { parseDate(it.assignedAt) }           // 과거순
+            0 -> assignedList.sortedByDescending { parseDateFlexible(it.assignedAt) } // 최신등록순
+            1 -> assignedList.sortedBy { parseDateFlexible(it.assignedAt) }           // 과거순
             2 -> {
                 if (myLat != null && myLng != null) {
                     assignedList.sortedBy {
@@ -154,7 +197,7 @@ class SurveyListActivity : AppCompatActivity() {
         bindList(sorted)
     }
 
-    /** 리스트 바인딩 */
+    /** 리스트 바인딩 (LinearLayout에 직접 추가) */
     private fun bindList(list: List<AssignedBuilding>) {
         container.removeAllViews()
         val inf = LayoutInflater.from(this)
@@ -162,13 +205,14 @@ class SurveyListActivity : AppCompatActivity() {
         list.forEach { item ->
             val row = inf.inflate(R.layout.item_survey, container, false)
 
-            // 주소 문자열: null/blank 안전 처리
             val addrText = item.lotAddress?.takeIf { it.isNotBlank() } ?: "주소 없음"
-
-            // 주소 표시
             row.findViewById<TextView>(R.id.tvAddress).text = addrText
 
-            // 행 클릭 → 건물 상세 (item.id 가 non-null이면 굳이 체크 불필요)
+            // 배정일시 표시
+            row.findViewById<TextView?>(R.id.tvAssignedAt)?.text =
+                "배정일자: ${formatAssignedAt(item.assignedAt)}"
+
+            // 카드 클릭 → 건물 상세
             row.setOnClickListener {
                 BuildingInfoBottomSheet.newInstanceForNew(item.id)
                     .show(supportFragmentManager, "buildingInfo")
@@ -181,7 +225,6 @@ class SurveyListActivity : AppCompatActivity() {
                 if (lat == null || lng == null) {
                     Toast.makeText(this, "좌표 정보가 없습니다.", Toast.LENGTH_SHORT).show()
                 } else {
-                    // addr: String(Non-null) 요구 → 안전 문자열 전달
                     MapBottomSheetFragment.newInstance(lat, lng, addrText)
                         .show(supportFragmentManager, "mapDialog")
                 }
@@ -194,7 +237,6 @@ class SurveyListActivity : AppCompatActivity() {
                 if (lat == null || lng == null) {
                     Toast.makeText(this, "좌표 정보가 없습니다.", Toast.LENGTH_SHORT).show()
                 } else {
-                    // destName: String(Non-null) 요구 → 안전 문자열 전달
                     startTmapRouteFromMyLocation(
                         destLat = lat,
                         destLng = lng,
@@ -207,20 +249,11 @@ class SurveyListActivity : AppCompatActivity() {
         }
     }
 
-
     /** 거리 계산 (단위 m) */
     private fun distance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val R = 6371e3
-        val φ1 = Math.toRadians(lat1)
-        val φ2 = Math.toRadians(lat2)
-        val Δφ = Math.toRadians(lat2 - lat1)
-        val Δλ = Math.toRadians(lon2 - lon1)
-
-        val a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                Math.cos(φ1) * Math.cos(φ2) *
-                Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
-        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-        return R * c
+        val out = FloatArray(1)
+        Location.distanceBetween(lat1, lon1, lat2, lon2, out)
+        return out[0].toDouble()
     }
 
     // ─── 길찾기(T맵) ─────────────────────────────────────────────

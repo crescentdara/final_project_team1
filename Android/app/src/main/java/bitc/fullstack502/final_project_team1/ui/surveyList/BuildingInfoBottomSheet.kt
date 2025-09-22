@@ -1,4 +1,3 @@
-// ui/surveyList/BuildingInfoBottomSheet.kt
 package bitc.fullstack502.final_project_team1.ui.surveyList
 
 import android.content.Intent
@@ -20,7 +19,6 @@ import bitc.fullstack502.final_project_team1.ui.SurveyActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
-
 
 class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
@@ -117,7 +115,6 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    // BuildingInfoBottomSheet.kt
     private fun startReinspectThenOpenEditor() {
         if (buildingId <= 0 || surveyId <= 0) {
             Toast.makeText(requireContext(), R.string.invalid_survey, Toast.LENGTH_SHORT).show()
@@ -133,11 +130,10 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         dismiss()
     }
 
-
-
     private fun openEditorNew() {
         val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
-            putExtra("buildingId", buildingId)
+            putExtra(SurveyActivity.EXTRA_MODE, "CREATE")
+            putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId) // ✅ 상수 사용
             putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
         startActivity(intent)
@@ -165,6 +161,6 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         add("기타용도", b.etcUse)
         add("구조", b.structureName)
         add("높이(m)", b.height?.toString())
+        add("지번주소", b.lotAddress)
     }
-
 }

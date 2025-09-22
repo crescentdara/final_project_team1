@@ -115,41 +115,4 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
                                                   Pageable pageable
     );
 
-//    @Query("""
-//    select new bitc.full502.final_project_team1.api.web.dto.BuildingSurveyRowDto(
-//        b.id,
-//        b.lotAddress,
-//        b.roadAddress,
-//        (case when u is not null then true else false end),
-//        u.userId,
-//        coalesce(u.name, u.username),
-//        sr.status,
-//        (case when sr.status is not null and upper(sr.status)='APPROVED' then true else false end)
-//    )
-//    from BuildingEntity b
-//    left join b.userId u
-//    left join SurveyResultEntity sr
-//           on sr.building = b
-//          and sr.id = (select max(s2.id) from SurveyResultEntity s2 where s2.building = b)
-//    where
-//      (
-//        :status is null
-//        or (:status = 'UNASSIGNED' and u is null)
-//        or (:status = 'ASSIGNED'   and u is not null and (sr.status is null or upper(sr.status) <> 'APPROVED'))
-//        or (:status = 'REWORK'     and sr.status is not null and upper(sr.status) = 'REWORK')
-//        or (:status = 'APPROVED'   and sr.status is not null and upper(sr.status) = 'APPROVED')
-//      )
-//      and (:investigatorId is null or (u is not null and u.userId = :investigatorId))
-//      and (
-//        :kw is null or :kw = '' or
-//        lower(coalesce(b.lotAddress,  '')) like lower(concat('%', :kw, '%')) or
-//        lower(coalesce(b.roadAddress, '')) like lower(concat('%', :kw, '%')) or
-//        (u is not null and lower(coalesce(u.name, u.username)) like lower(concat('%', :kw, '%'))) or
-//        str(b.id) like concat('%', :kw, '%')
-//      )
-//    """)
-//    Page<BuildingSurveyRowDto> searchForList(@Param("status") String status,
-//                                             @Param("investigatorId") Long investigatorId,
-//                                             @Param("kw") String keyword,
-//                                             Pageable pageable);
 }

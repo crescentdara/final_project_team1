@@ -89,16 +89,20 @@ class SurveyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mode = intent.getStringExtra(EXTRA_MODE) ?: "CREATE"
-        assignedBuildingId = intent.getLongExtra("buildingId", -1L)
+        // ✅ 상수로 먼저 읽고, 이전 호환(문자열 "buildingId")까지 fallback
+        assignedBuildingId = intent.getLongExtra(EXTRA_BUILDING_ID, -1L)
+            .takeIf { it > 0 }
+            ?: intent.getLongExtra("buildingId", -1L)
+
         editingSurveyId = if (intent.hasExtra(EXTRA_SURVEY_ID))
             intent.getLongExtra(EXTRA_SURVEY_ID, -1L).takeIf { it > 0 } else null
 
         setContentView(R.layout.activity_survey)
 
 
+
         // 주소 표시
         tvAddress = findViewById(R.id.tv_address)
-        assignedBuildingId = intent.getLongExtra("buildingId", -1L)
         val lotAddress = intent.getStringExtra("lotAddress") ?: ""
         tvAddress.text =
             if (lotAddress.isNotBlank())

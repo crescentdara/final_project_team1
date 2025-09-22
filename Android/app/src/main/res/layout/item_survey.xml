@@ -1,4 +1,4 @@
-<!-- res/layout/item_survey.xml -->
+<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
@@ -40,15 +40,6 @@
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1" />
-
-            <!-- 상태 표시 -->
-            <TextView
-                    android:id="@+id/tvStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="대기중"
-                    android:textColor="@color/text_light"
-                    android:textSize="12sp" />
         </LinearLayout>
 
         <!-- 주소 표시 -->
@@ -63,7 +54,7 @@
 
         <!-- 조사 정보 (배정일자) -->
         <TextView
-                android:id="@+id/tvDate"
+                android:id="@+id/tvAssignedAt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"

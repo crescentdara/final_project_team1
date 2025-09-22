@@ -74,7 +74,6 @@ class ArActivity : ComponentActivity(), SensorEventListener {
         try { fused.lastLocation.addOnSuccessListener { it?.let(::updateLoc) } } catch (_: SecurityException) {}
 
         if (isEmulator()) {
-            // ✅ 에뮬레이터: 센서 대신 더미 값 주입
             handler.post(object : Runnable {
                 override fun run() {
                     overlay.updatePose(90f, 0f)
@@ -82,7 +81,6 @@ class ArActivity : ComponentActivity(), SensorEventListener {
                 }
             })
         } else {
-            // ✅ 실제 기기: 센서 등록
             sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)?.also {
                 sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_GAME)
             }

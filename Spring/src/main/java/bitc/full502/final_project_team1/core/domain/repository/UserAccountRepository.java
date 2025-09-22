@@ -2,6 +2,7 @@
 package bitc.full502.final_project_team1.core.domain.repository;
 
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
+import bitc.full502.final_project_team1.core.domain.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,20 +13,20 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserAccountRepository extends JpaRepository<UserAccountEntity, Integer> {
-    
+
     Optional<UserAccountEntity> findByUsernameAndStatus(String username, Integer status);
 
     List<UserAccountEntity> findTop100ByNameContainingOrUsernameContainingOrderByUserId(
             String nameKeyword, String usernameKeyword
     );
 
-    // 🔍 role=EDITOR 전체 조회
-    List<UserAccountEntity> findByRole(UserAccountEntity.Role role);
+    // 🔍 role=RESEARCHER 전체 조회
+    List<UserAccountEntity> findByRole(Role role);
 
-    // 🔍 role=EDITOR + 이름/username 검색
+    // 🔍 role=RESEARCHER + 이름/username 검색
     List<UserAccountEntity> findByRoleAndNameContainingOrRoleAndUsernameContaining(
-            UserAccountEntity.Role role1, String name,
-            UserAccountEntity.Role role2, String username
+            Role role1, String name,
+            Role role2, String username
     );
 
     List<UserAccountEntity> findTop200ByOrderByUserIdAsc();
@@ -66,19 +67,19 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
     List<UserAccountEntity> searchByRoleLikeIgnoreCase(@Param("kw") String kw, Pageable pageable);
 
     // 조사자 상세 정보
-    List<UserAccountEntity> findAllByRoleOrderByUserIdAsc(UserAccountEntity.Role role);
+    List<UserAccountEntity> findAllByRoleOrderByUserIdAsc(Role role);
 
     // 페이징 - 개별 검색
-    Page<UserAccountEntity> findByRole(UserAccountEntity.Role role, Pageable pageable);
+    Page<UserAccountEntity> findByRole(Role role, Pageable pageable);
 
     Page<UserAccountEntity> findByRoleAndNameContainingIgnoreCase(
-            UserAccountEntity.Role role, String name, Pageable pageable);
+            Role role, String name, Pageable pageable);
 
     Page<UserAccountEntity> findByRoleAndUsernameContainingIgnoreCase(
-            UserAccountEntity.Role role, String username, Pageable pageable);
+            Role role, String username, Pageable pageable);
 
     Page<UserAccountEntity> findByRoleAndEmpNoContainingIgnoreCase(
-            UserAccountEntity.Role role, String empNo, Pageable pageable);
+            Role role, String empNo, Pageable pageable);
 
     // 전체 검색 (이름 + 아이디 + 사번)
     @Query("SELECT u FROM UserAccountEntity u " +
@@ -86,11 +87,10 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
             "AND (LOWER(u.name) LIKE LOWER(CONCAT('%', :kw, '%')) " +
             "OR LOWER(u.username) LIKE LOWER(CONCAT('%', :kw, '%')) " +
             "OR LOWER(u.empNo) LIKE LOWER(CONCAT('%', :kw, '%')))")
-    Page<UserAccountEntity> searchAllFields(@Param("role") UserAccountEntity.Role role,
+    Page<UserAccountEntity> searchAllFields(@Param("role") Role role,
                                             @Param("kw") String keyword,
                                             Pageable pageable);
 
     // 중복 확인
     boolean existsByUsername(String username);
-
 }

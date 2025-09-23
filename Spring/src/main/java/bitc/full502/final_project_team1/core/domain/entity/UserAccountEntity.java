@@ -1,9 +1,11 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
+import bitc.full502.final_project_team1.core.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "user_account", schema = "java502_team1_final_db")
@@ -27,8 +29,6 @@ public class UserAccountEntity {
 
     @Column(name = "name", length = 100, nullable = false)
     private String name;                        //  사람 이름 컬럼
-
-    public enum Role { ADMIN, EDITOR, VIEWER }
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", length = 20, nullable = false)

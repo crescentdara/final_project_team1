@@ -166,7 +166,11 @@ class SurveyActivity : AppCompatActivity() {
         updateTabs()
         updateNextButton()
         updateSubmitVisibility()
+
+        // 첫 번째 스테이지에서는 이전 버튼 숨기기
+        backButton.visibility = if (currentStage == 0) View.GONE else View.VISIBLE
     }
+
 
     // ===== 상단 탭 색상 변경 =====
     private fun updateTabs() {
@@ -180,11 +184,10 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     private fun updateNextButton() {
-        val allCheckedInStage = stages[currentStage]
-            .findViewsByType(RadioGroup::class.java)
-            .all { it.checkedRadioButtonId != -1 }
-        nextButton.isEnabled = allCheckedInStage && currentStage < stages.size - 1
-        nextButton.alpha = if (nextButton.isEnabled) 1f else 0.5f
+        // 항상 다음 버튼 활성화 (마지막 스테이지가 아니면)
+        val enabled = currentStage < stages.size - 1
+        nextButton.isEnabled = enabled
+        nextButton.alpha = if (enabled) 1f else 0.5f
     }
 
     private fun allCompleted(): Boolean {
@@ -212,10 +215,14 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     private fun updateSubmitVisibility() {
+        // 임시저장은 항상 가능
+        tempButton.visibility = View.VISIBLE
+
+        // 제출 버튼은 여전히 완료 여부에 따라 표시
         val visible = if (allCompleted()) View.VISIBLE else View.GONE
         submitButton.visibility = visible
-        tempButton.visibility   = visible
     }
+
 
     // ===== 유틸 =====
     private fun <T> View.findViewsByType(clazz: Class<T>): List<T> {

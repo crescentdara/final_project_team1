@@ -84,13 +84,24 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
         val info = view.findViewById<LinearLayout>(R.id.infoContainer)
 
-        view.findViewById<TextView?>(R.id.tvRejectReason)?.let { tv ->
+        view.findViewById<TextView>(R.id.tvRejectReason)?.apply {
             val reason = arguments?.getString(ARG_REJECT_REASON).orEmpty()
-            if (reason.isNotBlank()) tv.text = getString(R.string.reject_reason_fmt, reason)
+            if (reason.isNotBlank()) {
+                text = getString(R.string.reject_reason_fmt, reason)
+                visibility = View.VISIBLE
+            } else {
+                visibility = View.GONE
+            }
         }
-        view.findViewById<TextView?>(R.id.tvRejectedAt)?.let { tv ->
+
+        view.findViewById<TextView>(R.id.tvRejectedAt)?.apply {
             val dt = arguments?.getString(ARG_REJECTED_AT).orEmpty()
-            if (dt.isNotBlank()) tv.text = getString(R.string.rejected_at_fmt, dt)
+            if (dt.isNotBlank()) {
+                text = getString(R.string.rejected_at_fmt, dt)
+                visibility = View.VISIBLE
+            } else {
+                visibility = View.GONE
+            }
         }
 
         // 버튼 라벨/동작 분기

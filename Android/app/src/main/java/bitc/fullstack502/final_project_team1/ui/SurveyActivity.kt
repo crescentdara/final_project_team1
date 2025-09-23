@@ -11,15 +11,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RadioGroup
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
@@ -44,8 +36,8 @@ class SurveyActivity : AppCompatActivity() {
     // ---- request codes ----
     private val REQ_CAPTURE_EXT = 101
     private val REQ_CAPTURE_INT = 102
-    private val REQ_EDIT_EXT    = 201
-    private val REQ_EDIT_INT    = 202
+    private val REQ_EDIT_EXT = 201
+    private val REQ_EDIT_INT = 202
 
     // 전달값
     private var assignedBuildingId: Long = -1L
@@ -56,7 +48,6 @@ class SurveyActivity : AppCompatActivity() {
     private var currentStage = 0
     private lateinit var nextButton: Button
     private lateinit var backButton: Button
-    private lateinit var submitButton: Button
     private lateinit var tempButton: Button
     private lateinit var tabButtons: Map<Button, Int>
 
@@ -96,14 +87,10 @@ class SurveyActivity : AppCompatActivity() {
         // 하단 버튼
         backButton = findViewById(R.id.back_button)
         nextButton = findViewById(R.id.next_button)
-        submitButton = findViewById(R.id.submit_button)
         tempButton = findViewById(R.id.save_temp_button)
-        submitButton.visibility = View.GONE
-        tempButton.visibility   = View.GONE
 
         backButton.setOnClickListener { if (currentStage > 0) showStage(currentStage - 1) }
-        nextButton.setOnClickListener { if (currentStage < stages.size - 1) showStage(currentStage + 1) }
-        submitButton.setOnClickListener { submitSurvey() }
+        nextButton.setOnClickListener { handleNextOrSubmit() }
         tempButton.setOnClickListener { saveTemp() }
 
         // 상단 탭
@@ -146,16 +133,23 @@ class SurveyActivity : AppCompatActivity() {
             startEdit(REQ_EDIT_INT, src)
         }
 
-        // 폼 전체 라디오 변화 감지 → 다음/제출 버튼 상태 갱신
         allRadioGroups().forEach { rg ->
             rg.setOnCheckedChangeListener { _, _ ->
-                updateNextButton()
-                updateSubmitVisibility()
+                // 현재 스테이지에서 "조사불가" 버튼이 선택되었는지 확인
+                val impossibleSelected = rg.findViewById<RadioButton>(R.id.radio_impossible)?.isChecked == true
+
+                // 다음 버튼 활성/비활성 갱신
+                updateNextButton(disable = impossibleSelected)
+
+                // 상단 탭 활성/비활성 갱신
+                tabButtons.forEach { (btn, _) ->
+                    btn.isEnabled = !impossibleSelected
+                    btn.alpha = if (btn.isEnabled) 1f else 0.5f
+                }
             }
         }
 
         showStage(0)
-        updateSubmitVisibility()
     }
 
     // ===== 화면 전환/버튼 상태 =====
@@ -163,9 +157,12 @@ class SurveyActivity : AppCompatActivity() {
         stages.forEach { it.visibility = View.GONE }
         currentStage = index
         stages[currentStage].visibility = View.VISIBLE
+
+        // 첫 화면이면 backButton 숨기기, 아니면 보이기
+        backButton.visibility = if (currentStage == 0) View.GONE else View.VISIBLE
+
         updateTabs()
         updateNextButton()
-        updateSubmitVisibility()
     }
 
     // ===== 상단 탭 색상 변경 =====
@@ -179,12 +176,36 @@ class SurveyActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateNextButton() {
+    // ===== 다음/제출 버튼 상태 관리 =====
+    private fun updateNextButton(disable: Boolean = false) {
         val allCheckedInStage = stages[currentStage]
             .findViewsByType(RadioGroup::class.java)
             .all { it.checkedRadioButtonId != -1 }
-        nextButton.isEnabled = allCheckedInStage && currentStage < stages.size - 1
+
+        if (disable) {
+            nextButton.isEnabled = false
+            nextButton.alpha = 0.5f
+            return
+        }
+
+        if (currentStage == stages.size - 1) {
+            nextButton.text = "제출"
+            nextButton.isEnabled = allCheckedInStage && allCompleted()
+        } else {
+            nextButton.text = "다음"
+            nextButton.isEnabled = allCheckedInStage
+        }
+
         nextButton.alpha = if (nextButton.isEnabled) 1f else 0.5f
+    }
+
+    private fun handleNextOrSubmit() {
+        if (currentStage == stages.size - 1) {
+            // 마지막 단계 → 제출 실행
+            submitSurvey()
+        } else {
+            showStage(currentStage + 1)
+        }
     }
 
     private fun allCompleted(): Boolean {
@@ -209,12 +230,6 @@ class SurveyActivity : AppCompatActivity() {
                 extEditPhotoFile != null &&
                 intEditPhotoFile != null
         return radiosOk && photosOk
-    }
-
-    private fun updateSubmitVisibility() {
-        val visible = if (allCompleted()) View.VISIBLE else View.GONE
-        submitButton.visibility = visible
-        tempButton.visibility   = visible
     }
 
     // ===== 유틸 =====
@@ -263,7 +278,6 @@ class SurveyActivity : AppCompatActivity() {
         if (resultCode != Activity.RESULT_OK) return
 
         when (requestCode) {
-
             REQ_CAPTURE_EXT -> {
                 extPhotoFile = pendingOutputFile
                 pendingOutputFile = null
@@ -273,6 +287,7 @@ class SurveyActivity : AppCompatActivity() {
                     }
                 }
             }
+
             REQ_CAPTURE_INT -> {
                 intPhotoFile = pendingOutputFile
                 pendingOutputFile = null
@@ -282,6 +297,7 @@ class SurveyActivity : AppCompatActivity() {
                     }
                 }
             }
+
             REQ_EDIT_EXT -> {
                 val uriStr = data?.getStringExtra(EditActivity.EXTRA_EDITED_IMAGE_URI) ?: return
                 val file = File(Uri.parse(uriStr).path!!)
@@ -290,6 +306,7 @@ class SurveyActivity : AppCompatActivity() {
                     findViewById<ImageView>(R.id.img_extPhoto).setImageBitmap(bmp)
                 }
             }
+
             REQ_EDIT_INT -> {
                 val uriStr = data?.getStringExtra(EditActivity.EXTRA_EDITED_IMAGE_URI) ?: return
                 val file = File(Uri.parse(uriStr).path!!)
@@ -299,7 +316,7 @@ class SurveyActivity : AppCompatActivity() {
                 }
             }
         }
-        updateSubmitVisibility()
+        updateNextButton()
     }
 
     private fun idxOfChecked(rgId: Int): Int {
@@ -317,21 +334,21 @@ class SurveyActivity : AppCompatActivity() {
     private fun submitSurvey() {
         lifecycleScope.launch {
             val dto = SurveyResultRequest(
-                possible    = idxOfChecked(R.id.radioGroup_possible),
-                adminUse    = idxOfChecked(R.id.radioGroup_adminUse),
-                idleRate    = idxOfChecked(R.id.radioGroup_idleRate),
-                safety      = idxOfChecked(R.id.radioGroup_safety),
-                wall        = idxOfChecked(R.id.radioGroup_wall),
-                roof        = idxOfChecked(R.id.radioGroup_roof),
+                possible = idxOfChecked(R.id.radioGroup_possible),
+                adminUse = idxOfChecked(R.id.radioGroup_adminUse),
+                idleRate = idxOfChecked(R.id.radioGroup_idleRate),
+                safety = idxOfChecked(R.id.radioGroup_safety),
+                wall = idxOfChecked(R.id.radioGroup_wall),
+                roof = idxOfChecked(R.id.radioGroup_roof),
                 windowState = idxOfChecked(R.id.radioGroup_window),
-                parking     = idxOfChecked(R.id.radioGroup_parking),
-                entrance    = idxOfChecked(R.id.radioGroup_entrance),
-                ceiling     = idxOfChecked(R.id.radioGroup_ceiling),
-                floor       = idxOfChecked(R.id.radioGroup_floor),
-                extEtc      = findViewById<EditText>(R.id.input_extEtc).text.toString(),
-                intEtc      = findViewById<EditText>(R.id.input_intEtc).text.toString(),
-                buildingId  = assignedBuildingId.takeIf { it > 0 } ?: 1L,
-                userId      = 1
+                parking = idxOfChecked(R.id.radioGroup_parking),
+                entrance = idxOfChecked(R.id.radioGroup_entrance),
+                ceiling = idxOfChecked(R.id.radioGroup_ceiling),
+                floor = idxOfChecked(R.id.radioGroup_floor),
+                extEtc = findViewById<EditText>(R.id.input_extEtc).text.toString(),
+                intEtc = findViewById<EditText>(R.id.input_intEtc).text.toString(),
+                buildingId = assignedBuildingId.takeIf { it > 0 } ?: 1L,
+                userId = 1
             )
 
             val dtoBody = Gson().toJson(dto)
@@ -339,9 +356,9 @@ class SurveyActivity : AppCompatActivity() {
 
             val res = ApiClient.service.submitSurvey(
                 dto = dtoBody,
-                extPhoto     = extPhotoFile?.toPart("extPhoto"),
+                extPhoto = extPhotoFile?.toPart("extPhoto"),
                 extEditPhoto = extEditPhotoFile?.toPart("extEditPhoto"),
-                intPhoto     = intPhotoFile?.toPart("intPhoto"),
+                intPhoto = intPhotoFile?.toPart("intPhoto"),
                 intEditPhoto = intEditPhotoFile?.toPart("intEditPhoto")
             )
 
@@ -358,37 +375,38 @@ class SurveyActivity : AppCompatActivity() {
     private fun saveTemp() {
         lifecycleScope.launch {
             val dto = SurveyResultRequest(
-                possible    = idxOfChecked(R.id.radioGroup_possible),
-                adminUse    = idxOfChecked(R.id.radioGroup_adminUse),
-                idleRate    = idxOfChecked(R.id.radioGroup_idleRate),
-                safety      = idxOfChecked(R.id.radioGroup_safety),
-                wall        = idxOfChecked(R.id.radioGroup_wall),
-                roof        = idxOfChecked(R.id.radioGroup_roof),
+                possible = idxOfChecked(R.id.radioGroup_possible),
+                adminUse = idxOfChecked(R.id.radioGroup_adminUse),
+                idleRate = idxOfChecked(R.id.radioGroup_idleRate),
+                safety = idxOfChecked(R.id.radioGroup_safety),
+                wall = idxOfChecked(R.id.radioGroup_wall),
+                roof = idxOfChecked(R.id.radioGroup_roof),
                 windowState = idxOfChecked(R.id.radioGroup_window),
-                parking     = idxOfChecked(R.id.radioGroup_parking),
-                entrance    = idxOfChecked(R.id.radioGroup_entrance),
-                ceiling     = idxOfChecked(R.id.radioGroup_ceiling),
-                floor       = idxOfChecked(R.id.radioGroup_floor),
-                extEtc      = findViewById<EditText>(R.id.input_extEtc).text.toString(),
-                intEtc      = findViewById<EditText>(R.id.input_intEtc).text.toString(),
-                buildingId  = assignedBuildingId.takeIf { it > 0 } ?: 1L,
-                userId      = 1
+                parking = idxOfChecked(R.id.radioGroup_parking),
+                entrance = idxOfChecked(R.id.radioGroup_entrance),
+                ceiling = idxOfChecked(R.id.radioGroup_ceiling),
+                floor = idxOfChecked(R.id.radioGroup_floor),
+                extEtc = findViewById<EditText>(R.id.input_extEtc).text.toString(),
+                intEtc = findViewById<EditText>(R.id.input_intEtc).text.toString(),
+                buildingId = assignedBuildingId.takeIf { it > 0 } ?: 1L,
+                userId = 1
             )
 
             val dtoBody = Gson().toJson(dto).toRequestBody("application/json".toMediaTypeOrNull())
 
             val res = ApiClient.service.saveTemp(
                 dto = dtoBody,
-                extPhoto     = extPhotoFile?.toPart("extPhoto"),
+                extPhoto = extPhotoFile?.toPart("extPhoto"),
                 extEditPhoto = extEditPhotoFile?.toPart("extEditPhoto"),
-                intPhoto     = intPhotoFile?.toPart("intPhoto"),
+                intPhoto = intPhotoFile?.toPart("intPhoto"),
                 intEditPhoto = intEditPhotoFile?.toPart("intEditPhoto")
             )
 
             if (res.isSuccessful) {
                 Toast.makeText(this@SurveyActivity, "임시저장 완료", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this@SurveyActivity, "임시저장 실패: ${res.code()}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SurveyActivity, "임시저장 실패: ${res.code()}", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }

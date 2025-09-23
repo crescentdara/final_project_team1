@@ -23,6 +23,7 @@ public class SurveyServiceImpl implements SurveyService {
     private final AppAssignmentQueryRepository appAssignmentQueryRepository;
     private final SurveyResultRepository surveyResultRepository;
 
+
     @Override
     public List<AssignedBuildingDto> assigned(Long userId) {
         List<Object[]> rows = appAssignmentQueryRepository.findAssignedAll(userId);

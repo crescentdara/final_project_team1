@@ -5,8 +5,8 @@ function ResultModal({ show, onClose, result }) {
         <div className="modal-backdrop">
             <div className="modal-content p-4">
                 <h4>업로드 결과</h4>
-                <p>✅ 성공: {result.successCount}건</p>
-                <p>❌ 실패: {result.failCount}건</p>
+                <p>성공: {result.successCount}건</p>
+                <p>실패: {result.failCount}건</p>
 
                 {result.failMessages?.length > 0 && (
                     <div>

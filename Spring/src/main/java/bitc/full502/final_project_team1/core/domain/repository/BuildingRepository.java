@@ -42,78 +42,167 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
     //  - filter: 'ALL' | 'UNASSIGNED' | 'ASSIGNED' | 'APPROVED'
     //  - keyword: 번지/도로명/조사원명/아이디 LIKE 검색
     // ----------------------------------------------------------------------
+//    @Query(value = """
+//    SELECT
+//        b.id                           AS buildingId,
+//        b.lot_address                  AS lotAddress,
+//        b.road_address                 AS roadAddress,
+//        CASE WHEN uba.building_id IS NULL THEN 0 ELSE 1 END AS assigned,
+//        ua.user_id                     AS assignedUserId,
+//        ua.name                        AS assignedUserName,
+//        sr_latest.id                   AS resultId,
+//        sr_latest.status               AS resultStatus,
+//        approver.name                  AS approverName
+//
+//    FROM building b
+//    LEFT JOIN user_building_assignment uba ON uba.building_id = b.id
+//    LEFT JOIN user_account ua ON ua.user_id = uba.user_id
+//    LEFT JOIN (
+//        /* 건물별 최신 조사결과 1건 */
+//        SELECT sr1.*
+//        FROM survey_result sr1
+//        JOIN (
+//             SELECT building_id, MAX(id) AS max_id
+//             FROM survey_result
+//             GROUP BY building_id
+//        ) mx ON mx.building_id = sr1.building_id AND mx.max_id = sr1.id
+//    ) sr_latest ON sr_latest.building_id = b.id
+//    LEFT JOIN user_account approver ON sr_latest.approved_by = approver.user_id
+//
+//    WHERE
+//      (:keyword IS NULL OR :keyword = '' OR
+//         b.lot_address   LIKE CONCAT('%', :keyword, '%') OR
+//         b.road_address  LIKE CONCAT('%', :keyword, '%') OR
+//         ua.name         LIKE CONCAT('%', :keyword, '%') OR
+//         ua.username     LIKE CONCAT('%', :keyword, '%') OR
+//         approver.name   LIKE CONCAT('%', :keyword, '%') OR
+//         approver.username LIKE CONCAT('%', :keyword, '%')
+//      )
+//      AND (
+//         :filter = 'ALL'
+//         OR (:filter = 'UNASSIGNED' AND uba.building_id IS NULL)
+//         OR (:filter = 'ASSIGNED'   AND uba.building_id IS NOT NULL)
+//         OR (:filter = 'APPROVED'   AND sr_latest.status = 'APPROVED')
+//         OR (:filter = 'PENDING'    AND sr_latest.status = 'SENT')
+//         OR (:filter = 'REJECTED'   AND sr_latest.status = 'REJECTED')
+//      )
+//    ORDER BY b.id DESC
+//    """,
+//            countQuery = """
+//    SELECT COUNT(*)
+//    FROM building b
+//    LEFT JOIN user_building_assignment uba ON uba.building_id = b.id
+//    LEFT JOIN user_account ua ON ua.user_id = uba.user_id
+//    LEFT JOIN (
+//       SELECT sr1.*
+//       FROM survey_result sr1
+//       JOIN (
+//          SELECT building_id, MAX(id) AS max_id
+//          FROM survey_result
+//          GROUP BY building_id
+//       ) mx ON mx.building_id = sr1.building_id AND mx.max_id = sr1.id
+//    ) sr_latest ON sr_latest.building_id = b.id
+//    LEFT JOIN user_account approver ON sr_latest.approved_by = approver.user_id
+//    WHERE
+//      (:keyword IS NULL OR :keyword = '' OR
+//         b.lot_address   LIKE CONCAT('%', :keyword, '%') OR
+//         b.road_address  LIKE CONCAT('%', :keyword, '%') OR
+//         ua.name         LIKE CONCAT('%', :keyword, '%') OR
+//         ua.username     LIKE CONCAT('%', :keyword, '%') OR
+//         approver.name   LIKE CONCAT('%', :keyword, '%') OR
+//         approver.username LIKE CONCAT('%', :keyword, '%')
+//      )
+//      AND (
+//         :filter = 'ALL'
+//         OR (:filter = 'UNASSIGNED' AND uba.building_id IS NULL)
+//         OR (:filter = 'ASSIGNED'   AND uba.building_id IS NOT NULL)
+//         OR (:filter = 'APPROVED'   AND sr_latest.status = 'APPROVED')
+//         OR (:filter = 'PENDING'    AND sr_latest.status = 'SENT')
+//         OR (:filter = 'REJECTED'   AND sr_latest.status = 'REJECTED')
+//      )
+//    """,
+//            nativeQuery = true)
+//    Page<BuildingListProjection> searchBuildings(
+//            @Param("keyword") String keyword,
+//            @Param("filter")  String filter,
+//            Pageable pageable
+//    );
+
+    /** 결재자 정보가 없어서 결재가 없는 쿼리문 **/
     @Query(value = """
-        SELECT
-           b.id                           AS buildingId,
-           b.lot_address                  AS lotAddress,
-           b.road_address                 AS roadAddress,
-           CASE WHEN uba.building_id IS NULL THEN 0 ELSE 1 END AS assigned,
-           ua.user_id                     AS assignedUserId,
-           ua.name                        AS assignedUserName,
-           sr_latest.id                   AS resultId,
-           sr_latest.status               AS resultStatus
-        FROM building b
-        LEFT JOIN user_building_assignment uba ON uba.building_id = b.id
-        LEFT JOIN user_account ua ON ua.user_id = uba.user_id
-        LEFT JOIN (
-           /* 건물별 최신 조사결과 1건 */
-           SELECT sr1.*
-           FROM survey_result sr1
-           JOIN (
-              SELECT building_id, MAX(id) AS max_id
-              FROM survey_result
-              GROUP BY building_id
-           ) mx ON mx.building_id = sr1.building_id AND mx.max_id = sr1.id
-        ) sr_latest ON sr_latest.building_id = b.id
-        WHERE
-          (:keyword IS NULL OR :keyword = '' OR
-             b.lot_address  LIKE CONCAT('%', :keyword, '%') OR
-             b.road_address LIKE CONCAT('%', :keyword, '%') OR
-             ua.name        LIKE CONCAT('%', :keyword, '%') OR
-             ua.username    LIKE CONCAT('%', :keyword, '%')
-          )
-          AND (
-             :filter = 'ALL'
-             OR (:filter = 'UNASSIGNED' AND uba.building_id IS NULL)
-             OR (:filter = 'ASSIGNED'   AND uba.building_id IS NOT NULL)
-             OR (:filter = 'APPROVED'   AND sr_latest.status = 'APPROVED')
-          )
-        ORDER BY b.id DESC
-        """,
+    SELECT
+       b.id                           AS buildingId,
+       b.lot_address                  AS lotAddress,
+       b.road_address                 AS roadAddress,
+       CASE WHEN uba.building_id IS NULL THEN 0 ELSE 1 END AS assigned,
+       ua.user_id                     AS assignedUserId,
+       ua.name                        AS assignedUserName,
+       sr_latest.id                   AS resultId,
+       sr_latest.status               AS resultStatus
+    FROM building b
+    LEFT JOIN user_building_assignment uba ON uba.building_id = b.id
+    LEFT JOIN user_account ua ON ua.user_id = uba.user_id
+    LEFT JOIN (
+       /* 건물별 최신 조사결과 1건 */
+       SELECT sr1.*
+       FROM survey_result sr1
+       JOIN (
+          SELECT building_id, MAX(id) AS max_id
+          FROM survey_result
+          GROUP BY building_id
+       ) mx ON mx.building_id = sr1.building_id AND mx.max_id = sr1.id
+    ) sr_latest ON sr_latest.building_id = b.id
+    WHERE
+      (:keyword IS NULL OR :keyword = '' OR
+         b.lot_address  LIKE CONCAT('%', :keyword, '%') OR
+         b.road_address LIKE CONCAT('%', :keyword, '%') OR
+         ua.name        LIKE CONCAT('%', :keyword, '%') OR
+         ua.username    LIKE CONCAT('%', :keyword, '%')
+      )
+      AND (
+         :filter = 'ALL'
+         OR (:filter = 'UNASSIGNED' AND uba.building_id IS NULL)
+         OR (:filter = 'ASSIGNED'   AND uba.building_id IS NOT NULL)
+         OR (:filter = 'APPROVED'   AND sr_latest.status = 'APPROVED')
+      )
+    ORDER BY b.id DESC
+    """,
             countQuery = """
-        SELECT COUNT(*)
-        FROM building b
-        LEFT JOIN user_building_assignment uba ON uba.building_id = b.id
-        LEFT JOIN user_account ua ON ua.user_id = uba.user_id
-        LEFT JOIN (
-           SELECT sr1.*
-           FROM survey_result sr1
-           JOIN (
-              SELECT building_id, MAX(id) AS max_id
-              FROM survey_result
-              GROUP BY building_id
-           ) mx ON mx.building_id = sr1.building_id AND mx.max_id = sr1.id
-        ) sr_latest ON sr_latest.building_id = b.id
-        WHERE
-          (:keyword IS NULL OR :keyword = '' OR
-             b.lot_address  LIKE CONCAT('%', :keyword, '%') OR
-             b.road_address LIKE CONCAT('%', :keyword, '%') OR
-             ua.name        LIKE CONCAT('%', :keyword, '%') OR
-             ua.username    LIKE CONCAT('%', :keyword, '%')
-          )
-          AND (
-             :filter = 'ALL'
-             OR (:filter = 'UNASSIGNED' AND uba.building_id IS NULL)
-             OR (:filter = 'ASSIGNED'   AND uba.building_id IS NOT NULL)
-             OR (:filter = 'APPROVED'   AND sr_latest.status = 'APPROVED')
-          )
-        """,
+    SELECT COUNT(*)
+    FROM building b
+    LEFT JOIN user_building_assignment uba ON uba.building_id = b.id
+    LEFT JOIN user_account ua ON ua.user_id = uba.user_id
+    LEFT JOIN (
+       SELECT sr1.*
+       FROM survey_result sr1
+       JOIN (
+          SELECT building_id, MAX(id) AS max_id
+          FROM survey_result
+          GROUP BY building_id
+       ) mx ON mx.building_id = sr1.building_id AND mx.max_id = sr1.id
+    ) sr_latest ON sr_latest.building_id = b.id
+    WHERE
+      (:keyword IS NULL OR :keyword = '' OR
+         b.lot_address  LIKE CONCAT('%', :keyword, '%') OR
+         b.road_address LIKE CONCAT('%', :keyword, '%') OR
+         ua.name        LIKE CONCAT('%', :keyword, '%') OR
+         ua.username    LIKE CONCAT('%', :keyword, '%')
+      )
+      AND (
+         :filter = 'ALL'
+         OR (:filter = 'UNASSIGNED' AND uba.building_id IS NULL)
+         OR (:filter = 'ASSIGNED'   AND uba.building_id IS NOT NULL)
+         OR (:filter = 'APPROVED'   AND sr_latest.status = 'APPROVED')
+      )
+    """,
             nativeQuery = true)
-    Page<BuildingListProjection> searchBuildings( // ★ NEW
-                                                  @Param("keyword") String keyword,
-                                                  @Param("filter")  String filter,
-                                                  Pageable pageable
+    Page<BuildingListProjection> searchBuildings(
+            @Param("keyword") String keyword,
+            @Param("filter")  String filter,
+            Pageable pageable
     );
+
+
 
     // 📌 읍/면/동 단위까지만 자르기 (면/읍은 우선적으로 끊음)
     @Query(value = """

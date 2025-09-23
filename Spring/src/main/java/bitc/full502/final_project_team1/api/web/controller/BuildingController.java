@@ -170,11 +170,26 @@ public class BuildingController {
             @RequestParam(defaultValue = "1")  int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        var pageable = PageRequest.of(Math.max(0, page-1), Math.max(1, size), Sort.by(Sort.Direction.DESC, "id"));
-        var data = buildingRepo.searchBuildings(keyword, filter, pageable); // ← 메서드 사용
-        var items = data.getContent().stream().map(BuildingListItemDto::from).toList();
-        return new PageResponseDto<>(items, data.getTotalElements(), data.getTotalPages(), data.getNumber()+1, data.getSize());
+        var pageable = PageRequest.of(Math.max(0, page-1), Math.max(1, size),
+                Sort.by(Sort.Direction.DESC, "id"));
+
+        // 🔹 Projection 기반 조회 (검색/필터 포함)
+        var data = buildingRepo.searchBuildings(keyword, filter, pageable);
+
+        // 🔹 DTO 변환 (statusLabel 포함)
+        var items = data.getContent().stream()
+                .map(BuildingListItemDto::from)
+                .toList();
+
+        return new PageResponseDto<>(
+                items,
+                data.getTotalElements(),
+                data.getTotalPages(),
+                data.getNumber() + 1,
+                data.getSize()
+        );
     }
+
 
     // 📌 [수정] 미배정 조사지 + 조사원 목록 조회 (전체 리스트 반환)
     @GetMapping("/unassigned")

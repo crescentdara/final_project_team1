@@ -11,4 +11,7 @@ public interface BuildingListProjection {
 
     Long    getResultId();
     String  getResultStatus();
+
+    // 결재자 이름
+    String getApproverName();
 }

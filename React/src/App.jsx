@@ -15,6 +15,7 @@ import BuildingUpload from "./pages/BuildingUpload.jsx";
 import Message from "./pages/MessageTabs.jsx";
 import MessageTabs from "./pages/MessageTabs.jsx";
 import axios from "axios";
+import SurveyIndex from "./pages/SurveyIndex.jsx";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -68,6 +69,8 @@ function App() {
                                 <Link to="/login" className="btn btn-outline-info">Login 페이지로 이동</Link>
                                 <Link to="/buildingUpload" className="btn btn-primary mt-3">다건 등록 페이지로 이동</Link>
                                 <Link to="/messageTabs" className="btn btn-primary mt-3">messageTabs 페이지로 이동</Link>
+
+                                <Link to="/surveyIndex" className="btn btn-primary mt-3">surveyIndex 페이지로 이동</Link>
                             </div>
                         }
                     />
@@ -99,6 +102,7 @@ function App() {
                         element={<MessageTabs senderId={user?.id} />}
                     />
 
+                    <Route path="/surveyIndex" element={<SurveyIndex />} />
 
                 </Routes>
             </div>

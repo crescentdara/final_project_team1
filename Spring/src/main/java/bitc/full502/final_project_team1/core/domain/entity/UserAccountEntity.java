@@ -1,8 +1,8 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
+import bitc.full502.final_project_team1.core.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,8 +28,6 @@ public class UserAccountEntity {
     @Column(name = "name", length = 100, nullable = false)
     private String name;                        //  사람 이름 컬럼
 
-    public enum Role { ADMIN, EDITOR, VIEWER }
-
     @Enumerated(EnumType.STRING)
     @Column(name = "role", length = 20, nullable = false)
     private Role role;                          // DB에 'EDITOR' 같은 문자열로 저장됨
@@ -42,5 +40,4 @@ public class UserAccountEntity {
 
     @Column(name = "emp_no", length = 50, nullable = false, unique = true)
     private String empNo;
-
 }

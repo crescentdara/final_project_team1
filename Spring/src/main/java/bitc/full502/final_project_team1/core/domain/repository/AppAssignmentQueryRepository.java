@@ -30,7 +30,7 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
         HAVING distance_m <= :radiusMeters
         ORDER BY distance_m ASC
         """, nativeQuery = true)
-    List<Object[]> findAssignedWithin(@Param("userId") Integer userId,
+    List<Object[]> findAssignedWithin(@Param("userId") Long userId,
                                       @Param("lat") double lat,
                                       @Param("lng") double lng,
                                       @Param("radiusMeters") double radiusMeters);
@@ -42,5 +42,5 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
         where a.user.userId = :userId
         order by a.assignedAt desc
         """)
-    List<Object[]> findAssignedAll(@Param("userId") Integer userId);
+    List<Object[]> findAssignedAll(@Param("userId") Long userId);
 }

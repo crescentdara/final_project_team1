@@ -11,6 +11,7 @@ import ResultReport from "./pages/ResultReport.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
 import TotalSurveyList from "./pages/TotalSurveyList.jsx";
 import Login from "./pages/Login.jsx";
+import BuildingUpload from "./pages/BuildingUpload.jsx";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -45,6 +46,7 @@ function App() {
                                 <Link to="/approvals" className="btn btn-outline-primary me-3">결재 대기 중</Link>
                                 <Link to="/survey" className="btn btn-outline-info">전체 조사 목록</Link>
                                 <Link to="/login" className="btn btn-outline-info">Login 페이지로 이동</Link>
+                                <Link to="/buildingUpload" className="btn btn-primary mt-3">buildingUpload 페이지로 이동</Link>
                             </div>
                         }
                     />
@@ -67,6 +69,8 @@ function App() {
                         path="/admin-only"
                         element={user?.role === "ADMIN" ? <Dashboard /> : <Navigate to="/login" />}
                     />
+
+                    <Route path="/buildingUpload" element={<BuildingUpload />} />
                 </Routes>
             </div>
         </>

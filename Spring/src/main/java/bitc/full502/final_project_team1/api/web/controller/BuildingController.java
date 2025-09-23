@@ -1,9 +1,6 @@
 package bitc.full502.final_project_team1.api.web.controller;
 
-import bitc.full502.final_project_team1.api.web.dto.AssignRequestDTO;
-import bitc.full502.final_project_team1.api.web.dto.BuildingDTO;
-import bitc.full502.final_project_team1.api.web.dto.BuildingListItemDto;
-import bitc.full502.final_project_team1.api.web.dto.PageResponseDto;
+import bitc.full502.final_project_team1.api.web.dto.*;
 import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmentEntity;
@@ -11,6 +8,7 @@ import bitc.full502.final_project_team1.core.domain.enums.Role;
 import bitc.full502.final_project_team1.core.domain.repository.BuildingRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserBuildingAssignmentRepository;
+import bitc.full502.final_project_team1.core.service.BuildingService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,8 +16,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +31,7 @@ public class BuildingController {
     private final BuildingRepository buildingRepo;
     private final UserAccountRepository userRepo;
     private final UserBuildingAssignmentRepository assignmentRepo;
+    private final BuildingService buildingService;
 
     // 📌 전체 건물 목록 조회
     @GetMapping
@@ -162,29 +163,6 @@ public class BuildingController {
         return ResponseEntity.ok(Map.of("success", true, "assignedCount", assignments.size()));
     }
 
-    // 조사 목록 리스트 생성 부분
-    @PostMapping
-    public ResponseEntity<String> createBuilding(@RequestBody BuildingDTO dto) {
-        BuildingEntity entity = new BuildingEntity();
-
-        entity.setLotAddress(dto.getLotAddress());
-        entity.setLatitude(dto.getLatitude());
-        entity.setLongitude(dto.getLongitude());
-        entity.setBuildingName(dto.getBuildingName());
-        entity.setMainUseName(dto.getMainUseName());
-        entity.setStructureName(dto.getStructureName());
-        entity.setGroundFloors(dto.getGroundFloors());
-        entity.setBasementFloors(dto.getBasementFloors());
-        entity.setLandArea(dto.getLandArea());
-        entity.setBuildingArea(dto.getBuildingArea());
-
-        entity.setStatus(0);
-
-        buildingRepo.save(entity);
-
-        return ResponseEntity.ok("저장 완료");
-    }
-
     @GetMapping("/surveys")
     public PageResponseDto<BuildingListItemDto> list(
             @RequestParam(defaultValue = "") String keyword,
@@ -225,6 +203,46 @@ public class BuildingController {
                 "totalResults", results.size(),
                 "investigators", investigators
         );
+    }
+
+    // 조사 목록 리스트 생성 부분 (단건 등록)
+    @PostMapping
+    public ResponseEntity<String> createBuilding(@RequestBody BuildingDTO dto) {
+        BuildingEntity entity = new BuildingEntity();
+
+        entity.setLotAddress(dto.getLotAddress());
+        entity.setLatitude(dto.getLatitude());
+        entity.setLongitude(dto.getLongitude());
+        entity.setBuildingName(dto.getBuildingName());
+        entity.setMainUseName(dto.getMainUseName());
+        entity.setStructureName(dto.getStructureName());
+        entity.setGroundFloors(dto.getGroundFloors());
+        entity.setBasementFloors(dto.getBasementFloors());
+        entity.setLandArea(dto.getLandArea());
+        entity.setBuildingArea(dto.getBuildingArea());
+
+        entity.setStatus(0);
+
+        buildingRepo.save(entity);
+
+        return ResponseEntity.ok("저장 완료");
+    }
+
+    // 엑셀을 이용한 조사 목록 리스트 생성 (다건 등록)
+    @PostMapping("/upload-excel")
+    public ResponseEntity<UploadResultDTO> uploadBuildings(@RequestParam("file") MultipartFile file) {
+        try {
+            UploadResultDTO uploadResult = buildingService.saveBuildingsFromExcel(file);
+            return ResponseEntity.ok(uploadResult);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    UploadResultDTO.builder()
+                            .successCount(0)
+                            .failCount(1)
+                            .failMessages(List.of("업로드 실패: " + e.getMessage()))
+                            .build()
+            );
+        }
     }
 
 }

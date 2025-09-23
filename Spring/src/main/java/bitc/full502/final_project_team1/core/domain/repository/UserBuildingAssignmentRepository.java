@@ -19,7 +19,7 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
            where a.user.userId = :userId
            order by a.buildingId
            """)
-    List<Object[]> findPairsByUserId(Integer userId);
+    List<Object[]> findPairsByUserId(Long userId);
 
     /** 특정 지역(키워드) 배정만 삭제 (라운드로빈 재배정 전에 사용) */
     @Modifying
@@ -32,7 +32,7 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
            """)
     int deleteAllByLotAddressLike(String keyword);
 
-    long countByUser_UserIdAndStatus(Integer userId, Integer status);
+    long countByUser_UserIdAndStatus(Long userId, Integer status);
 
 
 

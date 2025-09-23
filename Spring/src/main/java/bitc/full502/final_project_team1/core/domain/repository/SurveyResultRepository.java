@@ -16,9 +16,9 @@ import java.util.List;
 @Repository
 public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity, Long> {
 
-    List<SurveyResultEntity> findByUser_UserIdAndStatus(Integer userId, String status);
+    List<SurveyResultEntity> findByUser_UserIdAndStatus(Long userId, String status);
 
-    long countByUser_UserIdAndStatus(Integer userId, String status);
+    long countByUser_UserIdAndStatus(Long userId, String status);
 
     interface StatusCount {
         String getStatus();
@@ -31,7 +31,7 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
         where s.user.userId = :userId
         group by s.status
         """)
-    List<StatusCount> countGroupByStatus(@Param("userId") Integer userId);
+    List<StatusCount> countGroupByStatus(@Param("userId") Long userId);
 
     @Query("""
         select s
@@ -43,7 +43,7 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
                  s.createdAt desc
         """)
     Page<SurveyResultEntity> findByUserAndStatusPage(
-            @Param("userId") Integer userId,
+            @Param("userId") Long userId,
             @Param("status") String status,
             Pageable pageable
     );

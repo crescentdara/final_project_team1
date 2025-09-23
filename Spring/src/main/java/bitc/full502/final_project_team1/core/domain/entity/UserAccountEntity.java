@@ -18,7 +18,7 @@ public class UserAccountEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Integer userId;                     // PK (INT AI)
+    private Long userId;                     // PK (INT AI)
 
     @Column(name = "username", length = 60, nullable = false, unique = true)
     private String username;

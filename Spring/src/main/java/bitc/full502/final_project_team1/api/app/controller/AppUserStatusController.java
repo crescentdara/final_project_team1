@@ -19,14 +19,14 @@ public class AppUserStatusController {
     private final SurveyService surveyService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<AppUserSurveyStatusResponse> getUserStatus(@PathVariable Integer userId) {
+    public ResponseEntity<AppUserSurveyStatusResponse> getUserStatus(@PathVariable Long userId) {
         return ResponseEntity.ok(userStatusService.getUserStatus(userId));
     }
 
     /** 상단 카운트만 */
     @GetMapping("/status")
     public ResponseEntity<AppUserSurveyStatusResponse> stats(
-            @RequestHeader("X-USER-ID") Integer userId
+            @RequestHeader("X-USER-ID") Long userId
     ) {
         return ResponseEntity.ok(userStatusService.getUserStatus(userId));
     }
@@ -34,7 +34,7 @@ public class AppUserStatusController {
     /** 목록 + 상단 카운트 (status 필터는 선택) */
     @GetMapping
     public ListWithStatusResponse<SurveyListItemDto> list(
-            @RequestHeader("X-USER-ID") Integer userId,
+            @RequestHeader("X-USER-ID") Long userId,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size

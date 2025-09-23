@@ -14,6 +14,11 @@
     <color name="green">#28A745</color>
     <color name="red">#DC3545</color>
     <color name="orange">#FD7E14</color>
+    <!-- 연한 색상 (그래프 바 배경용) -->
+    <color name="blue_soft">#E6F0FF</color>
+    <color name="red_soft">#FBE6E6</color>
+    <color name="green_soft">#E6F7EF</color>
+    <color name="orange_soft">#FFF0DA</color>
     
     <!-- White 계열 배경 -->
     <color name="background_white">#FFFFFF</color>

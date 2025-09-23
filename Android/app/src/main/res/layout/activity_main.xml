@@ -19,16 +19,16 @@
             android:background="@drawable/toolbar_background"
             android:paddingHorizontal="16dp">
 
-            <!-- 좌측 햄버거 메뉴 -->
+            <!-- 좌측 알림 아이콘 -->
             <ImageView
-                android:id="@+id/ivHamburger"
+                android:id="@+id/ivNotification"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_menu_white"
+                android:src="@drawable/ic_bell"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:contentDescription="메뉴"
+                android:contentDescription="알림"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
@@ -67,18 +67,12 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- 숨겨진 실제 툴바 (기존 기능 유지용) -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:menu="@menu/menu_main" />
 
     <!-- 스크롤 가능한 콘텐츠 -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:fillViewport="true">
 
         <LinearLayout
@@ -263,24 +257,99 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ✅ 조사목록 보기 버튼 -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSurveyList"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginBottom="24dp"
-                android:backgroundTint="@color/primary_blue"
-                android:text="조사목록 보기"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.02"
-                app:cornerRadius="16dp"
-                app:elevation="4dp"
-                app:iconGravity="textStart"
-                app:iconPadding="8dp" />
 
-            <!-- ✅ 조사현황 대시보드 -->
+
+            <!-- ✅ 빠른 작업 버튼 (조사예정관리, 재조사대상, 조사내역조회, 미전송내역) -->
+            <LinearLayout
+                android:id="@+id/quickActions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnScheduled"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:backgroundTint="@color/primary_blue"
+                        android:text="조사예정관리"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        app:icon="@drawable/ic_survey"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="16dp"
+                        app:elevation="4dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnReinspect"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="@color/primary_blue"
+                        android:text="재조사대상"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        app:icon="@drawable/ic_edit"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="16dp"
+                        app:elevation="4dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnHistory"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:backgroundTint="@color/primary_blue"
+                        android:text="조사내역조회"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        app:icon="@drawable/ic_chart"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="16dp"
+                        app:elevation="4dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNotTransmitted"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="@color/primary_blue"
+                        android:text="미전송내역"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        app:icon="@drawable/ic_error"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:cornerRadius="16dp"
+                        app:elevation="4dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ✅ 조사현황 (4개 요약 카드) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardDashboard"
                 android:layout_width="match_parent"
@@ -297,53 +366,342 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- 헤더 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
+                        android:text="조사현황"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="조사현황"
-                            android:textColor="@color/text_primary"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvDetail"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="자세히 보기"
-                            android:textColor="@color/primary_blue"
-                            android:textSize="14sp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp" />
-                    </LinearLayout>
-
-                    <!-- 그래프 영역 -->
                     <LinearLayout
-                        android:id="@+id/dashboardContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:gravity="center"
-                        android:background="@drawable/rounded_border"
-                        android:orientation="horizontal">
+                        android:layout_height="160dp"
+                        android:orientation="horizontal"
+                        android:weightSum="4">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="그래프 영역"
-                            android:textColor="@color/text_light"
-                            android:textSize="14sp" />
+                        <!-- 조사예정 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:padding="12dp"
+                            android:layout_marginEnd="8dp">
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:foregroundGravity="bottom">
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/rounded_soft_card" />
+                                <View
+                                    android:id="@+id/barScheduledBg"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/blue_soft" />
+                                <View
+                                    android:id="@+id/barScheduled"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@color/primary_blue" />
+                            </FrameLayout>
+                            <TextView
+                                android:id="@+id/tvDashScheduled"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/primary_blue"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="조사예정"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:ellipsize="end"
+                                android:singleLine="true" />
+                        </LinearLayout>
+
+                        <!-- 재조사대상 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:padding="12dp"
+                            android:layout_marginEnd="8dp">
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:foregroundGravity="bottom">
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/rounded_soft_card" />
+                                <View
+                                    android:id="@+id/barReinspectBg"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/red_soft" />
+                                <View
+                                    android:id="@+id/barReinspect"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@color/red" />
+                            </FrameLayout>
+                            <TextView
+                                android:id="@+id/tvDashReinspect"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/red"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="재조사"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:ellipsize="end"
+                                android:singleLine="true" />
+                        </LinearLayout>
+
+                        <!-- 미전송 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:padding="12dp"
+                            android:layout_marginEnd="8dp">
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:foregroundGravity="bottom">
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/rounded_soft_card" />
+                                <View
+                                    android:id="@+id/barNotTransmittedBg"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/orange_soft" />
+                                <View
+                                    android:id="@+id/barNotTransmitted"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@color/orange" />
+                            </FrameLayout>
+                            <TextView
+                                android:id="@+id/tvDashNotTransmitted"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/orange"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="미전송"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:ellipsize="end"
+                                android:singleLine="true" />
+                        </LinearLayout>
+
+                        <!-- 결재대기중 -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:padding="12dp">
+                            <FrameLayout
+                                android:layout_width="48dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:foregroundGravity="bottom">
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/rounded_soft_card" />
+                                <View
+                                    android:id="@+id/barPendingApprovalBg"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="#EFEFEF" />
+                                <View
+                                    android:id="@+id/barPendingApproval"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="@color/text_primary" />
+                            </FrameLayout>
+                            <TextView
+                                android:id="@+id/tvDashPendingApproval"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/text_primary"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="결재대기"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="12sp"
+                                android:ellipsize="end"
+                                android:singleLine="true" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </ScrollView>
+
+    <!-- ✅ 하단 푸터 네비게이션 -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="8dp"
+        android:elevation="6dp">
+
+        <LinearLayout
+            android:id="@+id/navScheduled"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_survey"
+                app:tint="@color/primary_blue" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="조사예정관리"
+                android:textSize="10sp"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navReinspect"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_edit"
+                app:tint="@color/primary_blue" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="재조사대상"
+                android:textSize="10sp"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_menu_mapmode"
+                app:tint="@color/primary_blue" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="메인페이지"
+                android:textSize="10sp"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navHistory"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chart"
+                app:tint="@color/primary_blue" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="조사내역조회"
+                android:textSize="10sp"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navNotTransmitted"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_error"
+                app:tint="@color/primary_blue" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="미전송내역"
+                android:textSize="10sp"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

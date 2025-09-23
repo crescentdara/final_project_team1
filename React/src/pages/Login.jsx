@@ -16,6 +16,7 @@ export default function Login({ onLogin }) {
         try {
             const res = await axios.post("/web/api/auth/login", form, { withCredentials: true });
             if (res.data.success) {
+                console.log("✅ 로그인 성공, 받은 info:", res.data.info);
                 onLogin(res.data.info); // App에 user 상태 전달
                 navigate("/"); // 로그인 성공 후 메인 페이지로 이동
             } else {

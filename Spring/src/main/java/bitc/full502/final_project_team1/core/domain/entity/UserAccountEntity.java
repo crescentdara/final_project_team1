@@ -45,4 +45,8 @@ public class UserAccountEntity {
     /** 선호 지역 컬럼 추가 */
     @Column(name = "preferred_region", length = 200)
     private String preferredRegion;
+
+    /** 파이어베이스 FCM 토큰 **/
+    @Column(name = "fcm_token")
+    private String fcmToken;
 }

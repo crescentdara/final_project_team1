@@ -25,10 +25,10 @@ public class UserStatusServiceImpl implements UserStatusService {
                         SurveyResultRepository.StatusCount::getCnt
                 ));
 
-        long approved = counts.getOrDefault("APPROVED", 0L);
-        long rejected = counts.getOrDefault("REJECTED", 0L);
-        long sent     = counts.getOrDefault("SENT", 0L);
-        long temp     = counts.getOrDefault("TEMP", 0L);
+        Long approved = counts.getOrDefault("APPROVED", 0L);
+        Long rejected = counts.getOrDefault("REJECTED", 0L);
+        Long sent     = counts.getOrDefault("SENT", 0L);
+        Long temp     = counts.getOrDefault("TEMP", 0L);
 
         return new AppUserSurveyStatusResponse(approved, rejected, sent, temp);
     }

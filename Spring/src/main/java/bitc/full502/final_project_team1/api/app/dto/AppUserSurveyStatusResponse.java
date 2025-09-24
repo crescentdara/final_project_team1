@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class AppUserSurveyStatusResponse {
-    private long approved; // 결재완료 (APPROVED)
-    private long rejected; // 반려 (REJECTED)
-    private long sent;     // 전송완료 (SENT)
-    private long temp;     // 임시저장 (TEMP)
+    private Long approved; // 결재완료 (APPROVED)
+    private Long rejected; // 반려 (REJECTED)
+    private Long sent;     // 전송완료 (SENT)
+    private Long temp;     // 임시저장 (TEMP)
 }

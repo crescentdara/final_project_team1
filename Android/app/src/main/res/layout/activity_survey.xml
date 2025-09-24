@@ -382,6 +382,16 @@
                         android:layout_marginTop="6dp">
 
                     <ImageButton
+                            android:id="@+id/btn_extGallery"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="start|center_vertical"
+                            android:layout_marginStart="12dp"
+                            android:backgroundTint="#C5C7CA"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_gallery" />
+
+                    <ImageButton
                             android:id="@+id/btn_extPhoto"
                             android:layout_width="56dp"
                             android:layout_height="56dp"
@@ -401,6 +411,7 @@
                             android:scaleType="centerInside"
                             android:src="@drawable/ic_edit" />
                 </FrameLayout>
+
             </LinearLayout>
 
             <!-- ▼ 6. 내부상태 + 사진 -->
@@ -543,6 +554,16 @@
                         android:layout_marginTop="6dp">
 
                     <ImageButton
+                            android:id="@+id/btn_intGallery"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="start|center_vertical"
+                            android:layout_marginStart="12dp"
+                            android:backgroundTint="#C5C7CA"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_gallery" />
+
+                    <ImageButton
                             android:id="@+id/btn_intPhoto"
                             android:layout_width="56dp"
                             android:layout_height="56dp"
@@ -562,6 +583,7 @@
                             android:scaleType="centerInside"
                             android:src="@drawable/ic_edit" />
                 </FrameLayout>
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

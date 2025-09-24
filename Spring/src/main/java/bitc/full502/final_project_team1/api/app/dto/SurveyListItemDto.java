@@ -2,7 +2,10 @@ package bitc.full502.final_project_team1.api.app.dto;
 
 import lombok.*;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SurveyListItemDto {
     private Long surveyId;
     private Long buildingId;

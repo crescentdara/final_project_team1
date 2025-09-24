@@ -30,6 +30,7 @@ interface ApiService {
     @POST("login")
     suspend fun login(@Body body: LoginRequest): Response<LoginResponse>
 
+    // 배정/건물
     @GET("assigned")
     suspend fun getAssigned(@Query("userId") userId: Long): List<AssignedBuilding>
 
@@ -44,6 +45,7 @@ interface ApiService {
     @GET("building/detail")
     suspend fun getBuildingDetail(@Query("buildingId") buildingId: Long): BuildingDetailDto
 
+    // 설문 결과 제출/임시저장/수정  (※ 서버는 /app/survey/result/..., 클라는 /survey/result/... 만)
     @Multipart
     @POST("survey/result/submit")
     suspend fun submitSurvey(
@@ -64,7 +66,6 @@ interface ApiService {
         @Part intEditPhoto: MultipartBody.Part?
     ): Response<SurveyResultResponse>
 
-    // (옵션) 수정 => PUT /app/survey/result/edit/{id}
     @Multipart
     @PUT("survey/result/edit/{id}")
     suspend fun updateSurvey(
@@ -76,18 +77,25 @@ interface ApiService {
         @Part intEditPhoto: MultipartBody.Part?
     ): Response<SurveyResultResponse>
 
+    // 상세/최근 (헤더 필수)
     @GET("survey/result/{id}")
-    suspend fun getSurvey(@Path("id") id: Long): Response<SurveyResultResponse>
+    suspend fun getSurveyDetail(
+        @Header("X-USER-ID") userId: Long,
+        @Path("id") id: Long
+    ): SurveyResultDetailDto
 
+    @GET("survey/result/latest")
+    suspend fun getSurveyLatest(
+        @Header("X-USER-ID") userId: Long,
+        @Query("buildingId") buildingId: Long
+    ): SurveyResultDetailDto?
 
-    // ===== 여기부터 목록/카운트 경로 교체 =====
-    /** 상단 카운트 (서버: GET /app/survey/status/status, Header: X-USER-ID) */
+    // 현황/목록 (서버: /app/survey/status..., 클라: /survey/status...)
     @GET("survey/status/status")
     suspend fun getSurveyStatus(
         @Header("X-USER-ID") userId: Long
     ): AppUserSurveyStatusResponse
 
-    /** 목록 + 카운트 (서버: GET /app/survey/status, Header: X-USER-ID, status optional) */
     @GET("survey/status")
     suspend fun getSurveys(
         @Header("X-USER-ID") userId: Long,
@@ -96,7 +104,6 @@ interface ApiService {
         @Query("size") size: Int = 50
     ): ListWithStatusResponse<SurveyListItemDto>
 
-    /** 재조사 목록 (status=REJECTED 고정) */
     @GET("survey/status")
     suspend fun getSurveysReJe(
         @Header("X-USER-ID") userId: Long,
@@ -105,24 +112,11 @@ interface ApiService {
         @Query("size") size: Int = 50
     ): ListWithStatusResponse<SurveyListItemDto>
 
-    /** 재조사 시작 경로는 서버 구현에 맞춰 조정 필요 */
+    // 재조사 시작 (서버쪽 경로에 app/가 붙어있다면 서버 기준으로 맞춰 변경)
     @POST("survey/reinspect/{surveyId}/redo/start")
     suspend fun startRedo(
         @Header("X-USER-ID") userId: Long,
         @Path("surveyId") surveyId: Long
     ): ResponseBody
-
-    // network/ApiService.kt (추가)
-    @GET("surveys/{id}")
-    suspend fun getSurveyDetail(
-        @Header("X-USER-ID") userId: Long,
-        @Path("id") id: Long
-    ): SurveyResultDetailDto
-
-    @GET("surveys/latest")
-    suspend fun getSurveyLatest(
-        @Header("X-USER-ID") userId: Long,
-        @Query("buildingId") buildingId: Long
-    ): SurveyResultDetailDto?
-
 }
+

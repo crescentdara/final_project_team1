@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,7 @@ public class SurveyServiceImpl implements SurveyService {
     private final AppAssignmentQueryRepository appAssignmentQueryRepository;
     private final SurveyResultRepository surveyResultRepository;
     private final ApprovalRepository approvalRepository;
+    private final RestClient.Builder builder;
 
     @Override
     public List<AssignedBuildingDto> assigned(Long userId) {
@@ -81,10 +83,10 @@ public class SurveyServiceImpl implements SurveyService {
                 .collect(Collectors.toMap(SurveyResultRepository.StatusCount::getStatus,
                         SurveyResultRepository.StatusCount::getCnt));
 
-        long approved = counts.getOrDefault("APPROVED", 0L);
-        long rejected = counts.getOrDefault("REJECTED", 0L);
-        long sent     = counts.getOrDefault("SENT", 0L);
-        long temp     = counts.getOrDefault("TEMP", 0L);
+        Long approved = counts.getOrDefault("APPROVED", 0L);
+        Long rejected = counts.getOrDefault("REJECTED", 0L);
+        Long sent     = counts.getOrDefault("SENT", 0L);
+        Long temp     = counts.getOrDefault("TEMP", 0L);
 
         return new AppUserSurveyStatusResponse(approved, rejected, sent, temp);
     }

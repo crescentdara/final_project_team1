@@ -13,19 +13,17 @@ import bitc.fullstack502.final_project_team1.MainActivity
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
+import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
 import bitc.fullstack502.final_project_team1.ui.survey.SurveyResultDialog
+import bitc.fullstack502.final_project_team1.ui.surveyList.BuildingInfoBottomSheet
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-/**
- * 📤 미전송(임시저장) 페이지
- * - 서버에서 status=TEMP 만 조회해서 표시
- * - 정렬: 최신순/과거순
- */
+
 class DataTransmissionActivity : AppCompatActivity() {
 
     // UI
@@ -33,10 +31,9 @@ class DataTransmissionActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyStateLayout: LinearLayout
     private lateinit var adapter: NotTransmittedListAdapter
+    private val allDataList    = mutableListOf<SurveyListItemDto>()
+    private val sortedDataList = mutableListOf<SurveyListItemDto>()
 
-    // 데이터 (주소만 표시)
-    private val allDataList = mutableListOf<String>()
-    private val sortedDataList = mutableListOf<String>()
 
     private val sortOptions = arrayOf("최신순", "과거순")
 
@@ -53,6 +50,19 @@ class DataTransmissionActivity : AppCompatActivity() {
         loadTempFromServer()
     }
 
+    // ✅ 돌아올 때마다 항상 새로고침
+    override fun onResume() {
+        super.onResume()
+        loadTempFromServer()
+    }
+
+    // ✅ CLEAR_TOP | SINGLE_TOP으로 재사용되어 포커스로 올라올 때도 새로고침
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        loadTempFromServer()
+    }
+
     private fun initViews() {
         spinnerSort = findViewById(R.id.spinnerSort)
         recyclerView = findViewById(R.id.recyclerNotTransmittedList)
@@ -60,6 +70,8 @@ class DataTransmissionActivity : AppCompatActivity() {
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabBack)
             ?.setOnClickListener { onBackPressed() }
     }
+
+
 
     private fun setupToolbar() {
         findViewById<ImageView>(R.id.ivHamburger)?.setOnClickListener { view ->
@@ -86,13 +98,20 @@ class DataTransmissionActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = NotTransmittedListAdapter(sortedDataList) { address ->
-            // 아이템 클릭 시: 미리보기/재전송 등 필요한 UX로 연결
-            SurveyResultDialog(this, address) {
-                // 전송 성공 시 전송완료 화면으로 이동하고 싶다면 여기서 처리
-                // startActivity(Intent(this, TransmissionCompleteActivity::class.java))
-                // finish()
-            }.show()
+        // 어댑터는 클릭 콜백으로 SurveyListItemDto를 넘기도록
+        adapter = NotTransmittedListAdapter(sortedDataList) { item ->
+            // DTO 필드명이 프로젝트마다 다를 수 있어 안전하게 꺼냄
+            val surveyId   = item.surveyId ?: return@NotTransmittedListAdapter
+            val buildingId = item.buildingId ?: 0L
+            val address    = item.address ?: ""
+
+            BuildingInfoBottomSheet
+                .newInstanceForTempDetail(
+                    surveyId   = surveyId,
+                    buildingId = buildingId,
+                    address    = address
+                )
+                .show(supportFragmentManager, "tempDetail")
         }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
@@ -110,37 +129,34 @@ class DataTransmissionActivity : AppCompatActivity() {
 
                 val resp = ApiClient.service.getSurveys(
                     userId = uid,
-                    status = "TEMP",   // ⬅️ 임시저장만!
+                    status = "TEMP",      // 임시저장만
                     page = 0,
                     size = 50
                 )
 
-                // resp.page.content: List<SurveyListItemDto>
-                val elements = resp.page.content.map { it.address ?: "(주소 없음)" }
-
                 allDataList.clear()
-                allDataList.addAll(elements)
+                allDataList.addAll(resp.page.content)  // ← 주소 문자열로 바꾸지 말고 원본 DTO 그대로
 
-                // 기본 정렬: 최신순 (updatedAt 기준 소팅이 필요하면 서버에서 정렬해주는 게 정확)
                 applySorting("최신순")
             } catch (e: Exception) {
                 Toast.makeText(this@DataTransmissionActivity, "목록 불러오기 실패: ${e.message}", Toast.LENGTH_SHORT).show()
-                // 실패 시 빈 화면 처리
                 allDataList.clear()
                 applySorting("최신순")
             }
         }
     }
 
-    /** 정렬 적용 */
     private fun applySorting(sortType: String) {
+        fun key(dt: String?) = dt ?: ""  // 필요 시 파싱 로직 넣어도 됨
         sortedDataList.clear()
         when (sortType) {
-            "최신순" -> sortedDataList.addAll(allDataList.asReversed())
-            "과거순" -> sortedDataList.addAll(allDataList)
+            "최신순" -> sortedDataList.addAll(allDataList.sortedByDescending { key(it.updatedAtIso) })
+            "과거순" -> sortedDataList.addAll(allDataList.sortedBy { key(it.updatedAtIso) })
+            else     -> sortedDataList.addAll(allDataList)
         }
         updateUI()
     }
+
 
     /** UI 갱신 */
     private fun updateUI() {

@@ -1,7 +1,7 @@
 package bitc.fullstack502.final_project_team1.network.dto
 
 data class SurveyResultDetailDto(
-    val id: Long?,
+    val id: Long,
     val possible: Int?,
     val adminUse: Int?,
     val idleRate: Int?,

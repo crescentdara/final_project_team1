@@ -18,11 +18,11 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
 
     List<SurveyResultEntity> findByUser_UserIdAndStatus(Long userId, String status);
 
-    long countByUser_UserIdAndStatus(Long userId, String status);
+    Long countByUser_UserIdAndStatus(Long userId, String status);
 
     interface StatusCount {
         String getStatus();
-        long getCnt();
+        Long getCnt();
     }
 
     @Query("""

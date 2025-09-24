@@ -9,7 +9,7 @@ import java.util.List;
 public class PageResponseDto<T> {
 
     private List<T> content;
-    private long totalElements;
+    private Long totalElements;
     private int totalPages;
     private int page;
     private int size;

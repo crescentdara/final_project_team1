@@ -2,12 +2,12 @@ package bitc.full502.final_project_team1.api.app.controller;
 
 import bitc.full502.final_project_team1.api.app.dto.AppUserSurveyStatusResponse;
 import bitc.full502.final_project_team1.api.app.dto.ListWithStatusResponse;
-import bitc.full502.final_project_team1.api.app.dto.SurveyListItemDto;
 import bitc.full502.final_project_team1.core.service.SurveyService;
 import bitc.full502.final_project_team1.core.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import bitc.full502.final_project_team1.api.app.dto.SurveyListItemDto;
 
 @RestController
 @RequestMapping("/app/survey/status")

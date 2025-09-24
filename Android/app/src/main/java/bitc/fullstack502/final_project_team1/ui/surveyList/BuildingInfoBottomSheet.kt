@@ -23,13 +23,13 @@ import retrofit2.HttpException
 class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
-        private const val ARG_BUILDING_ID   = "buildingId"
-        private const val ARG_SURVEY_ID     = "surveyId"
-        private const val ARG_MODE          = "mode"            // "REINSPECT" | "NEW"
-        private const val ARG_ADDRESS       = "address"
+        private const val ARG_BUILDING_ID = "buildingId"
+        private const val ARG_SURVEY_ID = "surveyId"
+        private const val ARG_MODE = "mode"         // "REINSPECT" | "NEW" | "TEMP_DETAIL"
+        private const val ARG_ADDRESS = "address"
         private const val ARG_BUILDING_NAME = "buildingName"
         private const val ARG_REJECT_REASON = "rejectReason"
-        private const val ARG_REJECTED_AT   = "rejectedAt"
+        private const val ARG_REJECTED_AT = "rejectedAt"
 
         fun newInstanceForReinspect(
             surveyId: Long,
@@ -57,13 +57,26 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                     ARG_MODE to "NEW"
                 )
             }
+        // ✅ 미전송(TEMP) 상세 보기용 팩토리
+        fun newInstanceForTempDetail(
+            surveyId: Long,
+            buildingId: Long,
+            address: String
+        ): BuildingInfoBottomSheet = BuildingInfoBottomSheet().apply {
+            arguments = bundleOf(
+                ARG_MODE to "TEMP_DETAIL",
+                ARG_SURVEY_ID to surveyId,
+                ARG_BUILDING_ID to buildingId,
+                ARG_ADDRESS to address
+            )
+        }
     }
 
     private var buildingId: Long = -1
     private var surveyId: Long = -1
     private var mode: String = "NEW"
-
     private var lotAddress: String? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,38 +92,131 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
-        val info = view.findViewById<LinearLayout>(R.id.infoContainer)
+        val btnStart  = view.findViewById<Button>(R.id.btnStartSurvey)
+        val info      = view.findViewById<LinearLayout>(R.id.infoContainer)
+        val tempBar   = view.findViewById<LinearLayout>(R.id.layoutTempActions)
+        val btnEdit   = view.findViewById<Button>(R.id.btnEditResult)
+        val btnSubmit = view.findViewById<Button>(R.id.btnSubmitResult)
 
-        val reason = arguments?.getString(ARG_REJECT_REASON)
-        val rejectedAt = arguments?.getString(ARG_REJECTED_AT)
-
+        // 반려 정보: 기존 로직 유지
         view.findViewById<TextView>(R.id.tvRejectReason)
-            .setTextOrGone(reason, R.string.reject_reason_fmt)      // 예: "반려사유: %s"
+            .setTextOrGone(arguments?.getString(ARG_REJECT_REASON), R.string.reject_reason_fmt)
         view.findViewById<TextView>(R.id.tvRejectedAt)
-            .setTextOrGone(rejectedAt, R.string.rejected_at_fmt)    // 예: "반려일시: %s"
+            .setTextOrGone(arguments?.getString(ARG_REJECTED_AT), R.string.rejected_at_fmt)
 
-        // 버튼 라벨/동작 분기 (그대로)
-        if (mode == "REINSPECT") {
-            btnStart.text = getString(R.string.reinspect_start)
-            btnStart.setOnClickListener { startReinspectThenOpenEditor() }
-        } else {
-            btnStart.text = getString(R.string.survey_start)
-            btnStart.setOnClickListener { openEditorNew() }
+        when (mode) {
+            "REINSPECT" -> {
+                tempBar.visibility = View.GONE
+                btnStart.visibility = View.VISIBLE
+                btnStart.text = getString(R.string.reinspect_start)
+                btnStart.setOnClickListener { startReinspectThenOpenEditor() }
+                // 건물 상세 출력
+                fetchAndRenderBuilding(info)
+            }
+            "NEW" -> {
+                tempBar.visibility = View.GONE
+                btnStart.visibility = View.VISIBLE
+                btnStart.text = getString(R.string.survey_start)
+                btnStart.setOnClickListener { openEditorNew() }
+                // 건물 상세 출력
+                fetchAndRenderBuilding(info)
+            }
+            // ✅ 미전송 상세
+            "TEMP_DETAIL" -> {
+                tempBar.visibility = View.VISIBLE
+                btnStart.visibility = View.GONE
+                // 주소(상단에 별도 표시가 없다면 info 첫 줄로 추가)
+                info.removeAllViews()
+                info.addView(TextView(requireContext()).apply {
+                    text = (arguments?.getString(ARG_ADDRESS) ?: "-")
+                    setTextColor(resources.getColor(R.color.text_primary, null))
+                    textSize = 16f
+                    setTypeface(typeface, android.graphics.Typeface.BOLD)
+                    setPadding(0,0,0,8)
+                })
+
+                fetchAndRenderSurveyResult(info)
+
+                btnEdit.setOnClickListener {
+                    openEditorForEdit(autoSubmit = false)
+                    dismiss()
+                }
+                btnSubmit.setOnClickListener {
+                    openEditorForEdit(autoSubmit = true)
+                    dismiss()
+                }
+            }
         }
+    }
 
-        // 건물 상세 불러오기 (그대로)
+    private fun fetchAndRenderBuilding(container: LinearLayout) {
         viewLifecycleOwner.lifecycleScope.launch {
             runCatching { ApiClient.service.getBuildingDetail(buildingId) }
-                .onSuccess { building ->
-                    lotAddress = building.lotAddress
-                    renderBuilding(info, building)
+                .onSuccess { b ->
+                    lotAddress = b.lotAddress
+                    container.removeAllViews()
+                    fun add(label: String, value: String?) {
+                        container.addView(TextView(requireContext()).apply {
+                            text = "$label : ${value ?: "-"}"
+                            textSize = 14f
+                            setPadding(0,6,0,6)
+                        })
+                    }
+                    add("도로명주소", b.roadAddress)
+                    add("건물명", b.buildingName)
+                    add("지상층수", b.groundFloors?.toString())
+                    add("지하층수", b.basementFloors?.toString())
+                    add("연면적", b.totalFloorArea?.toString())
+                    add("대지면적", b.landArea?.toString())
+                    add("주용도코드", b.mainUseCode)
+                    add("주용도명", b.mainUseName)
+                    add("기타용도", b.etcUse)
+                    add("구조", b.structureName)
+                    add("높이(m)", b.height?.toString())
+                    add("지번주소", b.lotAddress)
                 }
                 .onFailure {
-                    info.addView(TextView(requireContext()).apply {
+                    container.addView(TextView(requireContext()).apply {
                         text = getString(R.string.building_load_failed_fmt, it.message ?: "")
                     })
                 }
+        }
+    }
+
+    private fun fetchAndRenderSurveyResult(container: LinearLayout) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            runCatching {
+                val uid = AuthManager.userId(requireContext())
+                ApiClient.service.getSurveyDetail(uid, surveyId)
+            }.onSuccess { d ->
+                fun add(label: String, value: String?) {
+                    container.addView(TextView(requireContext()).apply {
+                        text = "$label : ${value ?: "-"}"
+                        textSize = 14f
+                        setPadding(0,6,0,6)
+                    })
+                }
+                fun opt(i: Int?, vararg labels: String) =
+                    i?.takeIf { it in 1..labels.size }?.let { labels[it-1] }
+
+                add("조사불가", if (d.possible == 2) "불가" else "가능")
+                add("행정목적", opt(d.adminUse, "활용", "일부 활용", "미활용"))
+                add("유휴비율", opt(d.idleRate, "0~10%", "10~30%", "30~50%", "50% 이상"))
+                add("안전등급", opt(d.safety, "A","B","C","D","E"))
+                add("외벽", opt(d.wall, "양호","보통","불량"))
+                add("옥상", opt(d.roof, "양호","보통","불량"))
+                add("창호", opt(d.windowState, "양호","보통","불량"))
+                add("주차", opt(d.parking, "가능","불가"))
+                add("현관", opt(d.entrance, "양호","보통","불량"))
+                add("천장", opt(d.ceiling, "양호","보통","불량"))
+                add("바닥", opt(d.floor, "양호","보통","불량"))
+                add("외부 기타", d.extEtc)
+                add("내부 기타", d.intEtc)
+            }.onFailure {
+                container.addView(TextView(requireContext()).apply {
+                    text = "조사결과 로드 실패: ${it.message}"
+                })
+            }
         }
     }
 
@@ -123,7 +229,8 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
             putExtra(SurveyActivity.EXTRA_MODE, "REINSPECT")
             putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
-            putExtra(SurveyActivity.EXTRA_SURVEY_ID, surveyId)   // ✅ 꼭 넘김
+            putExtra(SurveyActivity.EXTRA_SURVEY_ID, surveyId)
+            putExtra(SurveyActivity.EXTRA_RETURN_TO, SurveyActivity.RETURN_SURVEY_LIST)
             putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
         startActivity(intent)
@@ -143,14 +250,27 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
 
     private fun openEditorNew() {
-        val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
+        val i = Intent(requireContext(), SurveyActivity::class.java).apply {
             putExtra(SurveyActivity.EXTRA_MODE, "CREATE")
-            putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId) // ✅ 상수 사용
+            putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
+            putExtra(SurveyActivity.EXTRA_RETURN_TO, SurveyActivity.RETURN_SURVEY_LIST)
             putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
-        startActivity(intent)
-        dismiss()
+        startActivity(i); dismiss()
     }
+
+    private fun openEditorForEdit(autoSubmit: Boolean) {
+        val i = Intent(requireContext(), bitc.fullstack502.final_project_team1.ui.SurveyActivity::class.java).apply {
+            putExtra(SurveyActivity.EXTRA_MODE, "EDIT")
+            putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
+            putExtra(SurveyActivity.EXTRA_SURVEY_ID, surveyId)
+            putExtra(SurveyActivity.EXTRA_AUTO_SUBMIT, autoSubmit)
+            putExtra(SurveyActivity.EXTRA_RETURN_TO, SurveyActivity.RETURN_NOT_TRANSMITTED)
+            putExtra("lotAddress", arguments?.getString(ARG_ADDRESS).orEmpty())
+        }
+        startActivity(i)
+    }
+
 
     private fun renderBuilding(container: LinearLayout, b: BuildingDetailDto) {
         container.removeAllViews()

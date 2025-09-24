@@ -32,15 +32,15 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
            """)
     int deleteAllByLotAddressLike(String keyword);
 
-    long countByUser_UserIdAndStatus(Long userId, Integer status);
+    Long countByUser_UserIdAndStatus(Long userId, Integer status);
 
 
 
     @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u")
-    long countAllAssignments();
+    Long countAllAssignments();
 
     @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u WHERE u.status = :status")
-    long countByStatus(@Param("status") int status);
+    Long countByStatus(@Param("status") int status);
 
     @Query("""
     select uba

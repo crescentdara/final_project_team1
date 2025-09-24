@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp">
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="@android:color/white">
 
     <!-- (선택) 반려 정보 -->
     <TextView
@@ -24,25 +25,57 @@
             android:padding="0dp"
             android:visibility="gone"/>
 
-    <!-- 반드시 Button으로 -->
+    <!-- ✅ TEMP 상세용: 결과 수정/전송 버튼 (기본 GONE) -->
+    <LinearLayout
+            android:id="@+id/layoutTempActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:visibility="gone"
+            android:paddingBottom="8dp">
+
+        <Button
+                android:id="@+id/btnEditResult"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="결과 수정"
+                android:backgroundTint="@android:color/white"
+                android:textColor="#3366FF"
+                android:paddingHorizontal="16dp"
+                android:stateListAnimator="@null"/>
+
+        <Space
+                android:layout_width="8dp"
+                android:layout_height="1dp"/>
+
+        <Button
+                android:id="@+id/btnSubmitResult"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="결과 전송"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#1F2D3D"
+                android:paddingHorizontal="16dp"/>
+    </LinearLayout>
+
+    <!-- 반드시 Button으로 (다른 모드에서만 사용) -->
     <Button
             android:id="@+id/btnStartSurvey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="시작"/>
 
-
-
-    <!-- 건물 정보 -->
+    <!-- 건물/결과 정보 -->
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
 
         <LinearLayout
-            android:id="@+id/infoContainer"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                android:id="@+id/infoContainer"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
     </ScrollView>
 </LinearLayout>

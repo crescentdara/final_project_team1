@@ -4,12 +4,15 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class PageDto<T> {
     private List<T> content;
     private int number;
     private int size;
-    private long totalElements;
+    private Long totalElements;
     private int totalPages;
     private boolean last;
 }

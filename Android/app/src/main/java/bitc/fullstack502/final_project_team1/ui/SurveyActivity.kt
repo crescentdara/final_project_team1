@@ -42,6 +42,10 @@ class SurveyActivity : AppCompatActivity() {
         const val EXTRA_MODE = "mode"            // "CREATE" | "EDIT" | "REINSPECT"
         const val EXTRA_SURVEY_ID = "surveyId"   // Long? (EDIT에서 사용)
         const val EXTRA_BUILDING_ID = "buildingId" // Long (모든 모드 기본)
+        const val EXTRA_AUTO_SUBMIT = "auto_submit"
+        const val EXTRA_RETURN_TO = "return_to"           // "NOT_TRANSMITTED" | "SURVEY_LIST"
+        const val RETURN_NOT_TRANSMITTED = "NOT_TRANSMITTED"
+        const val RETURN_SURVEY_LIST     = "SURVEY_LIST"
     }
 
     private var mode: String = "CREATE"
@@ -52,6 +56,8 @@ class SurveyActivity : AppCompatActivity() {
     private val REQ_CAPTURE_INT = 102
     private val REQ_EDIT_EXT    = 201
     private val REQ_EDIT_INT    = 202
+    private val REQ_PICK_EXT    = 111
+    private val REQ_PICK_INT    = 112
 
     // 전달값
     private var assignedBuildingId: Long = -1L
@@ -127,10 +133,63 @@ class SurveyActivity : AppCompatActivity() {
             val src = intPhotoFile ?: return@setOnClickListener Toast.makeText(this, "내부 사진을 먼저 촬영하세요.", Toast.LENGTH_SHORT).show()
             startEdit(REQ_EDIT_INT, src)
         }
+        findViewById<ImageButton>(R.id.btn_extGallery).setOnClickListener { openGallery(REQ_PICK_EXT) }
+        findViewById<ImageButton>(R.id.btn_intGallery).setOnClickListener { openGallery(REQ_PICK_INT) }
+
 
         updateSubmitState()
         prefillIfPossible()
     }
+
+    private fun openGallery(requestCode: Int) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+            // 다중 선택 허용 안 함(필요시 putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true))
+        }
+        startActivityForResult(intent, requestCode)
+    }
+
+    private fun copyUriToTempFile(uri: Uri): File? {
+        return try {
+            // 임시 파일 생성
+            val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val outFile = File.createTempFile("GALLERY_${ts}_", ".jpg", dir)
+
+            // 퍼시스턴트 권한(재부팅/프로세스 재시작 후에도 접근하려면 필요)
+            contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+
+            contentResolver.openInputStream(uri).use { input ->
+                outFile.outputStream().use { output ->
+                    if (input != null) input.copyTo(output)
+                }
+            }
+            outFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+
+    // ✅ 호출 위치에 따라 적절한 화면으로 복귀
+    private fun goBackToOrigin() {
+        val target = intent.getStringExtra(EXTRA_RETURN_TO) ?: RETURN_NOT_TRANSMITTED
+        val targetCls = when (target) {
+            RETURN_SURVEY_LIST -> bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity::class.java
+            else               -> bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity::class.java
+        }
+        startActivity(Intent(this, targetCls).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        })
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+
 
     // === 불가 모드 판단 ===
     private fun isImpossible(): Boolean =
@@ -323,6 +382,31 @@ class SurveyActivity : AppCompatActivity() {
                     }
                 }
             }
+
+            // ✅ 갤러리 선택(외부)
+            REQ_PICK_EXT -> {
+                val uri = data?.data ?: return
+                copyUriToTempFile(uri)?.let { file ->
+                    extPhotoFile = file
+                    hasExtPhotoRemote = false // 로컬 새 파일 선택이므로 리모트 플래그 해제
+                    BitmapFactory.decodeFile(file.absolutePath)?.also { bmp ->
+                        findViewById<ImageView>(R.id.img_extPhoto).setImageBitmap(bmp)
+                    }
+                } ?: Toast.makeText(this, "이미지 로드 실패", Toast.LENGTH_SHORT).show()
+            }
+
+            // ✅ 갤러리 선택(내부)
+            REQ_PICK_INT -> {
+                val uri = data?.data ?: return
+                copyUriToTempFile(uri)?.let { file ->
+                    intPhotoFile = file
+                    hasIntPhotoRemote = false
+                    BitmapFactory.decodeFile(file.absolutePath)?.also { bmp ->
+                        findViewById<ImageView>(R.id.img_intPhoto).setImageBitmap(bmp)
+                    }
+                } ?: Toast.makeText(this, "이미지 로드 실패", Toast.LENGTH_SHORT).show()
+            }
+
             REQ_EDIT_EXT -> {
                 val uriStr = data?.getStringExtra(EditActivity.EXTRA_EDITED_IMAGE_URI) ?: return
                 val file = File(Uri.parse(uriStr).path!!)
@@ -342,6 +426,7 @@ class SurveyActivity : AppCompatActivity() {
         }
         updateSubmitState()
     }
+
 
     private fun idxOfChecked(rgId: Int): Int {
         val rg = findViewById<RadioGroup>(rgId)
@@ -379,14 +464,16 @@ class SurveyActivity : AppCompatActivity() {
                 intEditPhoto = if (impossible) null else intEditPhotoFile?.toPart("intEditPhoto")
             )
 
+            // 제출 성공 시
             if (res.isSuccessful) {
                 Toast.makeText(this@SurveyActivity, "제출 성공!", Toast.LENGTH_SHORT).show()
-                finish()
+                goBackToOrigin()
             } else {
                 Toast.makeText(this@SurveyActivity, "실패: ${res.code()}", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
 
     // 임시저장
     private fun saveTemp() {
@@ -402,17 +489,17 @@ class SurveyActivity : AppCompatActivity() {
                 intEditPhoto = if (impossible) null else intEditPhotoFile?.toPart("intEditPhoto")
             )
 
+            // 임시저장 성공 시
             if (res.isSuccessful) {
                 Toast.makeText(this@SurveyActivity, "임시저장 완료", Toast.LENGTH_SHORT).show()
-                // 조사목록으로 이동
-                startActivity(Intent(this@SurveyActivity,
-                    bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity::class.java))
-                finish()
-            } else {
+                goBackToOrigin()
+            }
+            else {
                 Toast.makeText(this@SurveyActivity, "임시저장 실패: ${res.code()}", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
 
     private fun prefillIfPossible() {
         lifecycleScope.launch {
@@ -457,6 +544,21 @@ class SurveyActivity : AppCompatActivity() {
 
             applyImpossibleModeIfNeeded()
             updateSubmitState()
+            maybeAutoSubmitIfRequested()
+        }
+    }
+
+    // ✅ 자동 전송 시도
+    private fun maybeAutoSubmitIfRequested() {
+        val wantAuto = intent.getBooleanExtra(EXTRA_AUTO_SUBMIT, false)
+        if (!wantAuto) return
+
+        if (allCompleted()) {
+            // 모든 항목이 이미 채워져 있으면 즉시 제출
+            submitSurvey()
+        } else {
+            // 미완료면 편집 화면에 머물도록 안내
+            Toast.makeText(this, "미입력 항목이 있어 편집 화면으로 이동합니다.", Toast.LENGTH_SHORT).show()
         }
     }
 

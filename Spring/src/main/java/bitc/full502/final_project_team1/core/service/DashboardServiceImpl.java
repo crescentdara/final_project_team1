@@ -13,10 +13,10 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public DashboardStatsDTO getStats() {
-        long total = assignmentRepo.countAllAssignments();
-        long inProgress = assignmentRepo.countByStatus(1);   // 조사 진행 중
-        long waiting = assignmentRepo.countByStatus(2);      // 결재 대기
-        long approved = assignmentRepo.countByStatus(3);     // 결재 완료
+        Long total = assignmentRepo.countAllAssignments();
+        Long inProgress = assignmentRepo.countByStatus(1);   // 조사 진행 중
+        Long waiting = assignmentRepo.countByStatus(2);      // 결재 대기
+        Long approved = assignmentRepo.countByStatus(3);     // 결재 완료
 
         double progressRate = 0.0;
         if (total > 0) {

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.EntityGraph;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -81,6 +83,15 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
 
     Optional<SurveyResultEntity> findByUser_UserIdAndBuilding_IdAndStatus(Long userId, Long buildingId, String status);
 
+    // 금일 완료
+    @Query("""
+    select count(s) 
+    from SurveyResultEntity s 
+    where s.user.userId = :userId 
+      and s.status = 'SENT' 
+      and s.createdAt >= :todayStart
+""")
+    long countSentToday(@Param("userId") Long userId, @Param("todayStart") LocalDateTime todayStart);
 
 
 }

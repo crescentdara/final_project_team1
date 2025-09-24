@@ -3,6 +3,7 @@ package bitc.fullstack502.final_project_team1.network
 import bitc.fullstack502.final_project_team1.network.dto.AppUserSurveyStatusResponse
 import bitc.fullstack502.final_project_team1.network.dto.AssignedBuilding
 import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
+import bitc.fullstack502.final_project_team1.network.dto.DashboardStatsResponse
 import bitc.fullstack502.final_project_team1.network.dto.ListWithStatusResponse
 import bitc.fullstack502.final_project_team1.network.dto.LoginRequest
 import bitc.fullstack502.final_project_team1.network.dto.LoginResponse
@@ -131,5 +132,12 @@ interface ApiService {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 10
     ): Response<PageResponse<SurveyResultResponse>>
+
+    // ✅ 앱 메인 대시보드 통계 조회
+    @GET("dashboard/stats")
+    suspend fun getDashboardStats(
+        @Header("X-USER-ID") userId: Long,
+        @Header("X-AUTH-TOKEN") token: String
+    ): DashboardStatsResponse
 
 }

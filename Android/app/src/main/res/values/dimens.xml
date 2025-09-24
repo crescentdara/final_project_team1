@@ -9,4 +9,7 @@
     <!-- 고급스러운 테두리 및 디자인 -->
     <dimen name="category_corner_radius">16dp</dimen>
     <dimen name="category_stroke_width">1dp</dimen>
+
+    <dimen name="dashboard_bar_max_height">100dp</dimen>
+
 </resources>

@@ -31,11 +31,11 @@ interface ApiService {
     suspend fun login(@Body body: LoginRequest): Response<LoginResponse>
 
     @GET("assigned")
-    suspend fun getAssigned(@Query("userId") userId: Int): List<AssignedBuilding>
+    suspend fun getAssigned(@Query("userId") userId: Long): List<AssignedBuilding>
 
     @GET("assigned/nearby")
     suspend fun getAssignedNearby(
-        @Query("userId") userId: Int,
+        @Query("userId") userId: Long,
         @Query("lat") lat: Double,
         @Query("lng") lng: Double,
         @Query("radiusKm") radiusKm: Double
@@ -84,13 +84,13 @@ interface ApiService {
     /** 상단 카운트 (서버: GET /app/survey/status/status, Header: X-USER-ID) */
     @GET("survey/status/status")
     suspend fun getSurveyStatus(
-        @Header("X-USER-ID") userId: Int
+        @Header("X-USER-ID") userId: Long
     ): AppUserSurveyStatusResponse
 
     /** 목록 + 카운트 (서버: GET /app/survey/status, Header: X-USER-ID, status optional) */
     @GET("survey/status")
     suspend fun getSurveys(
-        @Header("X-USER-ID") userId: Int,
+        @Header("X-USER-ID") userId: Long,
         @Query("status") status: String? = null,
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 50
@@ -99,7 +99,7 @@ interface ApiService {
     /** 재조사 목록 (status=REJECTED 고정) */
     @GET("survey/status")
     suspend fun getSurveysReJe(
-        @Header("X-USER-ID") userId: Int,
+        @Header("X-USER-ID") userId: Long,
         @Query("status") status: String = "REJECTED",
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 50
@@ -108,20 +108,20 @@ interface ApiService {
     /** 재조사 시작 경로는 서버 구현에 맞춰 조정 필요 */
     @POST("survey/reinspect/{surveyId}/redo/start")
     suspend fun startRedo(
-        @Header("X-USER-ID") userId: Int,  // ← Int
+        @Header("X-USER-ID") userId: Long,
         @Path("surveyId") surveyId: Long
     ): ResponseBody
 
     // network/ApiService.kt (추가)
     @GET("surveys/{id}")
     suspend fun getSurveyDetail(
-        @Header("X-USER-ID") userId: Int,
+        @Header("X-USER-ID") userId: Long,
         @Path("id") id: Long
     ): SurveyResultDetailDto
 
     @GET("surveys/latest")
     suspend fun getSurveyLatest(
-        @Header("X-USER-ID") userId: Int,
+        @Header("X-USER-ID") userId: Long,
         @Query("buildingId") buildingId: Long
     ): SurveyResultDetailDto?
 

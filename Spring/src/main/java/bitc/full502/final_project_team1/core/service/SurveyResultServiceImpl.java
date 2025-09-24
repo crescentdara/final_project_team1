@@ -52,39 +52,75 @@ public class SurveyResultServiceImpl implements SurveyResultService {
         surveyResultRepository.deleteById(id);
     }
 
+    // SurveyResultServiceImpl.java (기존 saveSurvey 교체)
     @Override
     @Transactional
     public SurveyResultEntity saveSurvey(AppSurveyResultRequest dto) {
-        BuildingEntity building = buildingRepository.findById(dto.getBuildingId())
+        var building = buildingRepository.findById(dto.getBuildingId())
                 .orElseThrow(() -> new IllegalArgumentException("건물 ID가 존재하지 않습니다."));
-        UserAccountEntity user = userAccountRepository.findById(dto.getUserId())
+        var user = userAccountRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유저 ID가 존재하지 않습니다."));
 
-        SurveyResultEntity entity = SurveyResultEntity.builder()
-                .possible(dto.getPossible())
-                .adminUse(dto.getAdminUse())
-                .idleRate(dto.getIdleRate())
-                .safety(dto.getSafety())
-                .wall(dto.getWall())
-                .roof(dto.getRoof())
-                .windowState(dto.getWindowState())
-                .parking(dto.getParking())
-                .entrance(dto.getEntrance())
-                .ceiling(dto.getCeiling())
-                .floor(dto.getFloor())
-                .extEtc(dto.getExtEtc())
-                .intEtc(dto.getIntEtc())
-                .extPhoto(dto.getExtPhoto())
-                .extEditPhoto(dto.getExtEditPhoto())
-                .intPhoto(dto.getIntPhoto())
-                .intEditPhoto(dto.getIntEditPhoto())
-                .status(dto.getStatus())
-                .building(building)
-                .user(user)
-                .build();
+        // 1) TEMP 요청: (user, building, TEMP) 1건만 유지 → 있으면 갱신, 없으면 생성
+        if ("TEMP".equalsIgnoreCase(dto.getStatus())) {
+            var entity = surveyResultRepository
+                    .findByUser_UserIdAndBuilding_IdAndStatus(user.getUserId(), building.getId(), "TEMP")
+                    .orElseGet(() -> {
+                        var e = new SurveyResultEntity();
+                        e.setUser(user);
+                        e.setBuilding(building);
+                        e.setStatus("TEMP");
+                        // createdAt은 @PrePersist 로, 없으면 여기서 now()
+                        return e;
+                    });
 
-        return surveyResultRepository.save(entity);
+            copyFromDto(entity, dto);          // 필드 덮어쓰기(아래 헬퍼)
+            // updatedAt은 @PreUpdate 로, 없으면 여기서 now()
+            return surveyResultRepository.save(entity);
+        }
+
+        // 2) SENT 요청: TEMP가 있으면 그 레코드를 "승격", 없으면 새로 생성
+        if ("SENT".equalsIgnoreCase(dto.getStatus())) {
+            var entity = surveyResultRepository
+                    .findByUser_UserIdAndBuilding_IdAndStatus(user.getUserId(), building.getId(), "TEMP")
+                    .orElseGet(() -> {
+                        var e = new SurveyResultEntity();
+                        e.setUser(user);
+                        e.setBuilding(building);
+                        // createdAt은 @PrePersist 로
+                        return e;
+                    });
+
+            copyFromDto(entity, dto);
+            entity.setStatus("SENT");          // ★ TEMP → SENT 전환
+            return surveyResultRepository.save(entity);
+        }
+
+        throw new IllegalArgumentException("Unsupported status: " + dto.getStatus());
     }
+
+    // 아래 유틸 추가(같은 클래스 안)
+    private void copyFromDto(SurveyResultEntity e, AppSurveyResultRequest d) {
+        e.setPossible(d.getPossible());
+        e.setAdminUse(d.getAdminUse());
+        e.setIdleRate(d.getIdleRate());
+        e.setSafety(d.getSafety());
+        e.setWall(d.getWall());
+        e.setRoof(d.getRoof());
+        e.setWindowState(d.getWindowState());
+        e.setParking(d.getParking());
+        e.setEntrance(d.getEntrance());
+        e.setCeiling(d.getCeiling());
+        e.setFloor(d.getFloor());
+        e.setExtEtc(d.getExtEtc());
+        e.setIntEtc(d.getIntEtc());
+        // 파일 경로는 컨트롤러에서 handleFiles로 주입된 값만 반영
+        if (d.getExtPhoto() != null)     e.setExtPhoto(d.getExtPhoto());
+        if (d.getExtEditPhoto() != null) e.setExtEditPhoto(d.getExtEditPhoto());
+        if (d.getIntPhoto() != null)     e.setIntPhoto(d.getIntPhoto());
+        if (d.getIntEditPhoto() != null) e.setIntEditPhoto(d.getIntEditPhoto());
+    }
+
 
     @Override
     @Transactional // ← 쓰기 트랜잭션

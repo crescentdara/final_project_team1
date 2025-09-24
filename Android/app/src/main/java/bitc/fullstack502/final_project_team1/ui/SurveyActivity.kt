@@ -362,7 +362,7 @@ class SurveyActivity : AppCompatActivity() {
                 extEtc      = findViewById<EditText>(R.id.input_extEtc).text.toString(),
                 intEtc      = findViewById<EditText>(R.id.input_intEtc).text.toString(),
                 buildingId  = assignedBuildingId.takeIf { it > 0 } ?: 1L,
-                userId      = 1
+                userId      = 1L
             )
 
             val dtoBody = Gson().toJson(dto)
@@ -403,7 +403,7 @@ class SurveyActivity : AppCompatActivity() {
                 extEtc      = findViewById<EditText>(R.id.input_extEtc).text.toString(),
                 intEtc      = findViewById<EditText>(R.id.input_intEtc).text.toString(),
                 buildingId  = assignedBuildingId.takeIf { it > 0 } ?: 1L,
-                userId      = 1
+                userId      = 1L
             )
 
             val dtoBody = Gson().toJson(dto).toRequestBody("application/json".toMediaTypeOrNull())

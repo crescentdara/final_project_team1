@@ -21,7 +21,7 @@ data class SurveyResultDetailDto(
     val intEditPhoto: String?,
     val status: String?,
     val buildingId: Long?,
-    val userId: Int?,
+    val userId: Long?,
     val createdAt: String?,
     val updatedAt: String?
 )

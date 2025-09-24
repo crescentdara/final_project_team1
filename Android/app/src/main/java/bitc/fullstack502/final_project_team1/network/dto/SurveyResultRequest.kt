@@ -15,6 +15,6 @@ data class SurveyResultRequest(
     val extEtc: String?,
     val intEtc: String?,
     val buildingId: Long,
-    val userId: Int
+    val userId: Long
 )
 

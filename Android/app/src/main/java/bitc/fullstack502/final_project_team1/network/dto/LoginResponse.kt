@@ -12,7 +12,7 @@ data class LoginResponse(
 
 // ✅ 사용자 정보
 data class UserInfo(
-    val id: Int,               // 서버: user_id
+    val id: Long,               // 서버: user_id
     val username: String,      // 사용자 계정 ID
     val name: String,          // 사용자 이름
     val role: String,          // 사용자 역할

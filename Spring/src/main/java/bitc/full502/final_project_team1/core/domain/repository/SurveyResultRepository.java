@@ -79,6 +79,9 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
     Optional<SurveyResultEntity>
     findTopByUser_UserIdAndBuilding_IdOrderByUpdatedAtDescCreatedAtDesc(Long userId, Long buildingId);
 
+    Optional<SurveyResultEntity> findByUser_UserIdAndBuilding_IdAndStatus(Long userId, Long buildingId, String status);
+
+
 
 }
 

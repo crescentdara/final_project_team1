@@ -13,7 +13,7 @@ import bitc.fullstack502.final_project_team1.MainActivity
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
-import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
+import bitc.fullstack502.final_project_team1.network.dto.SurveyResultResponse
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
 import bitc.fullstack502.final_project_team1.ui.survey.SurveyResultDialog
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
@@ -23,9 +23,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- * 📋 전송 완료 페이지
- * - 서버에서 상태별(SENT/APPROVED/REJECTED) 조사 목록 조회
- * - 필터: 전체(null), 결재완료(APPROVED), 처리중(SENT), 반려(REJECTED)
+ * 📋 조사내역 조회 페이지
+ * - 서버에서 상태별(SENT/APPROVED) 조사 목록 조회
+ * - 필터: 전체(null), 결재완료(APPROVED), 처리중(SENT)
  */
 class TransmissionCompleteActivity : AppCompatActivity() {
 
@@ -39,7 +39,8 @@ class TransmissionCompleteActivity : AppCompatActivity() {
     private val allDataList = mutableListOf<CompletedSurveyItem>()
     private val filteredDataList = mutableListOf<CompletedSurveyItem>()
 
-    private val filterOptions = arrayOf("전체", "결재완료", "처리중", "반려")
+    // ✅ 반려 제거
+    private val filterOptions = arrayOf("전체", "결재완료", "처리중")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,7 +102,6 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         val statusCode: String? = when (filterType) {
             "결재완료" -> "APPROVED"
             "처리중"   -> "SENT"
-            "반려"     -> "REJECTED"
             else       -> null // 전체
         }
         loadFromServer(statusCode, filterType)
@@ -112,41 +112,44 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val uid = AuthManager.userId(this@TransmissionCompleteActivity)
-                val resp = ApiClient.service.getSurveys(
+                val resp = ApiClient.service.getSurveyResults(
                     userId = uid,
                     status = statusCode,
                     page = 0,
                     size = 50
                 )
 
-                // 페이지 콘텐츠 꺼내기
-                val items: List<SurveyListItemDto> = resp.page.content
+                if (!resp.isSuccessful) {
+                    Toast.makeText(this@TransmissionCompleteActivity, "서버 오류: ${resp.code()}", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                val pageData = resp.body()
+                val items: List<SurveyResultResponse> = pageData?.content ?: emptyList()
 
                 // 화면용 데이터로 매핑
                 allDataList.clear()
                 allDataList.addAll(
                     items.map {
                         CompletedSurveyItem(
-                            id = it.surveyId,
-                            address = it.address ?: "(주소 없음)",
-                            completedDate = it.updatedAtIso ?: "",
+                            id = it.id,
+                            address = it.buildingAddress ?: "(주소 없음)",
+                            completedDate = it.updatedAt ?: "",
                             status = when (it.status) {
                                 "APPROVED" -> "결재완료"
                                 "SENT"     -> "처리중"
-                                "REJECTED" -> "반려"
                                 else       -> "기타"
                             }
                         )
                     }
                 )
 
-                // 선택된 필터 라벨을 기준으로 화면 리스트 구성
+                // 선택된 필터 라벨에 맞춰 리스트 구성
                 filteredDataList.clear()
                 when (filterLabel) {
                     "전체"     -> filteredDataList.addAll(allDataList)
                     "결재완료" -> filteredDataList.addAll(allDataList.filter { it.status == "결재완료" })
                     "처리중"   -> filteredDataList.addAll(allDataList.filter { it.status == "처리중" })
-                    "반려"     -> filteredDataList.addAll(allDataList.filter { it.status == "반려" })
                 }
                 updateUI()
             } catch (e: Exception) {
@@ -206,11 +209,11 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         }
     }
 
-    /** 전송 완료된 조사 아이템 */
+    /** 조사내역 아이템 */
     data class CompletedSurveyItem(
         val id: Long,
         val address: String,
         val completedDate: String,
-        val status: String // "결재완료", "처리중", "반려"
+        val status: String // "결재완료", "처리중"
     )
 }

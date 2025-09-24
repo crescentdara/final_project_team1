@@ -35,5 +35,8 @@ public class AppSurveyResultResponse {
     private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // 빌딩 주소
+    private String buildingAddress;
 }
 

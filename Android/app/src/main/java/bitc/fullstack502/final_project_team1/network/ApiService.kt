@@ -6,6 +6,7 @@ import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
 import bitc.fullstack502.final_project_team1.network.dto.ListWithStatusResponse
 import bitc.fullstack502.final_project_team1.network.dto.LoginRequest
 import bitc.fullstack502.final_project_team1.network.dto.LoginResponse
+import bitc.fullstack502.final_project_team1.network.dto.PageResponse
 import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
 import bitc.fullstack502.final_project_team1.network.dto.SurveyResultDetailDto
 import bitc.fullstack502.final_project_team1.network.dto.SurveyResultResponse
@@ -117,9 +118,18 @@ interface ApiService {
         @Query("buildingId") buildingId: Long
     ): SurveyResultDetailDto?
 
-    // ✅ 조사 거절 API 추가
+    // 조사 거절 API 추가
     @POST("assigned/reject")
     suspend fun rejectAssignment(
         @Query("buildingId") buildingId: Long
     ): Response<Void>
+
+    @GET("app/survey/result/list")
+    suspend fun getSurveyResults(
+        @Header("X-USER-ID") userId: Long,
+        @Query("status") status: String? = null,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10
+    ): Response<PageResponse<SurveyResultResponse>>
+
 }

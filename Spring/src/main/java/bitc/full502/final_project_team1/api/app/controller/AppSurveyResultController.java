@@ -6,6 +6,7 @@ import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
 import bitc.full502.final_project_team1.core.service.FileStorageService;
 import bitc.full502.final_project_team1.core.service.SurveyResultService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -154,9 +155,25 @@ public class AppSurveyResultController {
                 .intEditPhoto(s.getIntEditPhoto())
                 .status(s.getStatus())
                 .buildingId(s.getBuilding().getId())
+                .buildingAddress(s.getBuilding().getLotAddress())
                 .userId(s.getUser().getUserId())
                 .createdAt(s.getCreatedAt())
                 .updatedAt(s.getUpdatedAt())
                 .build();
     }
+
+    // 상태(status) 별 조회
+    @GetMapping("/list")
+    public ResponseEntity<Page<AppSurveyResultResponse>> getList(
+            @RequestHeader("X-USER-ID") Long userId,
+            @RequestParam(required = false) String status,   // "APPROVED", "SENT", 없으면 전체
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<SurveyResultEntity> results = surveyResultService
+                .findByUserAndStatus(userId, status, page, size);
+
+        return ResponseEntity.ok(results.map(this::toResponse));
+    }
+
 }

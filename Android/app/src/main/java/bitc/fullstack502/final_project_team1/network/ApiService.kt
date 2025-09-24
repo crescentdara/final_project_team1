@@ -124,7 +124,7 @@ interface ApiService {
         @Query("buildingId") buildingId: Long
     ): Response<Void>
 
-    @GET("app/survey/result/list")
+    @GET("survey/result/list")
     suspend fun getSurveyResults(
         @Header("X-USER-ID") userId: Long,
         @Query("status") status: String? = null,

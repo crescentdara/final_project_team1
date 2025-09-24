@@ -21,11 +21,13 @@ import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * 📋 조사내역 조회 페이지
- * - 서버에서 상태별(SENT/APPROVED) 조사 목록 조회
- * - 필터: 전체(null), 결재완료(APPROVED), 처리중(SENT)
+ * - 서버에서 상태별(결재완료/결재대기) 조사 목록 조회
+ * - 필터: 전체(null), 결재완료(APPROVED), 결재대기(SENT)
  */
 class TransmissionCompleteActivity : AppCompatActivity() {
 
@@ -39,8 +41,8 @@ class TransmissionCompleteActivity : AppCompatActivity() {
     private val allDataList = mutableListOf<CompletedSurveyItem>()
     private val filteredDataList = mutableListOf<CompletedSurveyItem>()
 
-    // ✅ 반려 제거
-    private val filterOptions = arrayOf("전체", "결재완료", "처리중")
+    // ✅ 옵션 수정 (기타 제거, 처리중 → 결재대기)
+    private val filterOptions = arrayOf("전체", "결재완료", "결재대기")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,7 +103,7 @@ class TransmissionCompleteActivity : AppCompatActivity() {
     private fun applyFilter(filterType: String) {
         val statusCode: String? = when (filterType) {
             "결재완료" -> "APPROVED"
-            "처리중"   -> "SENT"
+            "결재대기" -> "SENT"
             else       -> null // 전체
         }
         loadFromServer(statusCode, filterType)
@@ -127,20 +129,26 @@ class TransmissionCompleteActivity : AppCompatActivity() {
                 val pageData = resp.body()
                 val items: List<SurveyResultResponse> = pageData?.content ?: emptyList()
 
-                // 화면용 데이터로 매핑
+                // 화면용 데이터로 매핑 (APPROVED/SENT만)
                 allDataList.clear()
                 allDataList.addAll(
-                    items.map {
-                        CompletedSurveyItem(
-                            id = it.id,
-                            address = it.buildingAddress ?: "(주소 없음)",
-                            completedDate = it.updatedAt ?: "",
-                            status = when (it.status) {
-                                "APPROVED" -> "결재완료"
-                                "SENT"     -> "처리중"
-                                else       -> "기타"
-                            }
-                        )
+                    items.mapNotNull {
+                        val formattedDate = formatDateOnly(it.updatedAt ?: it.createdAt)
+                        when (it.status) {
+                            "APPROVED" -> CompletedSurveyItem(
+                                id = it.id,
+                                address = it.buildingAddress ?: "(주소 없음)",
+                                completedDate = formattedDate,
+                                status = "결재완료"
+                            )
+                            "SENT" -> CompletedSurveyItem(
+                                id = it.id,
+                                address = it.buildingAddress ?: "(주소 없음)",
+                                completedDate = formattedDate,
+                                status = "결재대기"
+                            )
+                            else -> null // ✅ 기타 상태는 무시
+                        }
                     }
                 )
 
@@ -149,12 +157,25 @@ class TransmissionCompleteActivity : AppCompatActivity() {
                 when (filterLabel) {
                     "전체"     -> filteredDataList.addAll(allDataList)
                     "결재완료" -> filteredDataList.addAll(allDataList.filter { it.status == "결재완료" })
-                    "처리중"   -> filteredDataList.addAll(allDataList.filter { it.status == "처리중" })
+                    "결재대기" -> filteredDataList.addAll(allDataList.filter { it.status == "결재대기" })
                 }
                 updateUI()
             } catch (e: Exception) {
                 Toast.makeText(this@TransmissionCompleteActivity, "목록 불러오기 실패: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    /** yyyy-MM-dd 로 변환 */
+    private fun formatDateOnly(datetime: String?): String {
+        if (datetime.isNullOrBlank()) return ""
+        return try {
+            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+            val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val parsed = LocalDateTime.parse(datetime, inputFormatter)
+            parsed.format(outputFormatter)
+        } catch (e: Exception) {
+            datetime.take(10) // 최소 yyyy-MM-dd 까지만
         }
     }
 
@@ -214,6 +235,6 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         val id: Long,
         val address: String,
         val completedDate: String,
-        val status: String // "결재완료", "처리중"
+        val status: String // "결재완료", "결재대기"
     )
 }

@@ -10,6 +10,8 @@ import com.lowagie.text.pdf.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -24,26 +26,19 @@ public class PdfGenerator {
             String fileName = basePath + "report-" + detail.getId() + ".pdf";
 
             Document document = new Document(PageSize.A4, 50, 50, 50, 50);
-            PdfWriter.getInstance(document, new FileOutputStream(fileName));
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(fileName));
             document.open();
 
-            // ✅ 한글 폰트 지정
+            // 한글 폰트 지정
             BaseFont bfKorean = BaseFont.createFont("c:/windows/fonts/malgun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font coverTitleFont = new Font(bfKorean, 24, Font.BOLD, Color.BLACK);
             Font coverSubFont = new Font(bfKorean, 14, Font.NORMAL, Color.DARK_GRAY);
             Font infoFont = new Font(bfKorean, 12, Font.NORMAL, Color.BLACK);
             Font sectionFont = new Font(bfKorean, 14, Font.BOLD, Color.BLACK);
-            Font keyFont = new Font(bfKorean, 10, Font.BOLD, Color.BLACK);
-            Font valFont = new Font(bfKorean, 10, Font.NORMAL, Color.BLACK);
-
-// ------------------ 1. 표지 ------------------
-
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(fileName));
-            document.open();
 
             PdfContentByte cb = writer.getDirectContent();
 
-        // 제목
+            // ------------------ 1. 표지 ------------------
             ColumnText.showTextAligned(
                     cb,
                     Element.ALIGN_CENTER,
@@ -53,7 +48,6 @@ public class PdfGenerator {
                     0
             );
 
-        // 사례 번호
             ColumnText.showTextAligned(
                     cb,
                     Element.ALIGN_CENTER,
@@ -63,7 +57,6 @@ public class PdfGenerator {
                     0
             );
 
-        // 조사자 + 승인자 + 승인일시 (여러 줄 처리)
             Paragraph footerPara = new Paragraph();
             footerPara.setAlignment(Element.ALIGN_CENTER);
             footerPara.add(new Phrase("조사자: " + detail.getInvestigator(), infoFont));
@@ -73,23 +66,19 @@ public class PdfGenerator {
             footerPara.add(new Phrase("승인일시: " +
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(LocalDateTime.now()), infoFont));
 
-        // 중앙 정렬된 좌표에 직접 추가
             ColumnText ct = new ColumnText(cb);
             ct.setSimpleColumn(
-                    document.getPageSize().getWidth() / 2 - 200, // 좌측 x
-                    document.getPageSize().getHeight() / 2 - 80, // y 시작 (중앙보다 아래쪽)
-                    document.getPageSize().getWidth() / 2 + 200, // 우측 x
-                    document.getPageSize().getHeight() / 2 - 10  // y 끝
+                    document.getPageSize().getWidth() / 2 - 200,
+                    document.getPageSize().getHeight() / 2 - 80,
+                    document.getPageSize().getWidth() / 2 + 200,
+                    document.getPageSize().getHeight() / 2 - 10
             );
             ct.addElement(footerPara);
             ct.go();
 
-        // 페이지 넘기기
             document.newPage();
 
-
             // ------------------ 2. 본문 ------------------
-            // 기본 정보 테이블
             PdfPTable table = new PdfPTable(2);
             table.setWidthPercentage(100);
             table.setWidths(new float[]{2.5f, 7.5f});
@@ -100,7 +89,6 @@ public class PdfGenerator {
             addGrayRow(table, "승인자", approver.getName() + "(" + approver.getUsername() + ")", bfKorean);
             addGrayRow(table, "승인일시", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), bfKorean);
 
-            // 점검 항목
             addGrayRow(table, "조사 가능 여부", mapPossible(detail.getPossible()), bfKorean);
             addGrayRow(table, "행정 목적 활용", mapAdminUse(detail.getAdminUse()), bfKorean);
             addGrayRow(table, "유휴 비율", mapIdleRate(detail.getIdleRate()), bfKorean);
@@ -117,7 +105,32 @@ public class PdfGenerator {
 
             document.add(table);
 
-            // 사진 추가
+            // ------------------ 3. 지도 이미지 ------------------
+            if (detail.getLatitude() != null && detail.getLongitude() != null) {
+                try {
+                    String mapUrl = String.format(
+                            "https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=600&h=400&center=%f,%f&level=16",
+                            detail.getLongitude(), detail.getLatitude()
+                    );
+
+                    HttpURLConnection conn = (HttpURLConnection) new URL(mapUrl).openConnection();
+                    conn.setRequestProperty("X-NCP-APIGW-API-KEY-ID", System.getenv("NAVER_CLIENT_ID"));
+                    conn.setRequestProperty("X-NCP-APIGW-API-KEY", System.getenv("NAVER_CLIENT_SECRET"));
+
+                    try (java.io.InputStream is = conn.getInputStream()) {
+                        byte[] imageBytes = is.readAllBytes();
+                        Image mapImg = Image.getInstance(imageBytes);
+                        mapImg.scaleToFit(500, 350);
+                        mapImg.setSpacingAfter(15);
+                        document.add(new Paragraph("건물 위치 지도", sectionFont));
+                        document.add(mapImg);
+                    }
+                } catch (Exception ex) {
+                    document.add(new Paragraph("지도 이미지 불러오기 실패: " + ex.getMessage()));
+                }
+            }
+
+            // ------------------ 4. 사진 ------------------
             addImageIfExists(document, "외부 사진", detail.getExtPhoto());
             addImageIfExists(document, "외부 편집본", detail.getExtEditPhoto());
             addImageIfExists(document, "내부 사진", detail.getIntPhoto());
@@ -132,36 +145,18 @@ public class PdfGenerator {
         }
     }
 
-
     // ================= 헬퍼 메서드 =================
-
-    private static void addCell(PdfPTable table, String key, String value, Font keyFont, Font valFont) {
-        String safeKey = (key == null || key.isBlank()) ? "-" : key;
-        String safeVal = (value == null || value.isBlank()) ? "-" : value;
-
-        PdfPCell cell1 = new PdfPCell(new Phrase(safeKey, keyFont));
-        PdfPCell cell2 = new PdfPCell(new Phrase(safeVal, valFont));
-
-        cell1.setBackgroundColor(new Color(220, 220, 240));
-        cell1.setPadding(6);
-        cell2.setPadding(6);
-
-        table.addCell(cell1);
-        table.addCell(cell2);
-    }
 
     private static void addGrayRow(PdfPTable table, String label, String value, BaseFont bf) {
         Font keyFont = new Font(bf, 11, Font.BOLD, Color.BLACK);
         Font valFont = new Font(bf, 11, Font.NORMAL, Color.DARK_GRAY);
 
-        // 라벨 셀
         PdfPCell keyCell = new PdfPCell(new Phrase(label, keyFont));
-        keyCell.setBackgroundColor(new Color(240, 240, 240)); // 옅은 회색
+        keyCell.setBackgroundColor(new Color(240, 240, 240));
         keyCell.setPadding(10);
         keyCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         keyCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
-        // 값 셀
         PdfPCell valCell = new PdfPCell(new Phrase(
                 (value == null || value.isBlank()) ? "-" : value, valFont));
         valCell.setBackgroundColor(Color.WHITE);
@@ -170,7 +165,6 @@ public class PdfGenerator {
         table.addCell(keyCell);
         table.addCell(valCell);
     }
-
 
     private static void addImageIfExists(Document document, String label, String path) throws Exception {
         if (path == null || path.isBlank()) {

@@ -128,6 +128,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
     );
 
 
+    // UserAccountRepository
+    Optional<UserAccountEntity> findFirstByRole(String role);
 
 
 }

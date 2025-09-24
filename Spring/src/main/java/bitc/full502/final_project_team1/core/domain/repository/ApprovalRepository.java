@@ -29,4 +29,12 @@ public interface ApprovalRepository extends JpaRepository<ApprovalEntity, Long> 
 //      AND (:region IS NULL OR :region = '' OR lot_address LIKE %:region%)
 //    """, nativeQuery = true)
 //  List<AssignedBuildingDto> findAssignedByRegion(@Param("region") String region);
+
+  // 건물 단위로 "대기중"인 결재가 이미 만들어져 있으면 재사용하고 싶을 때
+  @Query("""
+        select a from ApprovalEntity a
+         where a.building.id = :buildingId
+           and a.approvedAt is null
+    """)
+  Optional<ApprovalEntity> findPendingByBuildingId(Long buildingId);
 }

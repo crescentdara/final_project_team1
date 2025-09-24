@@ -1,171 +1,100 @@
-import {useEffect, useMemo, useState} from "react";
+// src/pages/ApproverAssignment.jsx
+import { useEffect, useState } from "react";
 import axios from "axios";
 import NaverMap from "../components/NaverMap";
 
 function ApproverAssignment() {
+  // 좌측 목록(조사원 배정 O + 결재자 미배정)
   const [addresses, setAddresses] = useState([]);
 
-  const [emdList, setEmdList] = useState([]);
-  const [selectedEmd, setSelectedEmd] = useState("");
-
+  // 지도 상태
   const [selectedLocation, setSelectedLocation] = useState({
     latitude: 35.228,
     longitude: 128.889,
   });
-
   const [errorMessage, setErrorMessage] = useState("");
 
-  // 조사자 상태
+  // 결재자(Approver) 검색/선택
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userKeyword, setUserKeyword] = useState("");
 
-  // 선택된 건물들
+  // 체크된 건물들
   const [selectedBuildings, setSelectedBuildings] = useState([]);
 
-  // ---- 배정 여부 판단 & 필터 -------------------------------------------------
-  const isAssigned = (b) =>
-      b?.assigned === true ||
-      b?.assigned === 1 ||
-      b?.assigned === "true" ||
-      b?.status === 1 ||
-      b?.status === "ASSIGNED" ||
-      b?.approverId != null ||
-      b?.approver?.id != null ||
-      b?.user?.id != null;
-
-  const assignedAddresses = useMemo(
-      () => (Array.isArray(addresses) ? addresses.filter(isAssigned) : []),
-      [addresses]
-  );
-
-  // ---- 배정된 조사자 표시 라벨(여러 응답 스키마 방어) -------------------------
-  // ✅ 연구원(조사원)만 표시. approver 관련 키는 전부 무시!
-  const getAssignedUserLabel = (addr) => {
-    // 1) 이름 후보 (researcher 쪽 우선)
-    const name =
-        addr?.researcherName ??
-        addr?.assignedUserName ??
-        addr?.userName ??
-        addr?.user?.name ??
-        addr?.researcher?.name ??
-        null;
-
-    // 2) 아이디(계정) 후보
-    const username =
-        addr?.researcherUsername ??
-        addr?.assignedUsername ??
-        addr?.username ??
-        addr?.user?.username ??
-        addr?.researcher?.username ??
-        null;
-
-    // 3) 숫자 ID 후보
-    const id =
-        addr?.researcherUserId ??
-        addr?.userId ??
-        addr?.user?.id ??
-        addr?.assignedUserId ??
-        null;
-
-    // 4) 표기 규칙
-    if (name && username) return `${name} (${username})`;
-    if (name) return name;
-    if (username) return `(${username})`;
-    if (id != null) return `#${id}`;
-
-    // 이 리스트는 '조사원 배정 O'가 전제라서 이 지점까지 거의 오지 않음.
-    // 그래도 방어적으로 최소한 ID 성격을 표시.
-    return "(조사원 정보 확인 필요)";
-  };
-
-
-  // =============================
+  // -------------------------
   // 초기 로딩
-  // =============================
+  // -------------------------
   useEffect(() => {
-    axios
-        .get("/web/building/eupmyeondong")
-        .then((res) => setEmdList(res.data))
-        .catch((err) => console.error(err));
-
+    // 1) 결재자 미배정 목록 불러오기
     handleSearch();
-
+    // 2) 기본 결재자 후보(approver) 불러오기
     axios
-        .get("/web/api/approver/search")
-        .then((res) => setUsers(res.data))
-        .catch((err) => console.error("❌ 조사자 목록 불러오기 실패:", err));
+        .get("/web/api/approver/search", { params: { keyword: "" } })
+        .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
+        .catch((err) => console.error("❌ 결재자 목록 로딩 실패:", err));
   }, []);
 
-  // =============================
-  // 조사지 검색
-  // =============================
+  // -------------------------
+  // 목록 조회 (서버가 이미 필터링된 데이터를 내려줌)
+  // -------------------------
   const handleSearch = () => {
     axios
-        .get("/web/building/search/assigned", {
-          params: { eupMyeonDong: selectedEmd || "" },
-        })
-        .then((res) => setAddresses(res.data))
-        .catch((err) => console.error(err));
+        .get("/web/building/pending-approval", { params: {} })
+        .then((res) => setAddresses(Array.isArray(res.data) ? res.data : []))
+        .catch((err) => console.error("❌ 목록 로딩 실패:", err));
   };
 
-  // =============================
-  // 대상자 검색 (Enter로만 실행)
-  // =============================
+  // -------------------------
+  // 결재자(Approver) 검색
+  // -------------------------
   const handleUserSearch = () => {
     axios
-        .get("/web/building/pending-approval", { params: { keyword: userKeyword } })
-        .then((res) => setUsers(res.data))
-        .catch((err) => console.error("❌ 대상자 검색 실패:", err));
+        .get("/web/api/approver/search", { params: { keyword: userKeyword } })
+        .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
+        .catch((err) => console.error("❌ 결재자 검색 실패:", err));
   };
 
-  // =============================
-  // 건물 체크박스 선택
-  // =============================
-  const handleBuildingCheck = (addr) => {
-    const id = addr.id;
-    const isChecked = selectedBuildings.includes(id);
-
-    const updated = isChecked
-        ? selectedBuildings.filter((bid) => bid !== id)
+  // -------------------------
+  // 체크박스 토글 + 지도 이동
+  // -------------------------
+  const handleBuildingCheck = (row) => {
+    const id = row.id;
+    const checked = selectedBuildings.includes(id);
+    const next = checked
+        ? selectedBuildings.filter((x) => x !== id)
         : [...selectedBuildings, id];
+    setSelectedBuildings(next);
 
-    setSelectedBuildings(updated);
-
-    if (!isChecked) {
-      handleSelect(addr); // 마지막 선택 좌표로 이동
+    if (!checked) {
+      handleLocate(row);
     }
   };
 
-  // =============================
-  // 지도 이동
-  // =============================
-  const handleSelect = (addr) => {
-    const query = addr.lotAddress || addr.buildingName;
+  // 주소 → 좌표 조회하여 지도 이동
+  const handleLocate = (row) => {
+    const query = row.lotAddress || row.buildingName;
     if (!query) return;
 
     axios
         .get("/web/building/coords", { params: { address: query } })
-        .then((res) => {
-          if (res?.data?.latitude && res?.data?.longitude) {
-            setSelectedLocation({
-              latitude: res.data.latitude,
-              longitude: res.data.longitude,
-            });
+        .then(({ data }) => {
+          if (data?.latitude && data?.longitude) {
+            setSelectedLocation({ latitude: data.latitude, longitude: data.longitude });
             setErrorMessage("");
           } else {
             setErrorMessage(`좌표를 찾을 수 없습니다.\n요청한 주소: ${query}`);
           }
         })
         .catch((err) => {
-          console.error("DB coords API error:", err);
+          console.error("좌표 조회 실패:", err);
           setErrorMessage("DB에서 좌표를 가져오는 중 오류가 발생했습니다.");
         });
   };
 
-  // =============================
-  // 배정 실행
-  // =============================
+  // -------------------------
+  // 결재자 배정
+  // -------------------------
   const handleAssign = async () => {
     if (!selectedUser) {
       alert("결재자를 선택하세요!");
@@ -177,39 +106,45 @@ function ApproverAssignment() {
     }
 
     try {
-      const res = await axios.post("/web/building/assign-approver", {
+      const { data } = await axios.post("/web/api/approver/assign", {
         userId: selectedUser.userId ?? selectedUser.id,
         buildingIds: selectedBuildings,
       });
-
-      // 성공 후 갱신
-      handleSearch();
+      // 성공 후 목록 갱신 및 선택 초기화
+      await handleSearch();
       setSelectedBuildings([]);
-      alert(`총 ${res?.data?.assignedCount ?? selectedBuildings.length}건이 배정되었습니다.`);
+      alert(`총 ${data?.assignedCount ?? selectedBuildings.length}건이 배정되었습니다.`);
     } catch (err) {
       console.error("❌ 배정 실패:", err);
       alert("배정 중 오류가 발생했습니다.");
     }
   };
 
-  // =============================
-  // JSX
-  // =============================
+  // 파란 상자에 표시할 ‘조사원 이름’ (없으면 대시)
+  const renderResearcherBadge = (addr) => {
+    const name =
+        addr?.assignedName ??
+        addr?.researcherName ??
+        addr?.user?.name ??
+        null;
+    return name ? name : "—";
+  };
+
   return (
       <div className="container mt-4">
         <h2 className="mb-4">결재자 미배정 조사목록</h2>
 
         <div className="row">
-          {/* 왼쪽: 결재자 미배정 조사지 목록 (현재는 assigned=true로 가져오므로 제목과 실제 필터가 다르면 제목을 조정하세요) */}
+          {/* 좌측: 결재자 미배정 목록 */}
           <div className="col-md-8">
             <div className="p-3 border rounded bg-white shadow-sm">
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <h5 className="mb-0">결재자 미배정 조사지 목록</h5>
-                <small className="text-muted">총 {assignedAddresses.length}건</small>
+                <small className="text-muted">총 {addresses.length}건</small>
               </div>
 
-              <ul className="list-group" style={{ maxHeight: "600px", overflowY: "auto" }}>
-                {assignedAddresses.map((addr) => (
+              <ul className="list-group" style={{ maxHeight: "580px", overflowY: "auto" }}>
+                {addresses.map((addr) => (
                     <li
                         key={addr.id}
                         className="list-group-item d-flex align-items-center"
@@ -222,18 +157,17 @@ function ApproverAssignment() {
                           onChange={() => handleBuildingCheck(addr)}
                       />
 
-                      {/* 주소 */}
                       <span className="text-truncate">
                     {addr.lotAddress || addr.buildingName || `#${addr.id}`}
                   </span>
 
-                      {/* 🔴 오른쪽 빨간 네모 박스: 배정된 조사자 표시 */}
+                      {/* 파란 배지: 조사원 이름 (없으면 —) */}
                       <span
-                          className="ms-auto px-2 py-1 border border-danger text-danger rounded"
+                          className="ms-auto px-2 py-1 border border-primary-subtle rounded"
                           style={{ minWidth: 150, textAlign: "center" }}
-                          title="배정된 조사자"
+                          title="배정된 조사원"
                       >
-                    {getAssignedUserLabel(addr)}
+                    {renderResearcherBadge(addr)}
                   </span>
                     </li>
                 ))}
@@ -241,12 +175,9 @@ function ApproverAssignment() {
             </div>
           </div>
 
-          {/* 오른쪽: 지도 + 안내문 + 대상자 조회 */}
+          {/* 우측: 지도 + 결재자 조회/배정 */}
           <div className="col-md-4 d-flex flex-column gap-3">
-            <NaverMap
-                latitude={selectedLocation.latitude}
-                longitude={selectedLocation.longitude}
-            />
+            <NaverMap latitude={selectedLocation.latitude} longitude={selectedLocation.longitude} />
 
             {errorMessage && <div className="alert alert-warning mt-2">{errorMessage}</div>}
 
@@ -272,15 +203,15 @@ function ApproverAssignment() {
               </div>
 
               <ul className="list-group mb-3" style={{ maxHeight: "200px", overflowY: "auto" }}>
-                {users.map((user) => (
-                    <li key={user.userId ?? user.id} className="list-group-item d-flex align-items-center">
+                {users.map((u) => (
+                    <li key={u.userId ?? u.id} className="list-group-item d-flex align-items-center">
                       <input
                           type="radio"
-                          name="userSelect"
+                          name="approverSelect"
                           className="form-check-input me-2"
-                          onChange={() => setSelectedUser(user)}
+                          onChange={() => setSelectedUser(u)}
                       />
-                      {user.name} {user.username ? `(${user.username})` : ""}
+                      {u.name} {u.username ? `(${u.username})` : ""}
                     </li>
                 ))}
               </ul>

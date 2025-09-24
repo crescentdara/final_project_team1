@@ -15,30 +15,30 @@ import java.util.Optional;
 @Repository
 public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> {
 
-    // 📌 읍면동 중복 없는 리스트 (경상남도 김해시 기준)
-    @Query(value = "SELECT DISTINCT SUBSTRING_INDEX(SUBSTRING_INDEX(lot_address, ' ', 3), ' ', -1) " +
-        "FROM building " +
-        "WHERE lot_address LIKE %:city%", nativeQuery = true)
-    List<String> findDistinctEupMyeonDong(@Param("city") String city);
+  // 📌 읍면동 중복 없는 리스트 (경상남도 김해시 기준)
+  @Query(value = "SELECT DISTINCT SUBSTRING_INDEX(SUBSTRING_INDEX(lot_address, ' ', 3), ' ', -1) " +
+      "FROM building " +
+      "WHERE lot_address LIKE %:city%", nativeQuery = true)
+  List<String> findDistinctEupMyeonDong(@Param("city") String city);
 
-    // 📌 조건 검색 (읍면동 + 미배정 status=0) — 기존 로직 유지(NATIVE)
-    @Query(value = "SELECT * FROM building " +
-        "WHERE (:eupMyeonDong IS NULL OR lot_address LIKE %:eupMyeonDong%) " +
-        "AND status = 0",
-        nativeQuery = true)
-    List<BuildingEntity> searchByEupMyeonDong(@Param("eupMyeonDong") String eupMyeonDong);
+  // 📌 조건 검색 (읍면동 + 미배정 status=0) — 기존 로직 유지(NATIVE)
+  @Query(value = "SELECT * FROM building " +
+      "WHERE (:eupMyeonDong IS NULL OR lot_address LIKE %:eupMyeonDong%) " +
+      "AND status = 0",
+      nativeQuery = true)
+  List<BuildingEntity> searchByEupMyeonDong(@Param("eupMyeonDong") String eupMyeonDong);
 
-    // 📌 조건 검색 (읍면동 + 미배정 status=1) — 기존 로직 유지(NATIVE)
-    @Query(value = "SELECT * FROM building " +
-        "WHERE (:eupMyeonDong IS NULL OR lot_address LIKE %:eupMyeonDong%) " +
-        "AND status = 1",
-        nativeQuery = true)
-    List<BuildingEntity> assignedResearcher(@Param("eupMyeonDong") String eupMyeonDong);
+  // 📌 조건 검색 (읍면동 + 미배정 status=1) — 기존 로직 유지(NATIVE)
+  @Query(value = "SELECT * FROM building " +
+      "WHERE (:eupMyeonDong IS NULL OR lot_address LIKE %:eupMyeonDong%) " +
+      "AND status = 1",
+      nativeQuery = true)
+  List<BuildingEntity> assignedResearcher(@Param("eupMyeonDong") String eupMyeonDong);
 
 
-    // ✅ NEW: 조건 검색 (읍면동 + 미배정 assignedUser IS NULL) — JPQL
-    //  - status 컬럼이 아닌, 실제 배정 관계(assignedUser=null) 기준으로도 조회가 필요할 때 사용
-    @Query("""
+  // ✅ NEW: 조건 검색 (읍면동 + 미배정 assignedUser IS NULL) — JPQL
+  //  - status 컬럼이 아닌, 실제 배정 관계(assignedUser=null) 기준으로도 조회가 필요할 때 사용
+  @Query("""
         select b
           from BuildingEntity b
           left join b.assignedUser u
@@ -51,40 +51,40 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
            )
          order by b.id desc
     """)
-    List<BuildingEntity> findUnassignedByEmd(@Param("emd") String emd);
+  List<BuildingEntity> findUnassignedByEmd(@Param("emd") String emd);
 
-    // 📌 주소(lotAddress)로 건물 찾기 (위도/경도 조회용) — 기존 유지
-    Optional<BuildingEntity> findByLotAddress(String lotAddress);
+  // 📌 주소(lotAddress)로 건물 찾기 (위도/경도 조회용) — 기존 유지
+  Optional<BuildingEntity> findByLotAddress(String lotAddress);
 
-    @Query("select b from BuildingEntity b where b.lotAddress like %:keyword% order by b.id asc")
-    List<BuildingEntity> findByLotAddressLike(@Param("keyword") String keyword);
+  @Query("select b from BuildingEntity b where b.lotAddress like %:keyword% order by b.id asc")
+  List<BuildingEntity> findByLotAddressLike(@Param("keyword") String keyword);
 
-    // ✅ NEW: 좌표 조회/검색용 — 정확 일치(번지/도로명/건물명)
-    @Query("""
+  // ✅ NEW: 좌표 조회/검색용 — 정확 일치(번지/도로명/건물명)
+  @Query("""
         select b from BuildingEntity b
          where lower(coalesce(b.lotAddress,  '')) = lower(trim(:q))
             or lower(coalesce(b.roadAddress, '')) = lower(trim(:q))
             or lower(coalesce(b.buildingName,'')) = lower(trim(:q))
          order by b.id asc
     """)
-    List<BuildingEntity> findByAddressOrNameExact(@Param("q") String query);
+  List<BuildingEntity> findByAddressOrNameExact(@Param("q") String query);
 
-    // ✅ NEW: 좌표 조회/검색용 — 포함 검색(번지/도로명/건물명)
-    @Query("""
+  // ✅ NEW: 좌표 조회/검색용 — 포함 검색(번지/도로명/건물명)
+  @Query("""
         select b from BuildingEntity b
          where lower(coalesce(b.lotAddress,  '')) like lower(concat('%', trim(:q), '%'))
             or lower(coalesce(b.roadAddress, '')) like lower(concat('%', trim(:q), '%'))
             or lower(coalesce(b.buildingName,'')) like lower(concat('%', trim(:q), '%'))
          order by b.id asc
     """)
-    List<BuildingEntity> findByAddressOrNameLike(@Param("q") String query);
+  List<BuildingEntity> findByAddressOrNameLike(@Param("q") String query);
 
-    // ----------------------------------------------------------------------
-    // ★ 기존: 전체 조사 목록(배정/승인 표시 포함) - 네이티브 + 프로젝션 페이징
-    //  - filter: 'ALL' | 'UNASSIGNED' | 'ASSIGNED' | 'APPROVED'
-    //  - keyword: 번지/도로명/조사원명/아이디 LIKE 검색
-    // ----------------------------------------------------------------------
-    @Query(value = """
+  // ----------------------------------------------------------------------
+  // ★ 기존: 전체 조사 목록(배정/승인 표시 포함) - 네이티브 + 프로젝션 페이징
+  //  - filter: 'ALL' | 'UNASSIGNED' | 'ASSIGNED' | 'APPROVED'
+  //  - keyword: 번지/도로명/조사원명/아이디 LIKE 검색
+  // ----------------------------------------------------------------------
+  @Query(value = """
         SELECT
            b.id                           AS buildingId,
            b.lot_address                  AS lotAddress,
@@ -122,7 +122,7 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
           )
         ORDER BY b.id DESC
         """,
-        countQuery = """
+      countQuery = """
         SELECT COUNT(*)
         FROM building b
         LEFT JOIN user_building_assignment uba ON uba.building_id = b.id
@@ -150,39 +150,21 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
              OR (:filter = 'APPROVED'   AND sr_latest.status = 'APPROVED')
           )
         """,
-        nativeQuery = true)
-    Page<BuildingListProjection> searchBuildings(
-        @Param("keyword") String keyword,
-        @Param("filter")  String filter,
-        Pageable pageable
-    );
+      nativeQuery = true)
+  Page<BuildingListProjection> searchBuildings(
+      @Param("keyword") String keyword,
+      @Param("filter")  String filter,
+      Pageable pageable
+  );
 
-    @Modifying(clearAutomatically = false, flushAutomatically = true)
-    @Query("""
-      update BuildingEntity b
-        set b.assignedUser = :user,
-            b.status = 1
-       where b.id in :ids
-    """)
-    int bulkAssign(@Param("user") UserAccountEntity user,
-                   @Param("ids") List<Long> ids);
-
-    @Query(value = """
-        SELECT DISTINCT b.emd
-        FROM building b
-        WHERE (:city IS NULL OR :city = '' OR b.lot_address LIKE CONCAT('%', :city, '%'))
-        ORDER BY b.emd
-        """, nativeQuery = true)
-    List<String> findDistinctEmd(@Param("city") String city);
-
-    @Query(value = """
-        SELECT b.*
-        FROM building b
-        WHERE (b.lot_address LIKE CONCAT('%', :addr, '%')
-            OR b.road_address LIKE CONCAT('%', :addr, '%')
-            OR b.building_name LIKE CONCAT('%', :addr, '%'))
-        ORDER BY b.id DESC
-        LIMIT 1
-        """, nativeQuery = true)
-    Optional<BuildingEntity> findOneByFuzzyAddress(@Param("addr") String address);
+  @Query(value = """
+  SELECT b.*
+    FROM building b
+    JOIN user_building_assignment uba ON uba.building_id = b.id
+   WHERE (:emd IS NULL OR b.lot_address LIKE CONCAT('%', :emd, '%'))
+     AND uba.user_id IS NOT NULL
+     AND uba.approval_id IS NULL
+   ORDER BY b.id DESC
+""", nativeQuery = true)
+  List<BuildingEntity> findPendingApprovalBuildings(@Param("emd") String eupMyeonDong);
 }

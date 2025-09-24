@@ -1,6 +1,7 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -74,6 +75,9 @@ public class BuildingEntity {
     @Column(nullable = false)
     private Integer status;  // 0 = 미배정, 1 = 배정됨
 
+    @Column(name = "assigned_user_id", insertable = false, updatable = false)
+    private Long assignedUserId;
+
     /** ✅ 결재자(배정 사용자) : null이면 미배정 */
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(
@@ -108,5 +112,18 @@ public class BuildingEntity {
     @PrePersist @PreUpdate
     public void syncStatus() {
         this.status = (this.assignedUser != null) ? 1 : 0;
+    }
+
+    @JsonProperty("assignedName")
+    public String getAssignedNameJson() {
+        if (assignedUser == null) return null;
+        // 이름이 비어있으면 username을 대체로
+        String n = assignedUser.getName();
+        return (n != null && !n.isBlank()) ? n : assignedUser.getUsername();
+    }
+
+    @JsonProperty("assignedUsername")   // (선택) 아이디도 함께 내리고 싶다면
+    public String getAssignedUsernameJson() {
+        return assignedUser != null ? assignedUser.getUsername() : null;
     }
 }

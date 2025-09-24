@@ -2,11 +2,14 @@
 package bitc.full502.final_project_team1.api.web.controller;
 
 import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
+import bitc.full502.final_project_team1.api.web.dto.AssignApproverRequestDTO;
+import bitc.full502.final_project_team1.api.web.dto.AssignApproverResponseDTO;
 import bitc.full502.final_project_team1.api.web.dto.AssignRequestDTO;
 import bitc.full502.final_project_team1.core.service.AssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +46,16 @@ public class ApproverController {
             "empNo",    u.getEmpNo()
         ))
         .collect(Collectors.toList());
+  }
+
+  @PostMapping(
+      value = "/assign",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public ResponseEntity<AssignApproverResponseDTO> assign(@RequestBody AssignApproverRequestDTO req) {
+    AssignApproverResponseDTO res = assignmentService.assignApprover(req);
+    return ResponseEntity.ok(res);
   }
 
 //  /** 선택 건물 → 지정 결재자에게 배정 */

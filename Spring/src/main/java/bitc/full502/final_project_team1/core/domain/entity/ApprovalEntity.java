@@ -1,3 +1,4 @@
+// src/main/java/bitc/full502/final_project_team1/core/domain/entity/ApprovalEntity.java
 package bitc.full502.final_project_team1.core.domain.entity;
 
 import jakarta.persistence.*;
@@ -5,54 +6,37 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-    name = "approval",
-    uniqueConstraints = {
-        @UniqueConstraint(name = "uk_approval_building_surveyor", columnNames = {"building_id", "surveyor_id"})
-    },
-    indexes = {
-        @Index(name = "idx_approval_approved_at", columnList = "approved_at")
-    }
-)
+@Table(name = "approval", schema = "java502_team1_final_db")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class ApprovalEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long id;                   // PK
 
-  /** 결재자(승인/반려 수행자) - 생성 시 null 가능 */
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "approver_id",
-      foreignKey = @ForeignKey(name = "fk_approval_approver_user"))
-  private UserAccountEntity approver;           // 결재자**
-
-  /** 반려 사유 */
-  @Column(name = "reject_reason", length = 500)
-  private String rejectReason;                  // 반려사유
-
-  /** 승인 일시 (대기 중 null) */
   @Column(name = "approved_at")
-  private LocalDateTime approvedAt;             // 일시
+  private LocalDateTime approvedAt;  // 결재 시각 (대기중엔 null)
 
-  /** 대상 빌딩 */
+  @Column(name = "reject_reason", length = 500)
+  private String rejectReason;
+
+  // 결재자
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "building_id", nullable = false,
-      foreignKey = @ForeignKey(name = "fk_approval_building"))
-  private BuildingEntity building;              // 빌딩id**
+  @JoinColumn(name = "approver_id")
+  private UserAccountEntity approver;
 
-  /** 조사원 */
+  // 조사 대상 건물
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "surveyor_id", nullable = false,
-      foreignKey = @ForeignKey(name = "fk_approval_surveyor_user"))
-  private UserAccountEntity surveyor;           // 조사원id**
+  @JoinColumn(name = "building_id")
+  private BuildingEntity building;
 
-  /** 결재 대상 '조사결과' */
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "survey_result_id",
-      nullable = false,
-      foreignKey = @ForeignKey(name = "fk_approval_survey_result"))
-  private SurveyResultEntity surveyResult;
+  // (선택) 설문 결과 – 아직 없을 수 있음
+  @Column(name = "survey_result_id")
+  private Long surveyResultId;
 
+  // 조사원(Researcher)
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @JoinColumn(name = "surveyor_id")
+  private UserAccountEntity surveyor;
 }

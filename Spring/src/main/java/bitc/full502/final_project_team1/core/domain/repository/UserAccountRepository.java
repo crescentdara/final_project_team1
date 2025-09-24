@@ -109,4 +109,16 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
     """)
     List<UserAccountEntity> searchApprovers(@Param("role") String role,
                                             @Param("kw") String keyword);
+
+    // "APPROVER 만 찾는 쿼리"
+    @Query("""
+  select u
+    from UserAccountEntity u
+   where u.role = bitc.full502.final_project_team1.core.domain.enums.Role.APPROVER
+     and (:kw is null
+          or lower(u.username) like lower(concat('%', :kw, '%'))
+          or lower(u.name)     like lower(concat('%', :kw, '%'))
+          or lower(u.empNo)    like lower(concat('%', :kw, '%')))
+""")
+    List<UserAccountEntity> findApprovers(@Param("kw") String kw);
 }

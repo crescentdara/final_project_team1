@@ -7,6 +7,9 @@ function ApproverAssignment() {
   // 좌측 목록(조사원 배정 O + 결재자 미배정)
   const [addresses, setAddresses] = useState([]);
 
+  const [emdList, setEmdList] = useState([]); // 읍면동 목록
+  const [selectedEmd, setSelectedEmd] = useState(""); // 선택된 읍면동
+
   // 지도 상태
   const [selectedLocation, setSelectedLocation] = useState({
     latitude: 35.228,
@@ -26,6 +29,10 @@ function ApproverAssignment() {
   // 초기 로딩
   // -------------------------
   useEffect(() => {
+    axios
+        .get("/web/building/eupmyeondong?city=김해시")
+        .then((res) => setEmdList(res.data))
+        .catch((err) => console.error(err));
     // 1) 결재자 미배정 목록 불러오기
     handleSearch();
     // 2) 기본 결재자 후보(approver) 불러오기
@@ -43,6 +50,15 @@ function ApproverAssignment() {
         .get("/web/building/pending-approval", { params: {} })
         .then((res) => setAddresses(Array.isArray(res.data) ? res.data : []))
         .catch((err) => console.error("❌ 목록 로딩 실패:", err));
+  };
+
+  const handleSearchEMD = () => {
+    axios
+        .get("/web/building/pending-approval", {
+          params: { eupMyeonDong: selectedEmd || "" },
+        })
+        .then((res) => setAddresses(res.data))
+        .catch((err) => console.error(err));
   };
 
   // -------------------------
@@ -134,6 +150,47 @@ function ApproverAssignment() {
       <div className="container mt-4">
         <h2 className="mb-4">결재자 미배정 조사목록</h2>
 
+        {/* 🔎 검색 박스 */}
+        <div className="border rounded p-3 mb-4 bg-light shadow-sm">
+          <div className="row g-3 align-items-end">
+            {/* 시/도 */}
+            <div className="col-md-4">
+              <label className="form-label fw-bold">시/도 구분</label>
+              <select className="form-select" disabled>
+                <option>경상남도 김해시</option>
+              </select>
+            </div>
+
+            {/* 읍면동 */}
+            <div className="col-md-4">
+              <label className="form-label fw-bold">읍/면/동 구분</label>
+              <select
+                  className="form-select"
+                  value={selectedEmd}
+                  onChange={(e) => setSelectedEmd(e.target.value)}
+              >
+                <option value="">전체</option>
+                {emdList.map((emd, idx) => (
+                    <option key={idx} value={emd}>
+                      {emd}
+                    </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 조회 버튼 */}
+            <div className="col-md-4">
+              <button
+                  className="btn btn-primary w-100 fw-bold"
+                  style={{ backgroundColor: "#289eff", border: "none" }}
+                  onClick={handleSearchEMD}
+              >
+                조회
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="row">
           {/* 좌측: 결재자 미배정 목록 */}
           <div className="col-md-8">
@@ -143,34 +200,40 @@ function ApproverAssignment() {
                 <small className="text-muted">총 {addresses.length}건</small>
               </div>
 
-              <ul className="list-group" style={{ maxHeight: "580px", overflowY: "auto" }}>
-                {addresses.map((addr) => (
-                    <li
-                        key={addr.id}
-                        className="list-group-item d-flex align-items-center"
-                        style={{ cursor: "pointer" }}
-                    >
-                      <input
-                          type="checkbox"
-                          className="form-check-input me-2"
-                          checked={selectedBuildings.includes(addr.id)}
-                          onChange={() => handleBuildingCheck(addr)}
-                      />
-
-                      <span className="text-truncate">
-                    {addr.lotAddress || addr.buildingName || `#${addr.id}`}
-                  </span>
-
-                      {/* 파란 배지: 조사원 이름 (없으면 —) */}
-                      <span
-                          className="ms-auto px-2 py-1 border border-primary-subtle rounded"
-                          style={{ minWidth: 150, textAlign: "center" }}
-                          title="배정된 조사원"
-                      >
-                    {renderResearcherBadge(addr)}
-                  </span>
+              <ul className="list-group" style={{ maxHeight: "450px", overflowY: "auto" }}>
+                {addresses.length === 0 ? (
+                    <li className="list-group-item text-center text-muted py-4">
+                      해당 목록이 없습니다.
                     </li>
-                ))}
+                ) : (
+                    addresses.map((addr) => (
+                        <li
+                            key={addr.id}
+                            className="list-group-item d-flex align-items-center"
+                            style={{ cursor: "pointer" }}
+                        >
+                          <input
+                              type="checkbox"
+                              className="form-check-input me-2"
+                              checked={selectedBuildings.includes(addr.id)}
+                              onChange={() => handleBuildingCheck(addr)}
+                          />
+
+                          <span className="text-truncate">
+                            {addr.lotAddress || addr.buildingName || `#${addr.id}`}
+                          </span>
+
+                          {/* 파란 배지: 조사원 이름 (없으면 —) */}
+                          <span
+                              className="ms-auto px-2 py-1 border border-primary-subtle rounded"
+                              style={{ minWidth: 150, textAlign: "center" }}
+                              title="배정된 조사원"
+                          >
+                            {renderResearcherBadge(addr)}
+                          </span>
+                        </li>
+                    ))
+                )}
               </ul>
             </div>
           </div>

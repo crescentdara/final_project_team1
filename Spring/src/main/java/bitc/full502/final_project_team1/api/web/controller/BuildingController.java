@@ -162,6 +162,7 @@ public class BuildingController {
                     uba.setStatus(1);
                     uba.setAssignedAt(LocalDateTime.now());
                     uba.setApprovalId(null); // 재배정 시 결재 초기화(정책)
+                    building.setAssignedUserId(user.getUserId());
                     assignmentRepo.save(uba);
                     updated++;
                 }

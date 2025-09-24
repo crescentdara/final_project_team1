@@ -70,6 +70,7 @@ class SurveyListActivity : AppCompatActivity() {
         }
     }
 
+
     private fun formatAssignedAt(dateStr: String?): String {
         val dt = parseDateFlexible(dateStr) ?: return "미정"
         return outFormatter.format(dt)
@@ -89,6 +90,7 @@ class SurveyListActivity : AppCompatActivity() {
 
         // 내 위치 (거리순 정렬용)
         loadMyLocation()
+        refreshAssigned()
 
         // 목록 불러오기
         CoroutineScope(Dispatchers.Main).launch {
@@ -109,6 +111,36 @@ class SurveyListActivity : AppCompatActivity() {
                 }
         }
     }
+
+    // ▼ 추가
+    override fun onResume() {
+        super.onResume()
+        refreshAssigned()
+    }
+
+
+
+    // ▼ 추가
+    private fun refreshAssigned() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val uid = AuthManager.userId(this@SurveyListActivity)
+            if (uid <= 0) {
+                Toast.makeText(this@SurveyListActivity, "로그인이 필요합니다.", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            runCatching { ApiClient.service.getAssigned(uid) }
+                .onSuccess { list ->
+                    assignedList = list
+                    bindList(assignedList)                    // 1차 표시
+                    sortAndBind(spinner.selectedItemPosition) // 현재 선택 기준으로 재정렬
+                }
+                .onFailure {
+                    Toast.makeText(this@SurveyListActivity, "목록 조회 실패: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
 
     /** ───── 위치 불러오기 ───── */
     private fun loadMyLocation() {

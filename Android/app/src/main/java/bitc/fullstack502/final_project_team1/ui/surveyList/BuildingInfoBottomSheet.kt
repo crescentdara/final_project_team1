@@ -82,16 +82,15 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
         val info = view.findViewById<LinearLayout>(R.id.infoContainer)
 
-        view.findViewById<TextView?>(R.id.tvRejectReason)?.let { tv ->
-            val reason = arguments?.getString(ARG_REJECT_REASON).orEmpty()
-            if (reason.isNotBlank()) tv.text = getString(R.string.reject_reason_fmt, reason)
-        }
-        view.findViewById<TextView?>(R.id.tvRejectedAt)?.let { tv ->
-            val dt = arguments?.getString(ARG_REJECTED_AT).orEmpty()
-            if (dt.isNotBlank()) tv.text = getString(R.string.rejected_at_fmt, dt)
-        }
+        val reason = arguments?.getString(ARG_REJECT_REASON)
+        val rejectedAt = arguments?.getString(ARG_REJECTED_AT)
 
-        // 버튼 라벨/동작 분기
+        view.findViewById<TextView>(R.id.tvRejectReason)
+            .setTextOrGone(reason, R.string.reject_reason_fmt)      // 예: "반려사유: %s"
+        view.findViewById<TextView>(R.id.tvRejectedAt)
+            .setTextOrGone(rejectedAt, R.string.rejected_at_fmt)    // 예: "반려일시: %s"
+
+        // 버튼 라벨/동작 분기 (그대로)
         if (mode == "REINSPECT") {
             btnStart.text = getString(R.string.reinspect_start)
             btnStart.setOnClickListener { startReinspectThenOpenEditor() }
@@ -100,7 +99,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
             btnStart.setOnClickListener { openEditorNew() }
         }
 
-        // 건물 상세 불러오기
+        // 건물 상세 불러오기 (그대로)
         viewLifecycleOwner.lifecycleScope.launch {
             runCatching { ApiClient.service.getBuildingDetail(buildingId) }
                 .onSuccess { building ->
@@ -114,6 +113,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                 }
         }
     }
+
 
     private fun startReinspectThenOpenEditor() {
         if (buildingId <= 0 || surveyId <= 0) {
@@ -129,6 +129,18 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         startActivity(intent)
         dismiss()
     }
+
+    private fun TextView.setTextOrGone(textRaw: String?, prefixRes: Int? = null) {
+        val t = textRaw?.trim().orEmpty()
+        if (t.isEmpty()) {
+            text = ""
+            visibility = View.GONE
+        } else {
+            text = if (prefixRes != null) getString(prefixRes, t) else t
+            visibility = View.VISIBLE
+        }
+    }
+
 
     private fun openEditorNew() {
         val intent = Intent(requireContext(), SurveyActivity::class.java).apply {

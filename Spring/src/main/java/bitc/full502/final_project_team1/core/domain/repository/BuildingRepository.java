@@ -115,8 +115,6 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
                                                   Pageable pageable
     );
 
-<<<<<<< HEAD
-=======
     // 📌 읍/면/동 단위까지만 자르기 (면/읍은 우선적으로 끊음)
     @Query(value = """
     SELECT DISTINCT
@@ -147,5 +145,4 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
     """, nativeQuery = true)
     List<BuildingEntity> findUnassignedByRegion(@Param("region") String region);
 
->>>>>>> origin/app/hsm/ResultDesign
 }

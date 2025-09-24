@@ -80,11 +80,7 @@ public class SurveyResultController {
         int count = 0;
 
         // 🔹 관리자 계정 approver로 지정
-<<<<<<< HEAD
-        UserAccountEntity approver = userRepo.findById(9l)   // 관리자 PK
-=======
         UserAccountEntity approver = userRepo.findById(9L)   // 관리자 PK
->>>>>>> origin/app/hsm/ResultDesign
                 .orElseThrow(() -> new IllegalArgumentException("관리자 계정을 찾을 수 없습니다."));
 
         for (var e : list) {

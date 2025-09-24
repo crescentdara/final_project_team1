@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import bitc.fullstack502.final_project_team1.R
+import bitc.fullstack502.final_project_team1.core.AuthManager.userId
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.SurveyResultRequest
 import bitc.fullstack502.final_project_team1.ui.transmission.EditActivity
@@ -177,11 +178,8 @@ class SurveyActivity : AppCompatActivity() {
         }
 
         showStage(0)
-<<<<<<< HEAD
         prefillIfPossible()
         updateSubmitVisibility()
-=======
->>>>>>> origin/app/hsm/ResultDesign
     }
 
     // ===== 화면 전환/버튼 상태 =====
@@ -265,17 +263,11 @@ class SurveyActivity : AppCompatActivity() {
         return radiosOk && photosOk
     }
 
-<<<<<<< HEAD
     private fun updateSubmitVisibility() {
         val visible = if (allCompleted()) View.VISIBLE else View.GONE
-        submitButton.visibility = visible
         tempButton.visibility   = visible
     }
 
-
-
-=======
->>>>>>> origin/app/hsm/ResultDesign
     // ===== 유틸 =====
     private fun <T> View.findViewsByType(clazz: Class<T>): List<T> {
         val out = mutableListOf<T>()
@@ -385,7 +377,6 @@ class SurveyActivity : AppCompatActivity() {
                 wall = idxOfChecked(R.id.radioGroup_wall),
                 roof = idxOfChecked(R.id.radioGroup_roof),
                 windowState = idxOfChecked(R.id.radioGroup_window),
-<<<<<<< HEAD
                 parking     = idxOfChecked(R.id.radioGroup_parking),
                 entrance    = idxOfChecked(R.id.radioGroup_entrance),
                 ceiling     = idxOfChecked(R.id.radioGroup_ceiling),
@@ -394,16 +385,6 @@ class SurveyActivity : AppCompatActivity() {
                 intEtc      = findViewById<EditText>(R.id.input_intEtc).text.toString(),
                 buildingId  = assignedBuildingId.takeIf { it > 0 } ?: 1L,
                 userId      = 1L
-=======
-                parking = idxOfChecked(R.id.radioGroup_parking),
-                entrance = idxOfChecked(R.id.radioGroup_entrance),
-                ceiling = idxOfChecked(R.id.radioGroup_ceiling),
-                floor = idxOfChecked(R.id.radioGroup_floor),
-                extEtc = findViewById<EditText>(R.id.input_extEtc).text.toString(),
-                intEtc = findViewById<EditText>(R.id.input_intEtc).text.toString(),
-                buildingId = assignedBuildingId.takeIf { it > 0 } ?: 1L,
-                userId = 1
->>>>>>> origin/app/hsm/ResultDesign
             )
 
             val dtoBody = Gson().toJson(dto)
@@ -437,7 +418,6 @@ class SurveyActivity : AppCompatActivity() {
                 wall = idxOfChecked(R.id.radioGroup_wall),
                 roof = idxOfChecked(R.id.radioGroup_roof),
                 windowState = idxOfChecked(R.id.radioGroup_window),
-<<<<<<< HEAD
                 parking     = idxOfChecked(R.id.radioGroup_parking),
                 entrance    = idxOfChecked(R.id.radioGroup_entrance),
                 ceiling     = idxOfChecked(R.id.radioGroup_ceiling),
@@ -446,16 +426,6 @@ class SurveyActivity : AppCompatActivity() {
                 intEtc      = findViewById<EditText>(R.id.input_intEtc).text.toString(),
                 buildingId  = assignedBuildingId.takeIf { it > 0 } ?: 1L,
                 userId      = 1L
-=======
-                parking = idxOfChecked(R.id.radioGroup_parking),
-                entrance = idxOfChecked(R.id.radioGroup_entrance),
-                ceiling = idxOfChecked(R.id.radioGroup_ceiling),
-                floor = idxOfChecked(R.id.radioGroup_floor),
-                extEtc = findViewById<EditText>(R.id.input_extEtc).text.toString(),
-                intEtc = findViewById<EditText>(R.id.input_intEtc).text.toString(),
-                buildingId = assignedBuildingId.takeIf { it > 0 } ?: 1L,
-                userId = 1
->>>>>>> origin/app/hsm/ResultDesign
             )
 
             val dtoBody = Gson().toJson(dto).toRequestBody("application/json".toMediaTypeOrNull())
@@ -476,7 +446,6 @@ class SurveyActivity : AppCompatActivity() {
             }
         }
     }
-<<<<<<< HEAD
 
     private fun prefillIfPossible() {
         lifecycleScope.launch {
@@ -543,6 +512,5 @@ class SurveyActivity : AppCompatActivity() {
 
 
 }
-=======
-}
->>>>>>> origin/app/hsm/ResultDesign
+
+

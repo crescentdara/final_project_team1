@@ -5,10 +5,7 @@ import bitc.full502.final_project_team1.api.web.dto.UserDetailDto;
 import bitc.full502.final_project_team1.api.web.dto.UserSimpleDto;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.enums.Role;
-<<<<<<< HEAD
-=======
 import bitc.full502.final_project_team1.core.domain.repository.BuildingRepository;
->>>>>>> origin/app/hsm/ResultDesign
 import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
 import bitc.full502.final_project_team1.core.service.AssignmentService;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +28,7 @@ public class WebUserController {
     private final UserAccountRepository repo;
     private final UserAccountRepository userRepo;
     private final AssignmentService assignmentService;
-<<<<<<< HEAD
-=======
     private final BuildingRepository buildingRepository; // 선호지역 뽑기
->>>>>>> origin/app/hsm/ResultDesign
 
     /** 전체 조회 + 검색 (keyword 파라미터 optional) */
     @GetMapping("/users/search")
@@ -211,9 +205,6 @@ public class WebUserController {
         boolean exists = userRepo.existsByUsername(username);
         return ResponseEntity.ok(exists);
     }
-<<<<<<< HEAD
-=======
-
     /** 선호 지역 리스트 API (읍/면/동까지만 추출) */
     @GetMapping("/users/preferred-regions")
     public List<String> getPreferredRegions(@RequestParam(defaultValue = "김해시") String city) {
@@ -222,5 +213,4 @@ public class WebUserController {
                 .sorted()
                 .toList();
     }
->>>>>>> origin/app/hsm/ResultDesign
 }

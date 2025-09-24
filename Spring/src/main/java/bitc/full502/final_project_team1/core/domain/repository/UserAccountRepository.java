@@ -93,8 +93,6 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
 
     // 중복 확인
     boolean existsByUsername(String username);
-<<<<<<< HEAD
-=======
 
     // 🔍 role=RESEARCHER + preferredRegion 부분일치
     @Query("SELECT u FROM UserAccountEntity u " +
@@ -130,7 +128,4 @@ public interface UserAccountRepository extends JpaRepository<UserAccountEntity, 
     );
 
 
-
-
->>>>>>> origin/app/hsm/ResultDesign
 }

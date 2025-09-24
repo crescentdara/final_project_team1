@@ -1,11 +1,16 @@
 package bitc.full502.final_project_team1.api.web.dto;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class AssignRequestDTO {
-    private Integer userId;
+    private Long userId;
     private List<Long> buildingIds;
 }

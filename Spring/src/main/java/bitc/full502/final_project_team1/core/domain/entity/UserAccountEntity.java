@@ -1,25 +1,23 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
 import bitc.full502.final_project_team1.core.domain.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 @Entity
 @Table(name = "user_account", schema = "java502_team1_final_db")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class UserAccountEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Integer userId;                     // PK (INT AI)
+    private Long userId;                     // PK (INT AI)
 
     @Column(name = "username", length = 60, nullable = false, unique = true)
     private String username;

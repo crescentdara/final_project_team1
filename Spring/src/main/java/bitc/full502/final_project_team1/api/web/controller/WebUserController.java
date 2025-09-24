@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:5173")
 public class WebUserController {
 
-    private final UserAccountRepository repo;
     private final UserAccountRepository userRepo;
     private final AssignmentServiceImpl assignmentServiceImpl;
 
@@ -35,13 +34,13 @@ public class WebUserController {
 
         if (keyword != null && !keyword.isBlank()) {
             // 🔍 RESEARCHER만 검색
-            users = repo.findByRoleAndNameContainingOrRoleAndUsernameContaining(
+            users = userRepo.findByRoleAndNameContainingOrRoleAndUsernameContaining(
                 Role.RESEARCHER, keyword,
                 Role.RESEARCHER, keyword
             );
         } else {
             // 📋 전체 조회 (RESEARCHER만)
-            users = repo.findByRole(Role.RESEARCHER);
+            users = userRepo.findByRole(Role.RESEARCHER);
         }
 
         return users.stream()
@@ -101,7 +100,7 @@ public class WebUserController {
             .createdAt(LocalDateTime.now())
             .build();
 
-        repo.save(user);
+        userRepo.save(user);
         return ResponseEntity.ok("등록 완료");
     }
 
@@ -120,7 +119,7 @@ public class WebUserController {
 
     /** 단건 상세 */
     @GetMapping("/users/{userId}")
-    public UserDetailDto userDetail(@PathVariable Integer userId) {
+    public UserDetailDto userDetail(@PathVariable Long userId) {
         UserAccountEntity u = userRepo.findById(userId).orElseThrow();
         return UserDetailDto.from(u);
     }
@@ -140,7 +139,7 @@ public class WebUserController {
 
     /** 배정 목록 */
     @GetMapping("/users/{userId}/assignments")
-    public List<Map<String, Object>> assignments(@PathVariable Integer userId) {
+    public List<Map<String, Object>> assignments(@PathVariable Long userId) {
         return assignmentServiceImpl.getAssignments(userId);
     }
 

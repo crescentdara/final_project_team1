@@ -1,14 +1,13 @@
 package bitc.full502.final_project_team1.core.domain.repository;
 
-import bitc.full502.final_project_team1.api.web.dto.BuildingSurveyRowDto;
 import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
-import bitc.full502.final_project_team1.core.domain.repository.projection.BuildingListProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import bitc.full502.final_project_team1.core.domain.repository.projection.BuildingListProjection;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +27,14 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
         "AND status = 0",
         nativeQuery = true)
     List<BuildingEntity> searchByEupMyeonDong(@Param("eupMyeonDong") String eupMyeonDong);
+
+    // 📌 조건 검색 (읍면동 + 미배정 status=1) — 기존 로직 유지(NATIVE)
+    @Query(value = "SELECT * FROM building " +
+        "WHERE (:eupMyeonDong IS NULL OR lot_address LIKE %:eupMyeonDong%) " +
+        "AND status = 1",
+        nativeQuery = true)
+    List<BuildingEntity> assignedResearcher(@Param("eupMyeonDong") String eupMyeonDong);
+
 
     // ✅ NEW: 조건 검색 (읍면동 + 미배정 assignedUser IS NULL) — JPQL
     //  - status 컬럼이 아닌, 실제 배정 관계(assignedUser=null) 기준으로도 조회가 필요할 때 사용
@@ -153,9 +160,29 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
     @Modifying(clearAutomatically = false, flushAutomatically = true)
     @Query("""
       update BuildingEntity b
-         set b.assignedUser = :user
+        set b.assignedUser = :user,
+            b.status = 1
        where b.id in :ids
     """)
     int bulkAssign(@Param("user") UserAccountEntity user,
                    @Param("ids") List<Long> ids);
+
+    @Query(value = """
+        SELECT DISTINCT b.emd
+        FROM building b
+        WHERE (:city IS NULL OR :city = '' OR b.lot_address LIKE CONCAT('%', :city, '%'))
+        ORDER BY b.emd
+        """, nativeQuery = true)
+    List<String> findDistinctEmd(@Param("city") String city);
+
+    @Query(value = """
+        SELECT b.*
+        FROM building b
+        WHERE (b.lot_address LIKE CONCAT('%', :addr, '%')
+            OR b.road_address LIKE CONCAT('%', :addr, '%')
+            OR b.building_name LIKE CONCAT('%', :addr, '%'))
+        ORDER BY b.id DESC
+        LIMIT 1
+        """, nativeQuery = true)
+    Optional<BuildingEntity> findOneByFuzzyAddress(@Param("addr") String address);
 }

@@ -1,5 +1,6 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -80,6 +81,7 @@ public class BuildingEntity {
         foreignKey = @ForeignKey(name = "fk_building_assigned_user")
     )
     @ToString.Exclude
+    @JsonIgnore
     private UserAccountEntity assignedUser;
 
     /** ✅ 편의: 배정 여부 */
@@ -90,7 +92,7 @@ public class BuildingEntity {
 
     /** ✅ 편의: 배정자 PK (null-safe) */
     @Transient
-    public Integer getAssignedUserIdSafe() {
+    public Long getAssignedUserIdSafe() {
         return (assignedUser != null) ? assignedUser.getUserId() : null;
     }
 

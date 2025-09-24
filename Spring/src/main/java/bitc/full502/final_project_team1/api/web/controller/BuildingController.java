@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -107,7 +108,7 @@ public class BuildingController {
 
     // 📌 읍면동 목록 조회 (경상남도 김해시 기준)
     @GetMapping("/eupmyeondong")
-    public List<String> getEupMyeonDong(@RequestParam(defaultValue = "김해시") String city) {
+    public List<String> getEupMyeonDong(@RequestParam String city) {
         return buildingRepo.findDistinctEupMyeonDong(city);
     }
 
@@ -118,6 +119,11 @@ public class BuildingController {
         return buildingRepo.searchByEupMyeonDong(eupMyeonDong);
     }
 
+    @GetMapping("/search/assigned")
+    public List<BuildingEntity> assignedResearcher(
+        @RequestParam(required = false) String eupMyeonDong) {
+        return buildingRepo.assignedResearcher(eupMyeonDong);
+    }
     // 📌 [추가] 주소(lotAddress)로 위도/경도 조회
     @GetMapping("/coords")
     public ResponseEntity<?> getCoordsByAddress(@RequestParam String address) {
@@ -196,5 +202,69 @@ public class BuildingController {
         return new PageResponseDto<>(items, data.getTotalElements(), data.getTotalPages(), data.getNumber()+1, data.getSize());
     }
 
-    
+    // ✅ 조사원 배정 O + 결재자 미배정 목록 (필터: eupMyeonDong 선택 가능)
+//    예) GET /web/building/pending-approval?eupMyeonDong=강동
+    @GetMapping("/pending-approval")
+    public List<Map<String, Object>> getPendingApproval(@RequestParam(required = false) String eupMyeonDong) {
+        var rows = assignmentRepo.findAssignedWithoutApprover(eupMyeonDong); // ↓ 레포 추가 필요
+        List<Map<String, Object>> result = new ArrayList<>(rows.size());
+        for (var r : rows) {
+            Long researcherId = r.getUserId();
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", r.getId());
+            m.put("lotAddress", r.getLotAddress());
+            m.put("roadAddress", r.getRoadAddress());
+            m.put("buildingName", r.getBuildingName());
+            m.put("emd", r.getEmd());
+
+            // 프론트 호환 필드 (오른쪽 빨간 박스에 표시)
+            m.put("userId", researcherId);
+            m.put("user", Map.of("id", researcherId));  // addr.user?.id 케이스 호환
+
+            // 결재자 미배정
+            m.put("approvalId", r.getApprovalId());     // 항상 null
+
+            // 프론트의 isAssigned() 방어 통과용
+            m.put("status", 1);
+            m.put("assigned", true);
+
+            result.add(m);
+        }
+        return result;
+    }
+
+    // ✅ 결재자 배정 (조사원은 이미 배정되어 있어야 함)
+//    예) POST /web/building/assign-approver  { "userId": 123, "buildingIds": [1,2,3] }
+    @PostMapping("/assign-approver")
+    @Transactional
+    public ResponseEntity<?> assignApprover(@RequestBody AssignRequestDTO req) {
+        var approver = userRepo.findById(req.getUserId())
+            .orElseThrow(() -> new IllegalArgumentException("결재자 없음: " + req.getUserId()));
+
+        int count = 0;
+        for (Long buildingId : req.getBuildingIds()) {
+            var uba = assignmentRepo.findByBuildingId(buildingId)
+                .orElseThrow(() -> new IllegalArgumentException("배정 정보가 없습니다. buildingId=" + buildingId));
+
+            // 조사원(Researcher) 미배정이면 정책상 스킵하거나 에러로 처리
+            if (uba.getUser() == null && uba.getId() == null) {
+                // throw new IllegalStateException("조사원이 미배정입니다. buildingId=" + buildingId);
+                continue;
+            }
+
+            // 이미 결재자 있으면 스킵(중복 방지)
+            if (uba.getApprovalId() != null) continue;
+
+            uba.setApprovalId(approver.getUserId()); // 결재자 배정
+            // 상태 진행(선택): 2 = 결재 대기
+            if (uba.getStatus() == null || uba.getStatus() < 2) {
+                uba.setStatus(2);
+            }
+            count++;
+        }
+        return ResponseEntity.ok(Map.of("success", true, "assignedCount", count));
+    }
+
+
+
 }

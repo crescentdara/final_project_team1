@@ -152,7 +152,7 @@ public class SurveyResultServiceImpl implements SurveyResultService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SurveyResultEntity> findTempByUser(Integer userId) {
+    public List<SurveyResultEntity> findTempByUser(Long userId) {
         return surveyResultRepository.findByUser_UserIdAndStatus(userId, "TEMP");
     }
 

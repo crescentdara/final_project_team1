@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserAccountRepository extends JpaRepository<UserAccountEntity, Integer> {
+public interface UserAccountRepository extends JpaRepository<UserAccountEntity, Long> {
 
     Optional<UserAccountEntity> findByUsernameAndStatus(String username, Integer status);
 

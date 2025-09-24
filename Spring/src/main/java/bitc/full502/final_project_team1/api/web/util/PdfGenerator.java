@@ -10,7 +10,7 @@ import com.lowagie.text.pdf.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.net.HttpURLConnection;
+import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -109,36 +109,33 @@ public class PdfGenerator {
 
             document.add(table);
 
-            // ------------------ 3. 지도 이미지 ------------------
-            if (detail.getLatitude() != null && detail.getLongitude() != null) {
-                try {
-                    String mapUrl = String.format(
-                            "https://naveropenapi.apigw.ntruss.com/map-static/v2/raster?w=600&h=400&center=%f,%f&level=16",
-                            detail.getLongitude(), detail.getLatitude()
-                    );
-
-                    HttpURLConnection conn = (HttpURLConnection) new URL(mapUrl).openConnection();
-                    conn.setRequestProperty("X-NCP-APIGW-API-KEY-ID", clientId);
-                    conn.setRequestProperty("X-NCP-APIGW-API-KEY", clientSecret);
-
-                    try (java.io.InputStream is = conn.getInputStream()) {
-                        byte[] imageBytes = is.readAllBytes();
-                        Image mapImg = Image.getInstance(imageBytes);
-                        mapImg.scaleToFit(500, 350);
-                        mapImg.setSpacingAfter(15);
-                        document.add(new Paragraph("📍 건물 위치 지도", sectionFont));
-                        document.add(mapImg);
-                    }
-                } catch (Exception ex) {
-                    document.add(new Paragraph("지도 이미지 불러오기 실패: " + ex.getMessage()));
-                }
-            }
-
             // ------------------ 4. 사진 ------------------
             addImageIfExists(document, "외부 사진", detail.getExtPhoto());
             addImageIfExists(document, "외부 편집본", detail.getExtEditPhoto());
             addImageIfExists(document, "내부 사진", detail.getIntPhoto());
             addImageIfExists(document, "내부 편집본", detail.getIntEditPhoto());
+
+            // ------------------ 3. 지도 이미지 ------------------
+            if (detail.getLatitude() != null && detail.getLongitude() != null) {
+                try {
+                    String mapUrl = String.format(
+                            "https://static-maps.yandex.ru/1.x/?ll=%f,%f&z=16&size=600,400&l=map&pt=%f,%f,pm2rdm",
+                            detail.getLongitude(), detail.getLatitude(),
+                            detail.getLongitude(), detail.getLatitude()
+                    );
+
+                    Image mapImg = Image.getInstance(new URL(mapUrl));
+                    mapImg.scaleToFit(500, 350);
+                    mapImg.setSpacingBefore(15);  // 사진과 간격
+                    mapImg.setSpacingAfter(15);
+
+                    document.add(new Paragraph("건물 위치 지도", sectionFont));
+                    document.add(mapImg);
+
+                } catch (Exception ex) {
+                    document.add(new Paragraph("지도 이미지 불러오기 실패: " + ex.getMessage()));
+                }
+            }
 
             document.close();
             return fileName;

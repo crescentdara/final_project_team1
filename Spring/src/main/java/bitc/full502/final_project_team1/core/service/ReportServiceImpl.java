@@ -51,6 +51,9 @@ public class ReportServiceImpl implements ReportService {
                 clientSecret
         );
 
+        System.out.println("📌 Naver ClientId=" + clientId);
+        System.out.println("📌 Naver ClientSecret=" + clientSecret);
+
         ReportEntity report = ReportEntity.builder()
                 .surveyResult(surveyResult)
                 .approvedBy(approvedBy)

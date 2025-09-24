@@ -9,7 +9,7 @@ import lombok.*;
 public class SurveyListItemDto {
     private Long surveyId;
     private Long buildingId;
-    private String address;       // roadAddress 우선, 없으면 lotAddress
+    private String address;
     private String buildingName;
     private String status;        // REJECTED / APPROVED / SENT / TEMP
     private String updatedAtIso;  // 정렬/표시용

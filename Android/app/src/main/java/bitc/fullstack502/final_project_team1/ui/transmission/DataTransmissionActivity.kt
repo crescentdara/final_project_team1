@@ -15,7 +15,6 @@ import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
-import bitc.fullstack502.final_project_team1.ui.survey.SurveyResultDialog
 import bitc.fullstack502.final_project_team1.ui.surveyList.BuildingInfoBottomSheet
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import com.google.android.material.button.MaterialButton

@@ -15,7 +15,6 @@ import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
-import bitc.fullstack502.final_project_team1.ui.survey.SurveyResultDialog
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
@@ -90,7 +89,7 @@ class TransmissionCompleteActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         adapter = CompletedListAdapter(filteredDataList) { item ->
-            SurveyResultDialog(this, item.address) { /* 필요시 추가 액션 */ }.show()
+//            SurveyResultDialog(this, item.address) { /* 필요시 추가 액션 */ }.show()
         }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter

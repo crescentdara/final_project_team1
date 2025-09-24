@@ -162,7 +162,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                             setPadding(0,6,0,6)
                         })
                     }
-                    add("도로명주소", b.roadAddress)
+                    add("지번주소", b.lotAddress)
                     add("건물명", b.buildingName)
                     add("지상층수", b.groundFloors?.toString())
                     add("지하층수", b.basementFloors?.toString())
@@ -173,7 +173,6 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                     add("기타용도", b.etcUse)
                     add("구조", b.structureName)
                     add("높이(m)", b.height?.toString())
-                    add("지번주소", b.lotAddress)
                 }
                 .onFailure {
                     container.addView(TextView(requireContext()).apply {
@@ -282,7 +281,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
             })
         }
 
-        add("도로명주소", b.roadAddress)
+        add("지번주소", b.lotAddress)
         add("건물명", b.buildingName)
         add("지상층수", b.groundFloors?.toString())
         add("지하층수", b.basementFloors?.toString())
@@ -293,6 +292,5 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         add("기타용도", b.etcUse)
         add("구조", b.structureName)
         add("높이(m)", b.height?.toString())
-        add("지번주소", b.lotAddress)
     }
 }

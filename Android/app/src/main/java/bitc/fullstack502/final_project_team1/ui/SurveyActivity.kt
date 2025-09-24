@@ -59,6 +59,12 @@ class SurveyActivity : AppCompatActivity() {
     private val REQ_PICK_EXT    = 111
     private val REQ_PICK_INT    = 112
 
+    // ▼ 서버 저장된 이미지 URL 보관 (원본/편집 각각)
+    private var extPhotoUrl: String? = null
+    private var extEditPhotoUrl: String? = null
+    private var intPhotoUrl: String? = null
+    private var intEditPhotoUrl: String? = null
+
     // 전달값
     private var assignedBuildingId: Long = -1L
     private lateinit var tvAddress: TextView
@@ -124,14 +130,40 @@ class SurveyActivity : AppCompatActivity() {
 
         // ===== 사진 버튼 =====
         findViewById<ImageButton>(R.id.btn_extPhoto).setOnClickListener { startCamera(REQ_CAPTURE_EXT) }
+        // 외부 편집
         findViewById<ImageButton>(R.id.btn_extEditPhoto).setOnClickListener {
-            val src = extPhotoFile ?: return@setOnClickListener Toast.makeText(this, "외부 사진을 먼저 촬영하세요.", Toast.LENGTH_SHORT).show()
-            startEdit(REQ_EDIT_EXT, src)
+            lifecycleScope.launch {
+                val srcFile = when {
+                    extEditPhotoFile != null -> extEditPhotoFile
+                    !extEditPhotoUrl.isNullOrBlank() -> downloadRemoteToTemp(extEditPhotoUrl!!)
+                    extPhotoFile != null -> extPhotoFile
+                    !extPhotoUrl.isNullOrBlank() -> downloadRemoteToTemp(extPhotoUrl!!)
+                    else -> null
+                }
+                if (srcFile == null) {
+                    Toast.makeText(this@SurveyActivity, "외부 사진이 없습니다. 촬영/선택 후 편집하세요.", Toast.LENGTH_SHORT).show()
+                } else {
+                    startEdit(REQ_EDIT_EXT, srcFile)
+                }
+            }
         }
         findViewById<ImageButton>(R.id.btn_intPhoto).setOnClickListener { startCamera(REQ_CAPTURE_INT) }
+        // 내부 편집
         findViewById<ImageButton>(R.id.btn_intEditPhoto).setOnClickListener {
-            val src = intPhotoFile ?: return@setOnClickListener Toast.makeText(this, "내부 사진을 먼저 촬영하세요.", Toast.LENGTH_SHORT).show()
-            startEdit(REQ_EDIT_INT, src)
+            lifecycleScope.launch {
+                val srcFile = when {
+                    intEditPhotoFile != null -> intEditPhotoFile
+                    !intEditPhotoUrl.isNullOrBlank() -> downloadRemoteToTemp(intEditPhotoUrl!!)
+                    intPhotoFile != null -> intPhotoFile
+                    !intPhotoUrl.isNullOrBlank() -> downloadRemoteToTemp(intPhotoUrl!!)
+                    else -> null
+                }
+                if (srcFile == null) {
+                    Toast.makeText(this@SurveyActivity, "내부 사진이 없습니다. 촬영/선택 후 편집하세요.", Toast.LENGTH_SHORT).show()
+                } else {
+                    startEdit(REQ_EDIT_INT, srcFile)
+                }
+            }
         }
         findViewById<ImageButton>(R.id.btn_extGallery).setOnClickListener { openGallery(REQ_PICK_EXT) }
         findViewById<ImageButton>(R.id.btn_intGallery).setOnClickListener { openGallery(REQ_PICK_INT) }
@@ -140,6 +172,34 @@ class SurveyActivity : AppCompatActivity() {
         updateSubmitState()
         prefillIfPossible()
     }
+
+    private fun loadInto(ivId: Int, url: String?) {
+        if (url.isNullOrBlank()) return
+        val iv = findViewById<ImageView>(ivId)
+        com.bumptech.glide.Glide.with(this)
+            .load(url)
+            .placeholder(android.R.color.darker_gray)
+            .error(android.R.color.darker_gray)
+            .into(iv)
+    }
+
+    // 서버 이미지를 임시 파일로 다운로드 (편집에 필요)
+    private suspend fun downloadRemoteToTemp(url: String): File? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        try {
+            val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val out = File.createTempFile("REMOTE_${ts}_", ".jpg", dir)
+
+            java.net.URL(url).openStream().use { input ->
+                out.outputStream().use { output -> input.copyTo(output) }
+            }
+            out
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 
     private fun openGallery(requestCode: Int) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -536,6 +596,22 @@ class SurveyActivity : AppCompatActivity() {
                     loadRemotePhotoFlag(detail.extEditPhoto) { hasExtEditPhotoRemote = it }
                     loadRemotePhotoFlag(detail.intPhoto)     { hasIntPhotoRemote = it }
                     loadRemotePhotoFlag(detail.intEditPhoto) { hasIntEditPhotoRemote = it }
+
+                    // ▼ URL 보관
+                    extPhotoUrl     = detail.extPhoto
+                    extEditPhotoUrl = detail.extEditPhoto
+                    intPhotoUrl     = detail.intPhoto
+                    intEditPhotoUrl = detail.intEditPhoto
+
+                    // ▼ 서버 보유 플래그
+                    hasExtPhotoRemote     = !extPhotoUrl.isNullOrBlank()
+                    hasExtEditPhotoRemote = !extEditPhotoUrl.isNullOrBlank()
+                    hasIntPhotoRemote     = !intPhotoUrl.isNullOrBlank()
+                    hasIntEditPhotoRemote = !intEditPhotoUrl.isNullOrBlank()
+
+                    // ▼ 화면에 표시: 편집본 우선, 없으면 원본
+                    loadInto(R.id.img_extPhoto, extEditPhotoUrl ?: extPhotoUrl)
+                    loadInto(R.id.img_intPhoto, intEditPhotoUrl ?: intPhotoUrl)
                 }
             } catch (e: Exception) {
                 val msg = if (e is retrofit2.HttpException) "HTTP ${e.code()}" else e.message ?: ""

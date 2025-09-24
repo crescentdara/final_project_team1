@@ -20,7 +20,6 @@ public class BuildingServiceImpl implements BuildingService {
         return AppBuildingDetailDto.builder()
                 .id(entity.getId())
                 .lotAddress(entity.getLotAddress())
-                .roadAddress(entity.getRoadAddress())
                 .buildingName(entity.getBuildingName())
                 .groundFloors(entity.getGroundFloors())
                 .basementFloors(entity.getBasementFloors())

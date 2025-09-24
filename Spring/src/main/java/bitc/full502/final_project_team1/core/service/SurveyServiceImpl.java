@@ -131,8 +131,8 @@ public class SurveyServiceImpl implements SurveyService {
 
     private SurveyListItemDto toItemWithReason(SurveyResultEntity s, String latestRejectReason) {
         var b = s.getBuilding();
-        String address = (b.getRoadAddress() != null && !b.getRoadAddress().isBlank())
-                ? b.getRoadAddress() : b.getLotAddress();
+        String address = (b.getLotAddress() != null && !b.getLotAddress().isBlank())
+                ? b.getLotAddress() : b.getRoadAddress();
 
         // REJECTED일 때만 노출하고, 없으면 null(또는 폴백으로 s.getIntEtc())
         String rejectReason = null;

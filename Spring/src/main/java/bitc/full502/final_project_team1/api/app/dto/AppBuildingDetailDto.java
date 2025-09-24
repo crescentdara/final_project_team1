@@ -13,7 +13,6 @@ public class AppBuildingDetailDto {
     private Long id;
 
     private String lotAddress;      // 번지주소
-    private String roadAddress;     // 도로명주소
 
     private String buildingName;    // 건물명
     private Integer groundFloors;   // 지상층수

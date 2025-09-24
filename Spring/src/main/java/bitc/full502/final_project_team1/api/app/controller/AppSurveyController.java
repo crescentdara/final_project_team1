@@ -20,8 +20,7 @@ public class AppSurveyController {
     // ex) GET /api/mobile/surveys/assigned?userId=7
     @GetMapping("/assigned")
     public List<AssignedBuildingDto> assigned(
-            @RequestParam Integer userId
-            // TODO: 인증 연동 시 → userId를 토큰/세션에서 읽도록 변경 (기존 웹 미변경)
+            @RequestParam Long userId
     ) {
         return appSurveyService.assigned(userId);
     }
@@ -29,7 +28,7 @@ public class AppSurveyController {
     // ex) GET /api/mobile/surveys/assigned/nearby?userId=7&lat=37.5&lng=127.0&radiusKm=2
     @GetMapping("/assigned/nearby")
     public List<AssignedBuildingDto> assignedNearby(
-            @RequestParam Integer userId,
+            @RequestParam Long userId,
             @RequestParam double lat,
             @RequestParam double lng,
             @RequestParam double radiusKm

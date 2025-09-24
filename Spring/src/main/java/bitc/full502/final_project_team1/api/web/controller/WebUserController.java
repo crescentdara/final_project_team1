@@ -120,7 +120,7 @@ public class WebUserController {
 
     /** 단건 상세 */
     @GetMapping("/users/{userId}")
-    public UserDetailDto userDetail(@PathVariable Integer userId) {
+    public UserDetailDto userDetail(@PathVariable Long userId) {
         UserAccountEntity u = userRepo.findById(userId).orElseThrow();
         return UserDetailDto.from(u);
     }
@@ -140,7 +140,7 @@ public class WebUserController {
 
     /** 배정 목록 */
     @GetMapping("/users/{userId}/assignments")
-    public List<Map<String, Object>> assignments(@PathVariable Integer userId) {
+    public List<Map<String, Object>> assignments(@PathVariable Long userId) {
         return assignmentService.getAssignments(userId);
     }
 

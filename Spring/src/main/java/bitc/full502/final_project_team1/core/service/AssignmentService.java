@@ -56,7 +56,7 @@ public class AssignmentService {
 
     // 유저별 배정 목록을 (buildingId, lotAddress) 맵으로 반환
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> getAssignments(Integer userId) {
+    public List<Map<String, Object>> getAssignments(Long userId) {
         List<Object[]> rows = assignRepo.findPairsByUserId(userId);
         List<Map<String, Object>> out = new ArrayList<>(rows.size());
         for (Object[] r : rows) {

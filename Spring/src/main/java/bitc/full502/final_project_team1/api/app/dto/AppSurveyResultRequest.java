@@ -23,5 +23,5 @@ public class AppSurveyResultRequest {
     private String intEditPhoto;
     private String status;
     private Long buildingId;
-    private Integer userId;
+    private Long userId;
 }

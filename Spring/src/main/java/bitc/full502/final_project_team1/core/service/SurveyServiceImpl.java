@@ -26,7 +26,7 @@ public class SurveyServiceImpl implements SurveyService {
     private final ApprovalRepository approvalRepository;
 
     @Override
-    public List<AssignedBuildingDto> assigned(Integer userId) {
+    public List<AssignedBuildingDto> assigned(Long userId) {
         List<Object[]> rows = appAssignmentQueryRepository.findAssignedAll(userId);
         return rows.stream()
                 .map(this::toDtoNoDistance)
@@ -34,7 +34,7 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public List<AssignedBuildingDto> assignedWithin(Integer userId, double lat, double lng, double radiusKm) {
+    public List<AssignedBuildingDto> assignedWithin(Long userId, double lat, double lng, double radiusKm) {
         double meters = radiusKm * 1000.0;
         List<Object[]> rows = appAssignmentQueryRepository.findAssignedWithin(userId, lat, lng, meters);
         return rows.stream()
@@ -76,7 +76,7 @@ public class SurveyServiceImpl implements SurveyService {
     private String toStr(Object o) { return o == null ? null : o.toString(); }
 
     @Override
-    public AppUserSurveyStatusResponse getStatus(Integer userId) {
+    public AppUserSurveyStatusResponse getStatus(Long userId) {
         Map<String, Long> counts = surveyResultRepository.countGroupByStatus(userId).stream()
                 .collect(Collectors.toMap(SurveyResultRepository.StatusCount::getStatus,
                         SurveyResultRepository.StatusCount::getCnt));
@@ -91,7 +91,7 @@ public class SurveyServiceImpl implements SurveyService {
 
     @Override
     public ListWithStatusResponse<SurveyListItemDto> getListWithStatus(
-            Integer userId, String status, int page, int size
+            Long userId, String status, int page, int size
     ) {
         Page<SurveyResultEntity> p = surveyResultRepository.findByUserAndStatusPage(
                 userId, status, PageRequest.of(page, size));

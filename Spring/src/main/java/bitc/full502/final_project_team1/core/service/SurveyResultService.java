@@ -18,7 +18,7 @@ public interface SurveyResultService {
     SurveyResultEntity updateSurvey(Long id, AppSurveyResultRequest dto,
                                     MultipartFile extPhoto, MultipartFile extEditPhoto,
                                     MultipartFile intPhoto, MultipartFile intEditPhoto);
-    List<SurveyResultEntity> findTempByUser(Integer userId);
+    List<SurveyResultEntity> findTempByUser(Long userId);
 
     /** 상태/키워드 검색 (키워드가 공백/빈문자면 전체 검색) */
     Page<SurveyResultEntity> search(String status, String rawKw, Pageable pageable);
@@ -35,5 +35,5 @@ public interface SurveyResultService {
 
     Optional<SurveyResultEntity> findByIdWithUserAndBuilding(Long id);
 
-    Optional<SurveyResultEntity> findLatestByUserAndBuilding(Integer userId, Long buildingId);
+    Optional<SurveyResultEntity> findLatestByUserAndBuilding(Long userId, Long buildingId);
 }

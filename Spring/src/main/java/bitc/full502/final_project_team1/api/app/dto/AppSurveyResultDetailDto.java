@@ -28,7 +28,7 @@ public class AppSurveyResultDetailDto {
 
     private String status;            // TEMP / SENT / REJECTED / APPROVED
     private Long buildingId;
-    private Integer userId;
+    private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

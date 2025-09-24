@@ -28,7 +28,7 @@ public class AppSurveyResultController {
     // ─────────────────────────────────────────────────────────────────
     @GetMapping("/{id}")
     public ResponseEntity<AppSurveyResultResponse> getOne(
-            @RequestHeader("X-USER-ID") Integer userId,
+            @RequestHeader("X-USER-ID") Long userId,
             @PathVariable Long id
     ) {
         return surveyResultService.findByIdWithUserAndBuilding(id)
@@ -44,7 +44,7 @@ public class AppSurveyResultController {
     // ─────────────────────────────────────────────────────────────────
     @GetMapping("/latest")
     public ResponseEntity<AppSurveyResultResponse> getLatest(
-            @RequestHeader("X-USER-ID") Integer userId,
+            @RequestHeader("X-USER-ID") Long userId,
             @RequestParam Long buildingId
     ) {
         return surveyResultService.findLatestByUserAndBuilding(userId, buildingId)

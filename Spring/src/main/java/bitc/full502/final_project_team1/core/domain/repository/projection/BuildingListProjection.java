@@ -6,7 +6,7 @@ public interface BuildingListProjection {
     String getRoadAddress();
 
     Integer getAssigned();          // 1 or 0 (CASE WHEN …)
-    Integer getAssignedUserId();
+    Long getAssignedUserId();
     String  getAssignedUserName();
 
     Long    getResultId();

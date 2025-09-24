@@ -152,7 +152,7 @@ public class SurveyResultServiceImpl implements SurveyResultService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SurveyResultEntity> findTempByUser(Integer userId) {
+    public List<SurveyResultEntity> findTempByUser(Long userId) {
         return surveyResultRepository.findByUser_UserIdAndStatus(userId, "TEMP");
     }
 
@@ -207,7 +207,7 @@ public class SurveyResultServiceImpl implements SurveyResultService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<SurveyResultEntity> findLatestByUserAndBuilding(Integer userId, Long buildingId) {
+    public Optional<SurveyResultEntity> findLatestByUserAndBuilding(Long userId, Long buildingId) {
         // 최신(updatedAt 우선, 없으면 createdAt) 1건
         return surveyResultRepository
                 .findTopByUser_UserIdAndBuilding_IdOrderByUpdatedAtDescCreatedAtDesc(userId, buildingId);

@@ -10,7 +10,7 @@ public class BuildingListItemDto {
     private String roadAddress;
 
     private boolean assigned;          // 배정 여부
-    private Integer assignedUserId;
+    private Long assignedUserId;
     private String  assignedUserName;
 
     private String  resultStatus;      // 최신 조사/결재 상태 (e.g. APPROVED/SENT/TEMP/...)

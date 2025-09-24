@@ -17,7 +17,7 @@ public class UserStatusServiceImpl implements UserStatusService {
 
     @Override
     @Transactional(readOnly = true)
-    public AppUserSurveyStatusResponse getUserStatus(Integer userId) {
+    public AppUserSurveyStatusResponse getUserStatus(Long userId) {
 
         Map<String, Long> counts = surveyResultRepository.countGroupByStatus(userId).stream()
                 .collect(Collectors.toMap(

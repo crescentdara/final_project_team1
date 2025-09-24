@@ -28,29 +28,22 @@ public class SurveyResultController {
     private final SurveyResultRepository repo;
     private final ReportService reportService;
     private final UserAccountRepository userRepo;
-    
+
     // 리스트 조회
     @GetMapping("/approvals")
     public PageResponseDto<ApprovalItemDto> list(
-            @RequestParam(defaultValue = "") String status,
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "latest") String sort,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "false") boolean requireKeyword
+            @RequestParam(defaultValue = "10") int size
     ) {
         Sort s = "oldest".equalsIgnoreCase(sort)
                 ? Sort.by(Sort.Direction.ASC, "id")
                 : Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.max(1, size), s);
 
-        // 공백/빈 문자열 입력 시 조회 안되도록
-//        String kw = keyword == null ? "" : keyword.trim();
-//        if (requireKeyword && kw.isEmpty()) {
-//            return new PageResponseDto<>(List.of(), 0, 0, page, size);
-//        }
-
-        Page<SurveyResultEntity> data = surveyResultService.search(status, keyword, pageable);
+        // 🔹 status 무조건 SENT 로 강제
+        Page<SurveyResultEntity> data = surveyResultService.search("SENT", keyword, pageable);
 
         var rows = data.getContent().stream()
                 .map(ApprovalItemDto::from)
@@ -64,6 +57,8 @@ public class SurveyResultController {
                 data.getSize()
         );
     }
+
+
 
     /** 상세 */
     @GetMapping("/approvals/{id}")

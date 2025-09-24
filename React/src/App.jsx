@@ -58,19 +58,17 @@ function App() {
                         element={
                             <div>
                                 <h2>메인 페이지</h2>
-                                <Link to="/surveyList" className="btn btn-primary mt-3">SurveyList 페이지로 이동</Link>
-                                <Link to="/createSurvey" className="btn btn-primary mt-3">CreateSurvey 페이지로 이동</Link>
-                                <Link to="/createUser" className="btn btn-primary mt-3">CreateUser 페이지로 이동</Link>
-                                <Link to="/dashboard" className="btn btn-primary mt-3">Dashboard 페이지로 이동</Link>
-                                <Link to="/resultReport" className="btn btn-primary mt-3">Report 페이지로 이동</Link>
-                                <Link to="/users" className="btn btn-outline-secondary me-3">조사원 상세정보</Link>
-                                <Link to="/approvals" className="btn btn-outline-primary me-3">결재 대기 중</Link>
-                                <Link to="/survey" className="btn btn-outline-info">전체 조사 목록</Link>
-                                <Link to="/login" className="btn btn-outline-info">Login 페이지로 이동</Link>
-                                <Link to="/buildingUpload" className="btn btn-primary mt-3">다건 등록 페이지로 이동</Link>
-                                <Link to="/messageTabs" className="btn btn-primary mt-3">messageTabs 페이지로 이동</Link>
-
-                                <Link to="/surveyIndex" className="btn btn-primary mt-3">surveyIndex 페이지로 이동</Link>
+                                <Link to="/surveyList" className="btn btn-primary mt-3">미배정 조사지 목록</Link>
+                                <Link to="/createSurvey" className="btn btn-primary mt-3 ms-2">조사지 생성</Link>
+                                <Link to="/createUser" className="btn btn-primary mt-3 ms-2">조사원 생성</Link>
+                                <Link to="/dashboard" className="btn btn-primary mt-3 ms-2">통계</Link>
+                                <Link to="/resultReport" className="btn btn-primary mt-3 ms-2">결재 완료</Link>
+                                <Link to="/users" className="btn btn-primary mt-3 ms-2">조사원 상세정보</Link>
+                                <Link to="/approvals" className="btn btn-primary mt-3 ms-2">결재 대기 중</Link>
+                                <Link to="/login" className="btn btn-primary mt-3 ms-2">로그인</Link>
+                                <Link to="/buildingUpload" className="btn btn-primary mt-3 ms-2">다건 등록</Link>
+                                <Link to="/messageTabs" className="btn btn-primary mt-3 ms-2">메시지 전송</Link>
+                                <Link to="/surveyIndex" className="btn btn-primary mt-3 ms-2">전체 조사지 리스트</Link>
                             </div>
                         }
                     />
@@ -83,7 +81,6 @@ function App() {
                     <Route path="/resultReport" element={<ResultReport />} />
                     <Route path="/users" element={<UserDetail />} />
                     <Route path="/approvals" element={<ApprovalFilters />} />
-                    <Route path="/survey" element={<TotalSurveyList />} />
 
                     {/* 로그인 페이지 */}
                     <Route path="/login" element={<Login onLogin={handleLogin} />} />

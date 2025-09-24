@@ -12,35 +12,50 @@ import java.util.List;
 public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEntity, Long> {
 
     @Query(value = """
-        SELECT 
-          b.id,
-          b.lot_address,
-          b.latitude,
-          b.longitude,
-          (6371000 * ACOS(LEAST(1, GREATEST(-1,
-            COS(RADIANS(:lat)) * COS(RADIANS(b.latitude)) * COS(RADIANS(b.longitude) - RADIANS(:lng))
-            + SIN(RADIANS(:lat)) * SIN(RADIANS(b.latitude))
-          )))) AS distance_m,
-          a.assigned_at                                       -- ★ 추가
-        FROM user_building_assignment a
-        JOIN building b ON b.id = a.building_id
-        WHERE a.user_id = :userId
-          AND b.latitude  IS NOT NULL                         -- ★ null 좌표 방지
-          AND b.longitude IS NOT NULL
-        HAVING distance_m <= :radiusMeters
-        ORDER BY distance_m ASC
-        """, nativeQuery = true)
+    SELECT 
+      b.id,
+      b.lot_address,
+      b.latitude,
+      b.longitude,
+      (6371000 * ACOS(LEAST(1, GREATEST(-1,
+        COS(RADIANS(:lat)) * COS(RADIANS(b.latitude)) * COS(RADIANS(b.longitude) - RADIANS(:lng))
+        + SIN(RADIANS(:lat)) * SIN(RADIANS(b.latitude))
+      )))) AS distance_m,
+      a.assigned_at
+    FROM java502_team1_final_db.user_building_assignment a
+    JOIN java502_team1_final_db.building b 
+         ON b.id = a.building_id
+    LEFT JOIN java502_team1_final_db.survey_result sr
+         ON sr.building_id = a.building_id
+        AND sr.user_id     = a.user_id
+    WHERE a.user_id = :userId
+      AND a.status  = 1                   -- 배정 상태만
+      AND b.latitude  IS NOT NULL
+      AND b.longitude IS NOT NULL
+      AND sr.id IS NULL                   -- ✅ 조사결과가 전혀 없는 것만
+    HAVING distance_m <= :radiusMeters
+    ORDER BY distance_m ASC
+    """, nativeQuery = true)
     List<Object[]> findAssignedWithin(@Param("userId") Long userId,
                                       @Param("lat") double lat,
                                       @Param("lng") double lng,
                                       @Param("radiusMeters") double radiusMeters);
 
+
     @Query("""
-        select b.id, b.lotAddress, b.latitude, b.longitude, a.assignedAt
-        from UserBuildingAssignmentEntity a
-        join a.building b
-        where a.user.userId = :userId
-        order by a.assignedAt desc
-        """)
+    select b.id, b.lotAddress, b.latitude, b.longitude, a.assignedAt
+    from UserBuildingAssignmentEntity a
+    join a.building b
+    where a.user.userId = :userId
+      and a.status = 1
+      and not exists (
+          select 1
+          from SurveyResultEntity sr
+          where sr.user.userId = :userId
+            and sr.building.id = b.id
+      )
+    order by a.assignedAt desc
+    """)
     List<Object[]> findAssignedAll(@Param("userId") Long userId);
+
 }

@@ -67,4 +67,18 @@ public class AssignmentService {
         }
         return out;
     }
+
+    /** 조사 거절 **/
+    @Transactional
+    public void rejectAssignment(Long buildingId) {
+        // 1. 배정 삭제
+        assignRepo.deleteById(buildingId);
+
+        // 2. 건물 상태 = 미배정(0)
+        BuildingEntity building = buildingRepo.findById(buildingId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 건물이 존재하지 않습니다."));
+        building.setStatus(0);
+        buildingRepo.save(building);
+    }
+
 }

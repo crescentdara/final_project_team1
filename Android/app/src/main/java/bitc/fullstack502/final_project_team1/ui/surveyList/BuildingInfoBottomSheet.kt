@@ -12,13 +12,11 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import bitc.fullstack502.final_project_team1.R
-import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
 import bitc.fullstack502.final_project_team1.ui.SurveyActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
 class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
@@ -80,18 +78,35 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
+        val btnReject = view.findViewById<Button>(R.id.btnRejectSurvey) // ✅ 새로 추가
         val info = view.findViewById<LinearLayout>(R.id.infoContainer)
 
-        view.findViewById<TextView?>(R.id.tvRejectReason)?.let { tv ->
-            val reason = arguments?.getString(ARG_REJECT_REASON).orEmpty()
-            if (reason.isNotBlank()) tv.text = getString(R.string.reject_reason_fmt, reason)
-        }
-        view.findViewById<TextView?>(R.id.tvRejectedAt)?.let { tv ->
-            val dt = arguments?.getString(ARG_REJECTED_AT).orEmpty()
-            if (dt.isNotBlank()) tv.text = getString(R.string.rejected_at_fmt, dt)
+        // ✅ 조사 거절 버튼 동작
+        btnReject.setOnClickListener {
+            if (buildingId <= 0) {
+                Toast.makeText(requireContext(), "잘못된 건물 ID입니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                runCatching { ApiClient.service.rejectAssignment(buildingId) }
+                    .onSuccess { resp ->
+                        if (resp.isSuccessful) {
+                            Toast.makeText(requireContext(), "조사를 거절했습니다.", Toast.LENGTH_SHORT).show()
+                            dismiss()
+                            // ✅ 부모 액티비티에 리스트 새로고침 신호 보내기
+                            (activity as? SurveyListActivity)?.refreshAssignments()
+                        } else {
+                            Toast.makeText(requireContext(), "거절 실패: ${resp.code()}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .onFailure {
+                        Toast.makeText(requireContext(), "에러: ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
         }
 
-        // 버튼 라벨/동작 분기
+        // 기존 조사 시작 버튼 분기
         if (mode == "REINSPECT") {
             btnStart.text = getString(R.string.reinspect_start)
             btnStart.setOnClickListener { startReinspectThenOpenEditor() }
@@ -123,7 +138,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
             putExtra(SurveyActivity.EXTRA_MODE, "REINSPECT")
             putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
-            putExtra(SurveyActivity.EXTRA_SURVEY_ID, surveyId)   // ✅ 꼭 넘김
+            putExtra(SurveyActivity.EXTRA_SURVEY_ID, surveyId)
             putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
         startActivity(intent)
@@ -133,7 +148,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
     private fun openEditorNew() {
         val intent = Intent(requireContext(), SurveyActivity::class.java).apply {
             putExtra(SurveyActivity.EXTRA_MODE, "CREATE")
-            putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId) // ✅ 상수 사용
+            putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
             putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
         startActivity(intent)

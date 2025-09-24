@@ -23,7 +23,6 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-
 // ApiService.kt
 interface ApiService {
 
@@ -64,7 +63,6 @@ interface ApiService {
         @Part intEditPhoto: MultipartBody.Part?
     ): Response<SurveyResultResponse>
 
-    // (옵션) 수정 => PUT /app/survey/result/edit/{id}
     @Multipart
     @PUT("survey/result/edit/{id}")
     suspend fun updateSurvey(
@@ -79,15 +77,12 @@ interface ApiService {
     @GET("survey/result/{id}")
     suspend fun getSurvey(@Path("id") id: Long): Response<SurveyResultResponse>
 
-
-    // ===== 여기부터 목록/카운트 경로 교체 =====
-    /** 상단 카운트 (서버: GET /app/survey/status/status, Header: X-USER-ID) */
+    // ===== 목록/카운트 경로 =====
     @GET("survey/status/status")
     suspend fun getSurveyStatus(
         @Header("X-USER-ID") userId: Long
     ): AppUserSurveyStatusResponse
 
-    /** 목록 + 카운트 (서버: GET /app/survey/status, Header: X-USER-ID, status optional) */
     @GET("survey/status")
     suspend fun getSurveys(
         @Header("X-USER-ID") userId: Long,
@@ -96,7 +91,6 @@ interface ApiService {
         @Query("size") size: Int = 50
     ): ListWithStatusResponse<SurveyListItemDto>
 
-    /** 재조사 목록 (status=REJECTED 고정) */
     @GET("survey/status")
     suspend fun getSurveysReJe(
         @Header("X-USER-ID") userId: Long,
@@ -105,14 +99,12 @@ interface ApiService {
         @Query("size") size: Int = 50
     ): ListWithStatusResponse<SurveyListItemDto>
 
-    /** 재조사 시작 경로는 서버 구현에 맞춰 조정 필요 */
     @POST("survey/reinspect/{surveyId}/redo/start")
     suspend fun startRedo(
         @Header("X-USER-ID") userId: Long,
         @Path("surveyId") surveyId: Long
     ): ResponseBody
 
-    // network/ApiService.kt (추가)
     @GET("surveys/{id}")
     suspend fun getSurveyDetail(
         @Header("X-USER-ID") userId: Long,
@@ -125,4 +117,9 @@ interface ApiService {
         @Query("buildingId") buildingId: Long
     ): SurveyResultDetailDto?
 
+    // ✅ 조사 거절 API 추가
+    @POST("assigned/reject")
+    suspend fun rejectAssignment(
+        @Query("buildingId") buildingId: Long
+    ): Response<Void>
 }

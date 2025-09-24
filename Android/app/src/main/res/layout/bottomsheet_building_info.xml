@@ -1,46 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp">
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="16dp">
 
     <!-- (선택) 반려 정보 -->
     <TextView
-        android:id="@+id/tvRejectReason"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textColor="#B00020"
-        android:textStyle="bold"
-        android:visibility="visible"
-        android:paddingBottom="4dp" />
+            android:id="@+id/tvRejectReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#B00020"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:paddingBottom="0dp"
+            android:layout_marginBottom="0dp"/>
 
     <TextView
-        android:id="@+id/tvRejectedAt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:paddingBottom="12dp" />
+            android:id="@+id/tvRejectedAt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:visibility="gone"
+            android:paddingBottom="0dp"
+            android:layout_marginBottom="0dp"/>
 
-    <!-- 조사시작 / 재조사 시작 버튼 (코드에서 텍스트 변경) -->
+    <!-- 조사시작 / 재조사 시작 버튼 -->
     <Button
-        android:id="@+id/btnStartSurvey"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="조사결과 입력하기"
-        android:textStyle="bold" />
+            android:id="@+id/btnStartSurvey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="조사결과 입력하기"
+            android:textStyle="bold"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"/>
 
-    <!-- 건물 정보 -->
+    <!-- 건물 정보 스크롤 영역 -->
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp">
 
         <LinearLayout
-            android:id="@+id/infoContainer"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                android:id="@+id/infoContainer"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"/>
     </ScrollView>
 </LinearLayout>

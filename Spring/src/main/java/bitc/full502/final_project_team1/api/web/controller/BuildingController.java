@@ -1,23 +1,25 @@
 package bitc.full502.final_project_team1.api.web.controller;
 
-import bitc.full502.final_project_team1.api.web.dto.AssignRequestDTO;
-import bitc.full502.final_project_team1.api.web.dto.BuildingDTO;
-import bitc.full502.final_project_team1.api.web.dto.BuildingListItemDto;
-import bitc.full502.final_project_team1.api.web.dto.PageResponseDto;
+import bitc.full502.final_project_team1.api.web.dto.*;
 import bitc.full502.final_project_team1.core.domain.entity.BuildingEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmentEntity;
+import bitc.full502.final_project_team1.core.domain.enums.Role;
 import bitc.full502.final_project_team1.core.domain.repository.BuildingRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserBuildingAssignmentRepository;
+import bitc.full502.final_project_team1.core.service.BuildingService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +31,7 @@ public class BuildingController {
     private final BuildingRepository buildingRepo;
     private final UserAccountRepository userRepo;
     private final UserBuildingAssignmentRepository assignmentRepo;
+    private final BuildingService buildingService;
 
     // 📌 전체 건물 목록 조회
     @GetMapping
@@ -160,7 +163,49 @@ public class BuildingController {
         return ResponseEntity.ok(Map.of("success", true, "assignedCount", assignments.size()));
     }
 
-    // 조사 목록 리스트 생성 부분
+    @GetMapping("/surveys")
+    public PageResponseDto<BuildingListItemDto> list(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "ALL") String filter,
+            @RequestParam(defaultValue = "1")  int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        var pageable = PageRequest.of(Math.max(0, page-1), Math.max(1, size), Sort.by(Sort.Direction.DESC, "id"));
+        var data = buildingRepo.searchBuildings(keyword, filter, pageable); // ← 메서드 사용
+        var items = data.getContent().stream().map(BuildingListItemDto::from).toList();
+        return new PageResponseDto<>(items, data.getTotalElements(), data.getTotalPages(), data.getNumber()+1, data.getSize());
+    }
+
+    // 📌 [수정] 미배정 조사지 + 조사원 목록 조회 (전체 리스트 반환)
+    @GetMapping("/unassigned")
+    public Map<String, Object> getUnassignedBuildings(
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String keyword
+    ) {
+        // 1. 미배정 건물(status=0)
+        List<BuildingEntity> results = buildingRepo.findUnassignedByRegion(region);
+
+        // 2. 조사원 조회 (region + keyword 반영)
+        List<UserAccountEntity> investigators;
+        if (region == null || region.isBlank()) {
+            investigators = (keyword == null || keyword.isBlank())
+                    ? userRepo.findByRole(Role.RESEARCHER)
+                    : userRepo.findByRoleAndKeyword(Role.RESEARCHER, keyword);
+        } else {
+            investigators = (keyword == null || keyword.isBlank())
+                    ? userRepo.findByRoleAndPreferredRegionLike(Role.RESEARCHER, region)
+                    : userRepo.findByRoleAndPreferredRegionAndKeyword(Role.RESEARCHER, region, keyword);
+        }
+
+        // 3. 응답
+        return Map.of(
+                "results", results,
+                "totalResults", results.size(),
+                "investigators", investigators
+        );
+    }
+
+    // 조사 목록 리스트 생성 부분 (단건 등록)
     @PostMapping
     public ResponseEntity<String> createBuilding(@RequestBody BuildingDTO dto) {
         BuildingEntity entity = new BuildingEntity();
@@ -183,18 +228,21 @@ public class BuildingController {
         return ResponseEntity.ok("저장 완료");
     }
 
-    @GetMapping("/surveys")
-    public PageResponseDto<BuildingListItemDto> list(
-            @RequestParam(defaultValue = "") String keyword,
-            @RequestParam(defaultValue = "ALL") String filter,
-            @RequestParam(defaultValue = "1")  int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
-        var pageable = PageRequest.of(Math.max(0, page-1), Math.max(1, size), Sort.by(Sort.Direction.DESC, "id"));
-        var data = buildingRepo.searchBuildings(keyword, filter, pageable); // ← 메서드 사용
-        var items = data.getContent().stream().map(BuildingListItemDto::from).toList();
-        return new PageResponseDto<>(items, data.getTotalElements(), data.getTotalPages(), data.getNumber()+1, data.getSize());
+    // 엑셀을 이용한 조사 목록 리스트 생성 (다건 등록)
+    @PostMapping("/upload-excel")
+    public ResponseEntity<UploadResultDTO> uploadBuildings(@RequestParam("file") MultipartFile file) {
+        try {
+            UploadResultDTO uploadResult = buildingService.saveBuildingsFromExcel(file);
+            return ResponseEntity.ok(uploadResult);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    UploadResultDTO.builder()
+                            .successCount(0)
+                            .failCount(1)
+                            .failMessages(List.of("업로드 실패: " + e.getMessage()))
+                            .build()
+            );
+        }
     }
 
-    
 }

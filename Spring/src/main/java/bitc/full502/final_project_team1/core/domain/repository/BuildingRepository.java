@@ -115,4 +115,37 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
                                                   Pageable pageable
     );
 
+<<<<<<< HEAD
+=======
+    // 📌 읍/면/동 단위까지만 자르기 (면/읍은 우선적으로 끊음)
+    @Query(value = """
+    SELECT DISTINCT
+           TRIM(
+               SUBSTRING(lot_address, 1,
+                   CASE
+                       WHEN LOCATE('읍', REVERSE(lot_address)) > 0 
+                            THEN CHAR_LENGTH(lot_address) - LOCATE('읍', REVERSE(lot_address)) + 1
+                       WHEN LOCATE('면', REVERSE(lot_address)) > 0 
+                            THEN CHAR_LENGTH(lot_address) - LOCATE('면', REVERSE(lot_address)) + 1
+                       WHEN LOCATE('동', REVERSE(lot_address)) > 0 
+                            THEN CHAR_LENGTH(lot_address) - LOCATE('동', REVERSE(lot_address)) + 1
+                       ELSE CHAR_LENGTH(lot_address)
+                   END
+               )
+           ) AS region
+    FROM building
+    WHERE (:city IS NULL OR lot_address LIKE CONCAT('%', :city, '%'))
+    """, nativeQuery = true)
+    List<String> findDistinctRegions(@Param("city") String city);
+
+
+    // 📌 미배정(status=0) + region 조건 (없으면 전체) - 전체 리스트 반환
+    @Query(value = """
+    SELECT * FROM building
+    WHERE status = 0
+      AND (:region IS NULL OR :region = '' OR lot_address LIKE %:region%)
+    """, nativeQuery = true)
+    List<BuildingEntity> findUnassignedByRegion(@Param("region") String region);
+
+>>>>>>> origin/app/hsm/ResultDesign
 }

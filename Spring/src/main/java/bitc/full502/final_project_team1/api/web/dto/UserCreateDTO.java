@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserCreateDTO {
 
-    private String name;       // 이름
-    private String username;   // 아이디
-    private String password;   // 비밀번호
-    private String empNo;      // 사번
+    private String name;             // 이름
+    private String username;         // 아이디
+    private String password;         // 비밀번호
+    private String empNo;            // 사번
+    private String preferredRegion;  // 선호 지역
 }

@@ -18,13 +18,13 @@ function SurveyList() {
     // ✅ 조사자 관련 상태
     const [users, setUsers] = useState([]); // 조사자 목록
     const [selectedUser, setSelectedUser] = useState(null); // 선택된 조사자
-    const [userKeyword, setUserKeyword] = useState(""); // 🔍 대상자 검색어
+    const [userKeyword, setUserKeyword] = useState(""); // 🔍 조사자 검색어
 
     // ✅ 건물 선택 상태 (체크박스 다중 선택)
     const [selectedBuildings, setSelectedBuildings] = useState([]);
 
     // =============================
-    // 초기 로딩: 읍면동 + 조사자 목록 + 전체 조사지
+    // 초기 로딩: 읍면동 + 전체 미배정 조사지 + 전체 조사원
     // =============================
     useEffect(() => {
         // 읍면동 옵션 불러오기
@@ -33,36 +33,35 @@ function SurveyList() {
             .then((res) => setEmdList(res.data))
             .catch((err) => console.error(err));
 
-        // 전체 조사지 불러오기
+        // 전체 미배정 조사지 + 전체 조사원 불러오기
         handleSearch();
-
-        // 전체 조사자 불러오기
-        axios
-            .get("/web/api/users/search")
-            .then((res) => setUsers(res.data))
-            .catch((err) => console.error("❌ 조사자 목록 불러오기 실패:", err));
     }, []);
 
     // =============================
-    // 조사지 검색
+    // 미배정 조사지 + 조사원 조회
     // =============================
     const handleSearch = () => {
         axios
-            .get("/web/building/search", {
-                params: { eupMyeonDong: selectedEmd || "" },
+            .get("/web/building/unassigned", {
+                params: { region: selectedEmd || "" },
             })
-            .then((res) => setAddresses(res.data))
-            .catch((err) => console.error(err));
+            .then((res) => {
+                setAddresses(res.data.results || []);
+                setUsers(res.data.investigators || []);
+            })
+            .catch((err) => console.error("❌ 미배정 조사지 불러오기 실패:", err));
     };
 
     // =============================
-    // 대상자 검색
+    // 조사원 검색 (선택한 읍/면/동 내에서만 검색됨)
     // =============================
     const handleUserSearch = () => {
         axios
-            .get("/web/api/users/search", { params: { keyword: userKeyword } })
-            .then((res) => setUsers(res.data))
-            .catch((err) => console.error("❌ 대상자 검색 실패:", err));
+            .get("/web/building/unassigned", {
+                params: { region: selectedEmd || "", keyword: userKeyword || "" },
+            })
+            .then((res) => setUsers(res.data.investigators || []))
+            .catch((err) => console.error("❌ 조사원 검색 실패:", err));
     };
 
     // =============================
@@ -165,7 +164,11 @@ function SurveyList() {
                         <select
                             className="form-select"
                             value={selectedEmd}
-                            onChange={(e) => setSelectedEmd(e.target.value)}
+                            onChange={(e) => {
+                                setSelectedEmd(e.target.value);
+                                // 읍면동 선택 시 바로 조회 실행
+                                setTimeout(() => handleSearch(), 0);
+                            }}
                         >
                             <option value="">전체</option>
                             {emdList.map((emd, idx) => (
@@ -220,7 +223,7 @@ function SurveyList() {
                     </div>
                 </div>
 
-                {/* 오른쪽: 지도 + 안내문 + 대상자 조회 */}
+                {/* 오른쪽: 지도 + 안내문 + 조사원 조회 */}
                 <div className="col-md-4 d-flex flex-column gap-3">
                     {/* 지도 */}
                     <NaverMap
@@ -233,11 +236,11 @@ function SurveyList() {
                         <div className="alert alert-warning mt-2">{errorMessage}</div>
                     )}
 
-                    {/* 대상자 조회 */}
+                    {/* 조사원 조회 */}
                     <div className="p-3 border rounded bg-white shadow-sm">
-                        <h5 className="mb-3">대상자 조회</h5>
+                        <h5 className="mb-3">조사원 조회</h5>
 
-                        {/* 🔎 대상자 검색 */}
+                        {/* 🔎 조사원 검색 */}
                         <div className="input-group mb-3">
                             <input
                                 type="text"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 function CreateUser() {
@@ -7,10 +7,20 @@ function CreateUser() {
         username: "",
         password: "",
         empNo: "",
+        preferredRegion: "", // ✅ 선호지역 추가
     });
 
-    const [usernameValid, setUsernameValid] = useState(null); // null=미확인, true=사용가능, false=불가능
-    const [loading, setLoading] = useState(false); // 아이디 체크 중 로딩 상태
+    const [regions, setRegions] = useState([]); // ✅ 선호지역 리스트
+    const [usernameValid, setUsernameValid] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    // 📌 선호 지역 목록 불러오기
+    useEffect(() => {
+        axios
+            .get("/web/api/users/preferred-regions?city=김해시")
+            .then((res) => setRegions(res.data))
+            .catch((err) => console.error("선호지역 불러오기 실패:", err));
+    }, []);
 
     // 입력값 변경 핸들러
     const handleChange = async (e) => {
@@ -28,7 +38,6 @@ function CreateUser() {
                 const res = await axios.get("/web/api/users/check-username", {
                     params: { username: value.trim() },
                 });
-                // 백엔드: true = 이미 있음 → 사용 불가능 / false = 없음 → 사용 가능
                 setUsernameValid(!res.data);
             } catch (err) {
                 console.error("아이디 중복 확인 실패:", err);
@@ -46,6 +55,7 @@ function CreateUser() {
             formData.username.trim() !== "" &&
             formData.password.trim() !== "" &&
             formData.empNo.trim() !== "" &&
+            formData.preferredRegion.trim() !== "" && // ✅ 필수값
             usernameValid === true
         );
     };
@@ -124,9 +134,7 @@ function CreateUser() {
                 value={formData.username}
                 onChange={handleChange}
             />
-            {loading && (
-                <p style={{ color: "gray", fontSize: "13px" }}>아이디 확인 중...</p>
-            )}
+            {loading && <p style={{ color: "gray", fontSize: "13px" }}>아이디 확인 중...</p>}
             {usernameValid === false && (
                 <p style={{ color: "red", fontSize: "13px" }}>사용 불가능한 아이디 입니다</p>
             )}
@@ -142,6 +150,22 @@ function CreateUser() {
                 value={formData.password}
                 onChange={handleChange}
             />
+
+            {/* ✅ 선호 지역 선택 */}
+            <label>선호 지역</label>
+            <select
+                style={inputStyle}
+                name="preferredRegion"
+                value={formData.preferredRegion}
+                onChange={handleChange}
+            >
+                <option value="">-- 선택하세요 --</option>
+                {regions.map((r, idx) => (
+                    <option key={idx} value={r}>
+                        {r}
+                    </option>
+                ))}
+            </select>
 
             <label>사번</label>
             <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>

@@ -1,285 +1,279 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background_light_gray">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/background_light_gray">
 
     <!-- 상단 앱바 -->
     <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="8dp"
-        app:elevation="8dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="8dp"
+            app:elevation="8dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:background="@drawable/toolbar_background"
-            android:paddingHorizontal="16dp">
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/toolbar_background"
+                android:paddingHorizontal="16dp">
 
             <!-- 좌측 햄버거 메뉴 -->
             <ImageView
-                android:id="@+id/ivHamburger"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_menu_white"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="메뉴"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                    android:id="@+id/ivHamburger"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_menu_white"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="메뉴"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
             <!-- 중앙 타이틀 -->
             <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="부동산 실태조사"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.02"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="부동산 실태조사"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.02"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
             <!-- 우측 로그아웃 버튼 -->
             <TextView
-                android:id="@+id/tvLogout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="로그아웃"
-                android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                    android:id="@+id/tvLogout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="로그아웃"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- 숨겨진 실제 툴바 (기존 기능 유지용) -->
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:menu="@menu/menu_main" />
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:menu="@menu/menu_main" />
 
     <!-- 스크롤 가능한 콘텐츠 -->
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <!-- ✅ 조사원 현황 카드 -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardSurveyor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:backgroundTint="@android:color/white"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="6dp"
-                app:strokeColor="#E8E8E8"
-                app:strokeWidth="1dp">
+                android:orientation="vertical"
+                android:padding="20dp">
 
-                <LinearLayout
+            <!-- 조사원 현황 카드 -->
+            <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSurveyor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:layout_marginBottom="24dp"
+                    android:backgroundTint="@android:color/white"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp"
+                    app:strokeColor="#E8E8E8"
+                    app:strokeWidth="1dp">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
                     <!-- 상단 제목 -->
                     <TextView
-                        android:id="@+id/tvCardTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="활동현황"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="16dp" />
+                            android:id="@+id/tvCardTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="활동현황"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="16dp" />
 
-                    <!-- 조사원 정보 컨테이너 -->
+                    <!-- 조사원 정보 -->
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="20dp">
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="20dp">
 
-                        <!-- 조사원 아이콘 -->
                         <LinearLayout
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:background="@drawable/circle_background"
-                            android:gravity="center"
-                            android:layout_marginEnd="16dp">
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/circle_background"
+                                android:gravity="center"
+                                android:layout_marginEnd="16dp">
 
                             <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_person"
-                                app:tint="@color/primary_blue" />
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_person"
+                                    app:tint="@color/primary_blue" />
                         </LinearLayout>
 
-                        <!-- 조사원 정보 -->
                         <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <!-- 조사원 이름 -->
-                            <TextView
-                                android:id="@+id/tvUserName"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="조사원 이름"
-                                android:textColor="@color/text_primary"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                            <!-- 사번 -->
                             <TextView
-                                android:id="@+id/tvEmpNo"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="사번 : -"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="14sp" />
+                                    android:id="@+id/tvUserName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="조사원 이름"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                            <TextView
+                                    android:id="@+id/tvEmpNo"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="사번 : -"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="14sp" />
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- 통계 정보 그리드 -->
+                    <!-- 통계 정보 -->
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:weightSum="3">
-
-                        <!-- 진행률 -->
-                        <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:background="@drawable/rounded_border">
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                        <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="12dp"
+                                android:background="@drawable/rounded_border">
 
                             <TextView
-                                android:id="@+id/tvProgress"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="-%"
-                                android:textColor="@color/primary_blue"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
+                                    android:id="@+id/tvProgress"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="-%"
+                                    android:textColor="@color/primary_blue"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="진행률"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="진행률"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12sp" />
                         </LinearLayout>
 
-                        <!-- 총 조사 건수 -->
                         <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:layout_marginHorizontal="8dp"
-                            android:background="@drawable/rounded_border">
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="12dp"
+                                android:layout_marginHorizontal="8dp"
+                                android:background="@drawable/rounded_border">
 
                             <TextView
-                                android:id="@+id/tvTotalCount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="-"
-                                android:textColor="@color/text_primary"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
+                                    android:id="@+id/tvTotalCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="-"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="총 건수"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="총 건수"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12sp" />
                         </LinearLayout>
 
-                        <!-- 금일 완료 -->
                         <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:background="@drawable/rounded_border">
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="12dp"
+                                android:background="@drawable/rounded_border">
 
                             <TextView
-                                android:id="@+id/tvTodayCount"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="-"
-                                android:textColor="@color/green"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
+                                    android:id="@+id/tvTodayCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="-"
+                                    android:textColor="@color/green"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="금일 완료"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="금일 완료"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12sp" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ✅ 조사목록 보기 버튼 -->
+            <!-- 조사 목록 보기 버튼 -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSurveyList"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginBottom="24dp"
-                android:backgroundTint="@color/primary_blue"
-                android:text="조사목록 보기"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.02"
-                app:cornerRadius="16dp"
-                app:elevation="4dp"
-                app:iconGravity="textStart"
-                app:iconPadding="8dp" />
+                    android:id="@+id/btnSurveyList"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="24dp"
+                    android:backgroundTint="@color/primary_blue"
+                    android:text="조사 목록 보기"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.02"
+                    app:cornerRadius="16dp"
+                    app:elevation="4dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp" />
 
+<<<<<<< HEAD
             <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnMainCamera"
                     android:layout_width="match_parent"
@@ -298,66 +292,201 @@
                     android:onClick="onMainCameraClick"/>
 
             <!-- ✅ 조사현황 대시보드 -->
+=======
+            <!-- 조사 현황 대시보드 -->
+>>>>>>> origin/app/jgy/MainPage
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardDashboard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/white"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="6dp"
-                app:strokeColor="#E8E8E8"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
+                    android:id="@+id/cardDashboard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:backgroundTint="@android:color/white"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp"
+                    app:strokeColor="#E8E8E8"
+                    app:strokeWidth="1dp">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
                     <!-- 헤더 -->
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="16dp">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="조사현황"
-                            android:textColor="@color/text_primary"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="조사현황"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/tvDetail"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="자세히 보기"
-                            android:textColor="@color/primary_blue"
-                            android:textSize="14sp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:padding="8dp" />
+                                android:id="@+id/tvDetail"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="자세히 보기"
+                                android:textColor="@color/primary_blue"
+                                android:textSize="14sp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:padding="8dp" />
                     </LinearLayout>
 
                     <!-- 그래프 영역 -->
                     <LinearLayout
-                        android:id="@+id/dashboardContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:gravity="center"
-                        android:background="@drawable/rounded_border"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                            android:id="@+id/dashboardContainer"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="그래프 영역"
-                            android:textColor="@color/text_light"
-                            android:textSize="14sp" />
+                            android:orientation="horizontal"
+                            android:weightSum="3"
+                            android:gravity="center_horizontal"
+                            android:padding="8dp">
+
+                        <!-- 조사 진행 -->
+                        <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal">
+
+                            <FrameLayout
+                                    android:layout_width="32dp"
+                                    android:layout_height="100dp"
+                                    android:layout_marginBottom="4dp">
+
+                                <!-- 회색 배경 -->
+                                <View
+                                        android:id="@+id/barInProgressBg"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@drawable/bar_gray" />
+
+                                <!-- 파랑 bar -->
+                                <View
+                                        android:id="@+id/barInProgress"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="0dp"
+                                        android:layout_gravity="bottom"
+                                        android:background="@drawable/bar_blue" />
+                            </FrameLayout>
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="조사 진행"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/text_secondary" />
+
+                            <TextView
+                                    android:id="@+id/tvInProgressCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0건"
+                                    android:textColor="@color/primary_blue"
+                                    android:textStyle="bold"
+                                    android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- 결재 대기 -->
+                        <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal">
+
+                            <FrameLayout
+                                    android:layout_width="32dp"
+                                    android:layout_height="100dp"
+                                    android:layout_marginBottom="4dp">
+
+                                <!-- 회색 배경 -->
+                                <View
+                                        android:id="@+id/barWaitingBg"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@drawable/bar_gray" />
+
+                                <!-- 주황 bar -->
+                                <View
+                                        android:id="@+id/barWaiting"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="0dp"
+                                        android:layout_gravity="bottom"
+                                        android:background="@drawable/bar_orange" />
+                            </FrameLayout>
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="결재 대기"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/text_secondary" />
+
+                            <TextView
+                                    android:id="@+id/tvWaitingCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0건"
+                                    android:textColor="@color/orange"
+                                    android:textStyle="bold"
+                                    android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- 결재 완료 -->
+                        <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:gravity="center_horizontal">
+
+                            <FrameLayout
+                                    android:layout_width="32dp"
+                                    android:layout_height="100dp"
+                                    android:layout_marginBottom="4dp">
+
+                                <!-- 회색 배경 -->
+                                <View
+                                        android:id="@+id/barApprovedBg"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@drawable/bar_gray" />
+
+                                <!-- 초록 bar -->
+                                <View
+                                        android:id="@+id/barApproved"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="0dp"
+                                        android:layout_gravity="bottom"
+                                        android:background="@drawable/bar_green" />
+                            </FrameLayout>
+
+                            <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="결재 완료"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/text_secondary" />
+
+                            <TextView
+                                    android:id="@+id/tvApprovedCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0건"
+                                    android:textColor="@color/green"
+                                    android:textStyle="bold"
+                                    android:textSize="12sp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

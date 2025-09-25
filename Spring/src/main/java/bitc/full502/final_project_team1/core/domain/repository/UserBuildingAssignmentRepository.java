@@ -45,16 +45,17 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
     @Query("""
     select uba
     from UserBuildingAssignmentEntity uba
-    where uba.user = :userId
+    where uba.user.userId = :userId
       and not exists (
         select 1
         from SurveyResultEntity sr
         where sr.building.id = uba.buildingId
-          and sr.user = :userId
+          and sr.user.userId = :userId
       )
     order by uba.assignedAt desc
 """)
     List<UserBuildingAssignmentEntity> findAssignedWithoutAnyResult(@Param("userId") Long userId);
+
 
 
 }

@@ -34,10 +34,9 @@
                 android:id="@+id/txtDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="전송일시: 2024-01-15 14:30"
+                android:text="전송일: 2024-01-15 14:30"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
-                android:drawableStart="@drawable/ic_clock"
                 android:drawablePadding="4dp"
                 android:gravity="center_vertical" />
 

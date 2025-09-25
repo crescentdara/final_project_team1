@@ -17,18 +17,28 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+<<<<<<< HEAD
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+=======
+import androidx.lifecycle.lifecycleScope
+>>>>>>> origin/app/jgy/MainPage
 import bitc.fullstack502.final_project_team1.core.AuthManager
+import bitc.fullstack502.final_project_team1.network.ApiClient
+import bitc.fullstack502.final_project_team1.network.dto.DashboardStatsResponse
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.ReinspectListActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.TransmissionCompleteActivity
 import com.google.android.material.button.MaterialButton
+<<<<<<< HEAD
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
+=======
+import kotlinx.coroutines.launch
+>>>>>>> origin/app/jgy/MainPage
 
 class MainActivity : AppCompatActivity() {
 
@@ -113,27 +123,28 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ✅ 로그인 체크: 로그인 안 했거나 토큰 만료되면 로그인 화면으로 이동
+        // 로그인 체크
         if (!AuthManager.isLoggedIn(this) || AuthManager.isExpired(this)) {
             gotoLoginAndFinish()
             return
         }
 
-        // ✅ 메인 레이아웃 연결
         setContentView(R.layout.activity_main)
-
-        // ✅ 상단 툴바 초기화
         setupToolbar()
 
-        // ✅ "조사목록 보기" 버튼 클릭 시 → SurveyListActivity 이동
+        // 조사 목록 버튼
         findViewById<MaterialButton>(R.id.btnSurveyList)?.setOnClickListener {
             startActivity(Intent(this, SurveyListActivity::class.java))
         }
 
+<<<<<<< HEAD
 
         // ✅ 사용자 이름 + 사번 표시
+=======
+        // 사용자 정보
+>>>>>>> origin/app/jgy/MainPage
         val userName = AuthManager.name(this) ?: "조사원"
-        val empNo = AuthManager.empNo(this) ?: "-"   // 🔹 AuthManager에서 사번 가져오기
+        val empNo = AuthManager.empNo(this) ?: "-"
 
         val tvUserName = findViewById<TextView>(R.id.tvUserName)
         val tvEmpNo = findViewById<TextView>(R.id.tvEmpNo)
@@ -141,37 +152,88 @@ class MainActivity : AppCompatActivity() {
         val tvTotalCount = findViewById<TextView>(R.id.tvTotalCount)
         val tvTodayCount = findViewById<TextView>(R.id.tvTodayCount)
 
+        // 조사 현황 뷰 (캡슐 그래프 + 숫자)
+        val barInProgress = findViewById<View>(R.id.barInProgress)
+        val barWaiting = findViewById<View>(R.id.barWaiting)
+        val barApproved = findViewById<View>(R.id.barApproved)
+
+        // 배경 캡슐 (고정 높이) → 필요시 애니메이션/효과용으로 접근 가능
+        val barInProgressBg = findViewById<View>(R.id.barInProgressBg)
+        val barWaitingBg = findViewById<View>(R.id.barWaitingBg)
+        val barApprovedBg = findViewById<View>(R.id.barApprovedBg)
+
+        val tvBarInProgress = findViewById<TextView>(R.id.tvInProgressCount)
+        val tvBarWaiting = findViewById<TextView>(R.id.tvWaitingCount)
+        val tvBarApproved = findViewById<TextView>(R.id.tvApprovedCount)
+
         tvUserName.text = "${userName} 조사원님"
         tvEmpNo.text = "사번 : $empNo"
 
-        // ✅ 통계 데이터 표시 (추후 서버 연동 시 실제 데이터로 교체)
-        tvProgress.text = "65%"
-        tvTotalCount.text = "24"
-        tvTodayCount.text = "3"
+        val userId = AuthManager.userId(this) ?: -1L
+        val token = AuthManager.token(this) ?: ""
 
-        // ✅ 환영 토스트 메시지 출력
+        // 대시보드 데이터 불러오기
+        lifecycleScope.launch {
+            try {
+                val stats: DashboardStatsResponse = ApiClient.service.getDashboardStats(
+                    userId, token
+                )
+
+                // 활동 현황
+                tvProgress.text = "${stats.progressRate}%"
+                tvTotalCount.text = stats.total.toString()
+                tvTodayCount.text = stats.todayComplete.toString()
+
+                // 조사 현황 값 반영
+                tvBarInProgress.text = "${stats.inProgress}건"
+                tvBarWaiting.text = "${stats.waitingApproval}건"
+                tvBarApproved.text = "${stats.approved}건"
+
+                // 막대 비율 적용 (최대값 대비 비율)
+                val maxValue = maxOf(stats.inProgress, stats.waitingApproval, stats.approved, 1)
+                val maxHeightPx = resources.getDimensionPixelSize(
+                    R.dimen.dashboard_bar_max_height
+                ) // 예: 100dp 정의
+
+                fun setBarHeight(bar: View, value: Long) {
+                    val ratio = if (maxValue > 0) value.toFloat() / maxValue else 0f
+                    val params = bar.layoutParams
+                    params.height = (maxHeightPx * ratio).toInt()
+                    bar.layoutParams = params
+                }
+
+                setBarHeight(barInProgress, stats.inProgress)
+                setBarHeight(barWaiting, stats.waitingApproval)
+                setBarHeight(barApproved, stats.approved)
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this@MainActivity, "대시보드 데이터 불러오기 실패", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 자세히 보기 클릭 -> 조사 내역 조회 페이지 이동
+        findViewById<TextView>(R.id.tvDetail)?.setOnClickListener {
+            startActivity(Intent(this, TransmissionCompleteActivity::class.java))
+        }
+
+        // 환영 메시지
         Toast.makeText(this, "${userName}님, 환영합니다!", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupToolbar() {
-        // ✅ 햄버거 메뉴 클릭 → 카테고리 팝업 열기
         findViewById<ImageView>(R.id.ivHamburger)?.setOnClickListener { view ->
             showCategoryPopup(view)
         }
-
-        // ✅ 로그아웃 버튼 클릭 → 로그아웃 처리
         findViewById<TextView>(R.id.tvLogout)?.setOnClickListener {
-            // ✅ 로그아웃 시 인증정보 삭제 후 로그인 화면으로 이동
             AuthManager.clear(this)
             gotoLoginAndFinish()
         }
     }
 
-    // ✅ 카테고리 팝업 (햄버거 위치에서 열림, 화면 너비의 60%로 표시)
+    // 카테고리 팝업
     private fun showCategoryPopup(anchor: View) {
         val popupView = LayoutInflater.from(this).inflate(R.layout.modal_category, null)
-
-        // ✅ 화면 크기 계산
         val displayMetrics = resources.displayMetrics
         val popupWidth = (displayMetrics.widthPixels * 0.6).toInt()
         val popupHeight = resources.getDimensionPixelSize(R.dimen.category_popup_height)
@@ -183,12 +245,10 @@ class MainActivity : AppCompatActivity() {
             true
         )
 
-        // ✅ 닫기 버튼 → 팝업 닫기
         popupView.findViewById<ImageView>(R.id.btnClose)?.setOnClickListener {
             popupWindow.dismiss()
         }
 
-        // ✅ 메뉴 버튼들
         popupView.findViewById<MaterialButton>(R.id.btnSurveyScheduled)?.setOnClickListener {
             startActivity(Intent(this, SurveyListActivity::class.java))
             popupWindow.dismiss()
@@ -206,11 +266,9 @@ class MainActivity : AppCompatActivity() {
             popupWindow.dismiss()
         }
 
-        // ✅ 팝업을 햄버거(anchor) 기준 좌측 상단에 표시
         popupWindow.showAsDropDown(anchor, 0, 0, Gravity.START)
     }
 
-    // ✅ 로그인 화면으로 이동하고 MainActivity 종료
     private fun gotoLoginAndFinish() {
         startActivity(Intent(this, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

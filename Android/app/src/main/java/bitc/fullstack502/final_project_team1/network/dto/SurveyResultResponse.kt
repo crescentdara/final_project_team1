@@ -20,6 +20,12 @@ data class SurveyResultResponse(
     val intPhoto: String?,
     val intEditPhoto: String?,
     val status: String?,
+
+    // 새로 추가
+    val buildingId: Long?,
+    val buildingAddress: String?,
+    val userId: Long?,
+
     val createdAt: String?,
     val updatedAt: String?
 )

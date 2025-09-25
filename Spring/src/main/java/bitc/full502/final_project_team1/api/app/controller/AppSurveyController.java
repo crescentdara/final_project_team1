@@ -1,12 +1,11 @@
 package bitc.full502.final_project_team1.api.app.controller;
 
 import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
+import bitc.full502.final_project_team1.core.service.AssignmentService;
 import bitc.full502.final_project_team1.core.service.SurveyService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,6 +15,7 @@ import java.util.List;
 public class AppSurveyController {
 
     private final SurveyService appSurveyService;
+    private final AssignmentService assignmentService;
 
     // ex) GET /api/mobile/surveys/assigned?userId=7
     @GetMapping("/assigned")
@@ -35,4 +35,11 @@ public class AppSurveyController {
     ) {
         return appSurveyService.assignedWithin(userId, lat, lng, radiusKm);
     }
+
+    @PostMapping("/assigned/reject")
+    public ResponseEntity<Void> rejectAssignment(@RequestParam Long buildingId) {
+        assignmentService.rejectAssignment(buildingId);
+        return ResponseEntity.ok().build();
+    }
+
 }

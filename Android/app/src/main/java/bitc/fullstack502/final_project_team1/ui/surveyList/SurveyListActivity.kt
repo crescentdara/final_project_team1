@@ -361,4 +361,21 @@ class SurveyListActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(PLAY_STORE_TMAP)))
         else startActivity(intent)
     }
+
+    fun refreshAssignments() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val uid = AuthManager.userId(this@SurveyListActivity)
+            if (uid <= 0) return@launch
+
+            runCatching { ApiClient.service.getAssigned(uid) }
+                .onSuccess { list ->
+                    assignedList = list
+                    sortAndBind(spinner.selectedItemPosition)
+                }
+                .onFailure {
+                    Toast.makeText(this@SurveyListActivity, "목록 재조회 실패: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
 }

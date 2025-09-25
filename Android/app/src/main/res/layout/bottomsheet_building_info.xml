@@ -3,24 +3,37 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+<<<<<<< HEAD
         android:padding="16dp"
         android:background="@android:color/white">
+=======
+        android:padding="16dp">
+>>>>>>> origin/app/jgy/MainPage
 
     <!-- (선택) 반려 정보 -->
     <TextView
             android:id="@+id/tvRejectReason"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+<<<<<<< HEAD
             android:textColor="#B00020"
             android:textStyle="bold"
             android:includeFontPadding="false"
             android:padding="0dp"
             android:visibility="gone"/>
+=======
+            android:text=""
+            android:textColor="#B00020"
+            android:textStyle="bold"
+            android:visibility="visible"
+            android:paddingBottom="4dp" />
+>>>>>>> origin/app/jgy/MainPage
 
     <TextView
             android:id="@+id/tvRejectedAt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+<<<<<<< HEAD
             android:includeFontPadding="false"
             android:padding="0dp"
             android:visibility="gone"/>
@@ -60,11 +73,31 @@
     </LinearLayout>
 
     <!-- 반드시 Button으로 (다른 모드에서만 사용) -->
+=======
+            android:text=""
+            android:paddingBottom="12dp" />
+
+    <!-- 조사시작 / 재조사 시작 버튼 -->
+>>>>>>> origin/app/jgy/MainPage
     <Button
             android:id="@+id/btnStartSurvey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+<<<<<<< HEAD
             android:text="시작"/>
+=======
+            android:text="조사결과 입력하기"
+            android:textStyle="bold" />
+
+    <!-- ✅ 조사 거절 버튼 -->
+    <Button
+            android:id="@+id/btnRejectSurvey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="조사 거절"
+            android:layout_marginTop="8dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+>>>>>>> origin/app/jgy/MainPage
 
     <!-- 건물/결과 정보 -->
     <ScrollView

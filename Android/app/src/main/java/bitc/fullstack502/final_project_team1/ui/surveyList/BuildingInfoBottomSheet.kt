@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import bitc.fullstack502.final_project_team1.R
-import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
 import bitc.fullstack502.final_project_team1.ui.SurveyActivity
@@ -106,6 +105,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+<<<<<<< HEAD
         val btnStart  = view.findViewById<Button>(R.id.btnStartSurvey)
         val info      = view.findViewById<LinearLayout>(R.id.infoContainer)
         val tempBar   = view.findViewById<LinearLayout>(R.id.layoutTempActions)
@@ -136,6 +136,45 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
             "TEMP_DETAIL" -> {
                 tempBar.visibility = View.VISIBLE
                 btnStart.visibility = View.GONE
+=======
+        val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
+        val btnReject = view.findViewById<Button>(R.id.btnRejectSurvey) // ✅ 새로 추가
+        val info = view.findViewById<LinearLayout>(R.id.infoContainer)
+
+        // ✅ 조사 거절 버튼 동작
+        btnReject.setOnClickListener {
+            if (buildingId <= 0) {
+                Toast.makeText(requireContext(), "잘못된 건물 ID입니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                runCatching { ApiClient.service.rejectAssignment(buildingId) }
+                    .onSuccess { resp ->
+                        if (resp.isSuccessful) {
+                            Toast.makeText(requireContext(), "조사를 거절했습니다.", Toast.LENGTH_SHORT).show()
+                            dismiss()
+                            // ✅ 부모 액티비티에 리스트 새로고침 신호 보내기
+                            (activity as? SurveyListActivity)?.refreshAssignments()
+                        } else {
+                            Toast.makeText(requireContext(), "거절 실패: ${resp.code()}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .onFailure {
+                        Toast.makeText(requireContext(), "에러: ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+
+        // 기존 조사 시작 버튼 분기
+        if (mode == "REINSPECT") {
+            btnStart.text = getString(R.string.reinspect_start)
+            btnStart.setOnClickListener { startReinspectThenOpenEditor() }
+        } else {
+            btnStart.text = getString(R.string.survey_start)
+            btnStart.setOnClickListener { openEditorNew() }
+        }
+>>>>>>> origin/app/jgy/MainPage
 
                 // 주소 헤더
                 info.removeAllViews()
@@ -240,7 +279,10 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
             putExtra(SurveyActivity.EXTRA_MODE, "REINSPECT")
             putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
             putExtra(SurveyActivity.EXTRA_SURVEY_ID, surveyId)
+<<<<<<< HEAD
             putExtra(SurveyActivity.EXTRA_RETURN_TO, resolveReturnTo())
+=======
+>>>>>>> origin/app/jgy/MainPage
             putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
         startActivity(intent)
@@ -262,7 +304,10 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         val i = Intent(requireContext(), SurveyActivity::class.java).apply {
             putExtra(SurveyActivity.EXTRA_MODE, "CREATE")
             putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
+<<<<<<< HEAD
             putExtra(SurveyActivity.EXTRA_RETURN_TO, resolveReturnTo())
+=======
+>>>>>>> origin/app/jgy/MainPage
             putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
         startActivity(i)

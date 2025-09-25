@@ -248,5 +248,9 @@ public class SurveyResultServiceImpl implements SurveyResultService {
                 .findTopByUser_UserIdAndBuilding_IdOrderByUpdatedAtDescCreatedAtDesc(userId, buildingId);
     }
 
-
+    // status 별 조회
+    @Override
+    public Page<SurveyResultEntity> findByUserAndStatus(Long userId, String status, int page, int size) {
+        return surveyResultRepository.findByUserAndStatusPage(userId, status, PageRequest.of(page, size));
+    }
 }

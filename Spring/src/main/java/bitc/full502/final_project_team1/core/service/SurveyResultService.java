@@ -36,4 +36,7 @@ public interface SurveyResultService {
     Optional<SurveyResultEntity> findByIdWithUserAndBuilding(Long id);
 
     Optional<SurveyResultEntity> findLatestByUserAndBuilding(Long userId, Long buildingId);
+
+    // status 별 조회
+    Page<SurveyResultEntity> findByUserAndStatus(Long userId, String status, int page, int size);
 }

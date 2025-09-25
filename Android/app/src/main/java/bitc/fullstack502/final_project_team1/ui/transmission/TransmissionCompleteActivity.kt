@@ -13,18 +13,20 @@ import bitc.fullstack502.final_project_team1.MainActivity
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
-import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
+import bitc.fullstack502.final_project_team1.network.dto.SurveyResultResponse
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
- * 📋 전송 완료 페이지
- * - 서버에서 상태별(SENT/APPROVED/REJECTED) 조사 목록 조회
- * - 필터: 전체(null), 결재완료(APPROVED), 처리중(SENT), 반려(REJECTED)
+ * 📋 조사내역 조회 페이지
+ * - 서버에서 상태별(결재완료/결재대기) 조사 목록 조회
+ * - 필터: 전체(null), 결재완료(APPROVED), 결재대기(SENT)
  */
 class TransmissionCompleteActivity : AppCompatActivity() {
 
@@ -38,7 +40,8 @@ class TransmissionCompleteActivity : AppCompatActivity() {
     private val allDataList = mutableListOf<CompletedSurveyItem>()
     private val filteredDataList = mutableListOf<CompletedSurveyItem>()
 
-    private val filterOptions = arrayOf("전체", "결재완료", "처리중", "반려")
+    // ✅ 옵션 수정 (기타 제거, 처리중 → 결재대기)
+    private val filterOptions = arrayOf("전체", "결재완료", "결재대기")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,8 +102,7 @@ class TransmissionCompleteActivity : AppCompatActivity() {
     private fun applyFilter(filterType: String) {
         val statusCode: String? = when (filterType) {
             "결재완료" -> "APPROVED"
-            "처리중"   -> "SENT"
-            "반려"     -> "REJECTED"
+            "결재대기" -> "SENT"
             else       -> null // 전체
         }
         loadFromServer(statusCode, filterType)
@@ -111,19 +113,25 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val uid = AuthManager.userId(this@TransmissionCompleteActivity)
-                val resp = ApiClient.service.getSurveys(
+                val resp = ApiClient.service.getSurveyResults(
                     userId = uid,
                     status = statusCode,
                     page = 0,
                     size = 50
                 )
 
-                // 페이지 콘텐츠 꺼내기
-                val items: List<SurveyListItemDto> = resp.page.content
+                if (!resp.isSuccessful) {
+                    Toast.makeText(this@TransmissionCompleteActivity, "서버 오류: ${resp.code()}", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
 
-                // 화면용 데이터로 매핑
+                val pageData = resp.body()
+                val items: List<SurveyResultResponse> = pageData?.content ?: emptyList()
+
+                // 화면용 데이터로 매핑 (APPROVED/SENT만)
                 allDataList.clear()
                 allDataList.addAll(
+<<<<<<< HEAD
                     items.map {
                         CompletedSurveyItem(
                             id = it.surveyId,
@@ -136,21 +144,52 @@ class TransmissionCompleteActivity : AppCompatActivity() {
                                 else       -> "기타"
                             }
                         )
+=======
+                    items.mapNotNull {
+                        val formattedDate = formatDateOnly(it.updatedAt ?: it.createdAt)
+                        when (it.status) {
+                            "APPROVED" -> CompletedSurveyItem(
+                                id = it.id,
+                                address = it.buildingAddress ?: "(주소 없음)",
+                                completedDate = formattedDate,
+                                status = "결재완료"
+                            )
+                            "SENT" -> CompletedSurveyItem(
+                                id = it.id,
+                                address = it.buildingAddress ?: "(주소 없음)",
+                                completedDate = formattedDate,
+                                status = "결재대기"
+                            )
+                            else -> null // ✅ 기타 상태는 무시
+                        }
+>>>>>>> origin/app/jgy/MainPage
                     }
                 )
 
-                // 선택된 필터 라벨을 기준으로 화면 리스트 구성
+                // 선택된 필터 라벨에 맞춰 리스트 구성
                 filteredDataList.clear()
                 when (filterLabel) {
                     "전체"     -> filteredDataList.addAll(allDataList)
                     "결재완료" -> filteredDataList.addAll(allDataList.filter { it.status == "결재완료" })
-                    "처리중"   -> filteredDataList.addAll(allDataList.filter { it.status == "처리중" })
-                    "반려"     -> filteredDataList.addAll(allDataList.filter { it.status == "반려" })
+                    "결재대기" -> filteredDataList.addAll(allDataList.filter { it.status == "결재대기" })
                 }
                 updateUI()
             } catch (e: Exception) {
                 Toast.makeText(this@TransmissionCompleteActivity, "목록 불러오기 실패: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    /** yyyy-MM-dd 로 변환 */
+    private fun formatDateOnly(datetime: String?): String {
+        if (datetime.isNullOrBlank()) return ""
+        return try {
+            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+            val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val parsed = LocalDateTime.parse(datetime, inputFormatter)
+            parsed.format(outputFormatter)
+        } catch (e: Exception) {
+            datetime.take(10) // 최소 yyyy-MM-dd 까지만
         }
     }
 
@@ -205,11 +244,11 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         }
     }
 
-    /** 전송 완료된 조사 아이템 */
+    /** 조사내역 아이템 */
     data class CompletedSurveyItem(
         val id: Long,
         val address: String,
         val completedDate: String,
-        val status: String // "결재완료", "처리중", "반려"
+        val status: String // "결재완료", "결재대기"
     )
 }

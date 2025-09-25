@@ -12,6 +12,9 @@ public class SurveyListItemDto {
     private String address;
     private String buildingName;
     private String status;        // REJECTED / APPROVED / SENT / TEMP
-    private String updatedAtIso;  // 정렬/표시용
     private String rejectReason;  // REJECTED일 때만 채워도 OK
+    private String assignedAtIso;
+    private Double latitude;
+    private Double longitude;
+
 }

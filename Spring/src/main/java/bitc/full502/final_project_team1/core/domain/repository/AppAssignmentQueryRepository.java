@@ -58,4 +58,24 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
     """)
     List<Object[]> findAssignedAll(@Param("userId") Long userId);
 
+    @Query(value = """
+        SELECT b.id,
+               t.max_assigned_at,
+               b.latitude,
+               b.longitude
+        FROM (
+            SELECT uba.building_id,
+                   MAX(uba.assigned_at) AS max_assigned_at
+            FROM user_building_assignment uba
+            WHERE uba.user_id = :userId
+              AND uba.status = 1
+              AND uba.building_id IN (:buildingIds)
+            GROUP BY uba.building_id
+        ) t
+        JOIN building b ON b.id = t.building_id
+        """, nativeQuery = true)
+    List<Object[]> findAssignedAtForBuildings(
+            @Param("userId") Long userId,
+            @Param("buildingIds") List<Long> buildingIds
+    );
 }

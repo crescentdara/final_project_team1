@@ -2,6 +2,7 @@ package bitc.full502.final_project_team1.core.service;
 
 import bitc.full502.final_project_team1.api.app.dto.*;
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
+import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmentEntity;
 import bitc.full502.final_project_team1.core.domain.repository.AppAssignmentQueryRepository;
 import bitc.full502.final_project_team1.core.domain.repository.ApprovalRepository;
 import bitc.full502.final_project_team1.core.domain.repository.SurveyResultRepository;
@@ -11,8 +12,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
-
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,8 +71,13 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     private LocalDateTime toDate(Object o) {
-        return (o instanceof LocalDateTime dt) ? dt : null;
+        if (o == null) return null;
+        if (o instanceof LocalDateTime dt) return dt;
+        if (o instanceof Timestamp ts) return ts.toLocalDateTime();              // ✅ 핵심
+        if (o instanceof java.util.Date d) return new Timestamp(d.getTime()).toLocalDateTime();
+        return null; // 알 수 없는 타입이면 null
     }
+
 
 
     private Long toLong(Object o) { return o == null ? null : ((Number) o).longValue(); }
@@ -91,56 +98,23 @@ public class SurveyServiceImpl implements SurveyService {
         return new AppUserSurveyStatusResponse(approved, rejected, sent, temp);
     }
 
-    @Override
-    public ListWithStatusResponse<SurveyListItemDto> getListWithStatus(
-            Long userId, String status, int page, int size
-    ) {
-        Page<SurveyResultEntity> p = surveyResultRepository.findByUserAndStatusPage(
-                userId, status, PageRequest.of(page, size));
-
-        // ① 이번 페이지의 survey_result_id 모으기
-        var ids = p.getContent().stream().map(SurveyResultEntity::getId).toList();
-
-        // ② approval에서 각 sr_id별 최신 반려사유 한번에 조회 → Map<srId, reason>
-        var latestReasons = approvalRepository.findLatestRejectReasons(ids).stream()
-                .collect(Collectors.toMap(
-                        r -> ((Number) r[0]).longValue(),  // survey_result_id
-                        r -> (String) r[1]                 // reject_reason
-                ));
-
-        // ③ DTO 변환 시 rejectReason 주입
-        var items = p.getContent().stream()
-                .map(sr -> toItemWithReason(sr, latestReasons.get(sr.getId())))
-                .toList();
-
-        var state = getStatus(userId);
-
-        return ListWithStatusResponse.<SurveyListItemDto>builder()
-                .status(state)
-                .page(PageDto.<SurveyListItemDto>builder()
-                        .content(items)
-                        .number(p.getNumber())
-                        .size(p.getSize())
-                        .totalElements(p.getTotalElements())
-                        .totalPages(p.getTotalPages())
-                        .last(p.isLast())
-                        .build())
-                .build();
-    }
 
 
-    private SurveyListItemDto toItemWithReason(SurveyResultEntity s, String latestRejectReason) {
+    private SurveyListItemDto toItemWithReason(SurveyResultEntity s, String latestRejectReason, UserBuildingAssignmentEntity u) {
         var b = s.getBuilding();
         String address = (b.getLotAddress() != null && !b.getLotAddress().isBlank())
                 ? b.getLotAddress() : b.getRoadAddress();
 
-        // REJECTED일 때만 노출하고, 없으면 null(또는 폴백으로 s.getIntEtc())
         String rejectReason = null;
         if ("REJECTED".equalsIgnoreCase(s.getStatus())) {
             rejectReason = (latestRejectReason != null && !latestRejectReason.isBlank())
                     ? latestRejectReason
-                    : s.getIntEtc(); // 폴백(선택)
+                    : s.getIntEtc();
         }
+
+        String assignedAtIso = (u != null && u.getAssignedAt() != null)
+                ? u.getAssignedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                : null;
 
         return SurveyListItemDto.builder()
                 .surveyId(s.getId())
@@ -148,7 +122,7 @@ public class SurveyServiceImpl implements SurveyService {
                 .address(address)
                 .buildingName(b.getBuildingName())
                 .status(s.getStatus())
-                .updatedAtIso(s.getUpdatedAt() != null ? s.getUpdatedAt().toString() : null)
+                .assignedAtIso(assignedAtIso)
                 .rejectReason(rejectReason)
                 .build();
     }
@@ -181,6 +155,82 @@ public class SurveyServiceImpl implements SurveyService {
                 .build();
     }
 
+    @Override
+    public ListWithStatusResponse<SurveyListItemDto> getListWithStatus(
+            Long userId, String status, int page, int size
+    ) {
+        Page<SurveyResultEntity> p = surveyResultRepository.findByUserAndStatusPage(
+                userId, status, PageRequest.of(page, size));
 
+        var srIds = p.getContent().stream().map(SurveyResultEntity::getId).toList();
+
+        var latestReasons = approvalRepository.findLatestRejectReasons(srIds).stream()
+                .collect(Collectors.toMap(
+                        r -> ((Number) r[0]).longValue(),
+                        r -> (String) r[1]
+                ));
+
+        var buildingIds = p.getContent().stream()
+                .map(sr -> sr.getBuilding().getId())
+                .distinct()
+                .toList();
+
+        // ✅ (building_id, assigned_at) 만 받는 쿼리 → Map<Long, LocalDateTime>
+        var assignedAtMap = appAssignmentQueryRepository
+                .findAssignedAtForBuildings(userId, buildingIds).stream()
+                .collect(Collectors.toMap(
+                        r -> ((Number) r[0]).longValue(),   // building_id
+                        r -> toDate(r[1])                   // Timestamp → LocalDateTime
+                ));
+
+        var items = p.getContent().stream()
+                .map(sr -> {
+                    var b = sr.getBuilding();
+
+                    String address = (b.getLotAddress() != null && !b.getLotAddress().isBlank())
+                            ? b.getLotAddress() : b.getRoadAddress();
+
+                    String latestRejectReason = latestReasons.get(sr.getId());
+                    String rejectReason = null;
+                    if ("REJECTED".equalsIgnoreCase(sr.getStatus())) {
+                        rejectReason = (latestRejectReason != null && !latestRejectReason.isBlank())
+                                ? latestRejectReason
+                                : sr.getIntEtc();
+                    }
+
+                    LocalDateTime assignedAt = assignedAtMap.get(b.getId());   // ✅ 배정일자
+
+                    return SurveyListItemDto.builder()
+                            .surveyId(sr.getId())
+                            .buildingId(b.getId())
+                            .address(address)
+                            .buildingName(b.getBuildingName())
+                            .status(sr.getStatus())
+                            .rejectReason(rejectReason)
+                            .assignedAtIso(toIso(assignedAt))     // ✅ ISO 문자열
+                            .latitude(b.getLatitude())             // ✅ 좌표는 엔티티에서
+                            .longitude(b.getLongitude())
+                            .build();
+                })
+                .toList();
+
+        var state = getStatus(userId);
+
+        return ListWithStatusResponse.<SurveyListItemDto>builder()
+                .status(state)
+                .page(PageDto.<SurveyListItemDto>builder()
+                        .content(items)
+                        .number(p.getNumber())
+                        .size(p.getSize())
+                        .totalElements(p.getTotalElements())
+                        .totalPages(p.getTotalPages())
+                        .last(p.isLast())
+                        .build())
+                .build();
+    }
+
+    private String toIso(LocalDateTime dt) {
+        return dt == null ? null : dt.toString(); // ISO-8601
+    }
 
 }

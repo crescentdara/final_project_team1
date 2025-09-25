@@ -128,7 +128,7 @@ class TransmissionCompleteActivity : AppCompatActivity() {
                         CompletedSurveyItem(
                             id = it.surveyId,
                             address = it.address ?: "(주소 없음)",
-                            completedDate = it.updatedAtIso ?: "",
+                            completedDate = it.assignedAtIso ?: "",
                             status = when (it.status) {
                                 "APPROVED" -> "결재완료"
                                 "SENT"     -> "처리중"

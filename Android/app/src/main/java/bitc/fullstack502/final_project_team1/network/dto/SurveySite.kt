@@ -24,8 +24,10 @@ data class SurveyListItemDto(
     val address: String?,
     val buildingName: String?,
     val status: String,
-    val updatedAtIso: String?,
-    val rejectReason: String?
+    val rejectReason: String?,
+    val assignedAtIso: String?,
+    val latitude: Double?,
+    val longitude: Double?
 )
 
 data class PageDto<T>(

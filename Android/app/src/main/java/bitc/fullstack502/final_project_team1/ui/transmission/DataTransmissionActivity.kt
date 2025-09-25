@@ -149,8 +149,8 @@ class DataTransmissionActivity : AppCompatActivity() {
         fun key(dt: String?) = dt ?: ""  // 필요 시 파싱 로직 넣어도 됨
         sortedDataList.clear()
         when (sortType) {
-            "최신순" -> sortedDataList.addAll(allDataList.sortedByDescending { key(it.updatedAtIso) })
-            "과거순" -> sortedDataList.addAll(allDataList.sortedBy { key(it.updatedAtIso) })
+            "최신순" -> sortedDataList.addAll(allDataList.sortedByDescending { key(it.assignedAtIso) })
+            "과거순" -> sortedDataList.addAll(allDataList.sortedBy { key(it.assignedAtIso) })
             else     -> sortedDataList.addAll(allDataList)
         }
         updateUI()

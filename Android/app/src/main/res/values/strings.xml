@@ -44,7 +44,7 @@
     <string name="survey_result">조사 결과</string>
     <string name="transmit">전송하기</string>
     <string name="sort_latest">최신순</string>
-    <string name="sort_oldest">과거순</string>
+    <string name="sort_oldest">오래된순</string>
 
     <!-- 전송완료 -->
     <string name="transmission_complete_title">전송 완료</string>

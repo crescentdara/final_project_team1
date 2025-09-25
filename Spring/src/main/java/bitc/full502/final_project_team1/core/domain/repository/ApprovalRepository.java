@@ -10,8 +10,8 @@ import java.util.Optional;
 
 public interface ApprovalRepository extends JpaRepository<ApprovalEntity, Long> {
 
-    // 단건 상세 화면 등에서 쓸 수 있는 헬퍼 (최신 이력 1건)
-    Optional<ApprovalEntity> findTopBySurveyResult_IdOrderByApprovedAtDescIdDesc(Long surveyResultId);
+    Optional<ApprovalEntity>
+    findTopBySurveyResult_IdOrderByApprovedAtDescIdDesc(Long surveyResultId);
 
     // 목록 화면 배치 조회: 각 survey_result_id별 최신(approved_at DESC, id DESC) 1건
     @Query(value = """

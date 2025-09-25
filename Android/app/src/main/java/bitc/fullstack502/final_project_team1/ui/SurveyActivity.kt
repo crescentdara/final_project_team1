@@ -35,6 +35,8 @@ import java.text.SimpleDateFormat
 import java.util.ArrayDeque
 import java.util.Date
 import java.util.Locale
+import android.util.Log
+
 
 class SurveyActivity : AppCompatActivity() {
 
@@ -45,7 +47,7 @@ class SurveyActivity : AppCompatActivity() {
         const val EXTRA_AUTO_SUBMIT = "auto_submit"
         const val EXTRA_RETURN_TO = "return_to"           // "NOT_TRANSMITTED" | "SURVEY_LIST"
         const val RETURN_NOT_TRANSMITTED = "NOT_TRANSMITTED"
-        const val RETURN_SURVEY_LIST     = "SURVEY_LIST"
+        const val RETURN_SURVEY_LIST = "SURVEY_LIST"
         const val RETURN_REINSPECT = "REINSPECT"
 
     }
@@ -56,10 +58,10 @@ class SurveyActivity : AppCompatActivity() {
     // ---- request codes ----
     private val REQ_CAPTURE_EXT = 101
     private val REQ_CAPTURE_INT = 102
-    private val REQ_EDIT_EXT    = 201
-    private val REQ_EDIT_INT    = 202
-    private val REQ_PICK_EXT    = 111
-    private val REQ_PICK_INT    = 112
+    private val REQ_EDIT_EXT = 201
+    private val REQ_EDIT_INT = 202
+    private val REQ_PICK_EXT = 111
+    private val REQ_PICK_INT = 112
 
     // ▼ 서버 저장된 이미지 URL 보관 (원본/편집 각각)
     private var extPhotoUrl: String? = null
@@ -112,13 +114,13 @@ class SurveyActivity : AppCompatActivity() {
 
         // 하단 버튼
         submitButton = findViewById(R.id.submit_button)
-        tempButton   = findViewById(R.id.save_temp_button)
+        tempButton = findViewById(R.id.save_temp_button)
         submitButton.isEnabled = false
         submitButton.alpha = 0.5f
         tempButton.isEnabled = true
         tempButton.alpha = 1f
         submitButton.setOnClickListener { submitSurvey() }
-        tempButton.setOnClickListener   { saveTemp() }
+        tempButton.setOnClickListener { saveTemp() }
 
         // 라디오 변경 시 제출 버튼 상태 갱신
         allRadioGroups().forEach { rg ->
@@ -131,39 +133,28 @@ class SurveyActivity : AppCompatActivity() {
         }
 
         // ===== 사진 버튼 =====
-        findViewById<ImageButton>(R.id.btn_extPhoto).setOnClickListener { startCamera(REQ_CAPTURE_EXT) }
-        // 외부 편집
+        findViewById<ImageButton>(R.id.btn_extPhoto).setOnClickListener {
+            startCamera(
+                REQ_CAPTURE_EXT
+            )
+        }
         findViewById<ImageButton>(R.id.btn_extEditPhoto).setOnClickListener {
             lifecycleScope.launch {
-                val srcFile = when {
-                    extEditPhotoFile != null -> extEditPhotoFile
-                    !extEditPhotoUrl.isNullOrBlank() -> downloadRemoteToTemp(extEditPhotoUrl!!)
-                    extPhotoFile != null -> extPhotoFile
-                    !extPhotoUrl.isNullOrBlank() -> downloadRemoteToTemp(extPhotoUrl!!)
-                    else -> null
-                }
-                if (srcFile == null) {
+                val src = pickSrcFileForEdit(extEditPhotoFile, extEditPhotoUrl, extPhotoFile, extPhotoUrl)
+                if (src == null) {
                     Toast.makeText(this@SurveyActivity, "외부 사진이 없습니다. 촬영/선택 후 편집하세요.", Toast.LENGTH_SHORT).show()
                 } else {
-                    startEdit(REQ_EDIT_EXT, srcFile)
+                    startEdit(REQ_EDIT_EXT, src)
                 }
             }
         }
-        findViewById<ImageButton>(R.id.btn_intPhoto).setOnClickListener { startCamera(REQ_CAPTURE_INT) }
-        // 내부 편집
         findViewById<ImageButton>(R.id.btn_intEditPhoto).setOnClickListener {
             lifecycleScope.launch {
-                val srcFile = when {
-                    intEditPhotoFile != null -> intEditPhotoFile
-                    !intEditPhotoUrl.isNullOrBlank() -> downloadRemoteToTemp(intEditPhotoUrl!!)
-                    intPhotoFile != null -> intPhotoFile
-                    !intPhotoUrl.isNullOrBlank() -> downloadRemoteToTemp(intPhotoUrl!!)
-                    else -> null
-                }
-                if (srcFile == null) {
+                val src = pickSrcFileForEdit(intEditPhotoFile, intEditPhotoUrl, intPhotoFile, intPhotoUrl)
+                if (src == null) {
                     Toast.makeText(this@SurveyActivity, "내부 사진이 없습니다. 촬영/선택 후 편집하세요.", Toast.LENGTH_SHORT).show()
                 } else {
-                    startEdit(REQ_EDIT_INT, srcFile)
+                    startEdit(REQ_EDIT_INT, src)
                 }
             }
         }
@@ -175,8 +166,8 @@ class SurveyActivity : AppCompatActivity() {
         prefillIfPossible()
     }
 
-    private fun loadInto(ivId: Int, url: String?) {
-        if (url.isNullOrBlank()) return
+    private fun loadInto(ivId: Int, maybeUrl: String?) {
+        val url = normalizeUrlMaybe(maybeUrl) ?: return
         val iv = findViewById<ImageView>(ivId)
         com.bumptech.glide.Glide.with(this)
             .load(url)
@@ -185,22 +176,42 @@ class SurveyActivity : AppCompatActivity() {
             .into(iv)
     }
 
-    // 서버 이미지를 임시 파일로 다운로드 (편집에 필요)
-    private suspend fun downloadRemoteToTemp(url: String): File? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-        try {
-            val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            val dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            val out = File.createTempFile("REMOTE_${ts}_", ".jpg", dir)
-
-            java.net.URL(url).openStream().use { input ->
-                out.outputStream().use { output -> input.copyTo(output) }
-            }
-            out
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+    // 3-1) 공용 소스 선택기
+    private suspend fun pickSrcFileForEdit(
+        localEdited: File?, remoteEditedUrl: String?,
+        localOriginal: File?, remoteOriginalUrl: String?
+    ): File? {
+        if (localEdited?.exists() == true) return localEdited        // 1) 로컬 편집본
+        if (localOriginal?.exists() == true) return localOriginal    // 2) 로컬 원본
+        if (!remoteEditedUrl.isNullOrBlank())                        // 3) 원격 편집본
+            downloadRemoteToTemp(remoteEditedUrl)?.let { return it }
+        if (!remoteOriginalUrl.isNullOrBlank())                      // 4) 원격 원본
+            downloadRemoteToTemp(remoteOriginalUrl)?.let { return it }
+        return null
     }
+
+
+    // 기존 함수 교체
+    private suspend fun downloadRemoteToTemp(urlRaw: String): File? =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val url = normalizeUrlMaybe(urlRaw) ?: return@withContext null
+                val ts =
+                    java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault())
+                        .format(java.util.Date())
+                val dir = getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES)
+                val out = File.createTempFile("REMOTE_${ts}_", ".jpg", dir)
+                java.net.URL(url).openStream().use { input ->
+                    out.outputStream().use { output -> input.copyTo(output) }
+                }
+                out
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("SurveyDL", "download fail for url=$urlRaw", e)
+
+                null
+            }
+        }
 
 
     private fun openGallery(requestCode: Int) {
@@ -242,9 +253,9 @@ class SurveyActivity : AppCompatActivity() {
     private fun goBackToOrigin() {
         val target = intent.getStringExtra(EXTRA_RETURN_TO) ?: RETURN_NOT_TRANSMITTED
         val targetCls = when (target) {
-            RETURN_SURVEY_LIST  -> bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity::class.java
-            RETURN_REINSPECT    -> bitc.fullstack502.final_project_team1.ui.surveyList.ReinspectListActivity::class.java // ★ 추가
-            else                -> bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity::class.java
+            RETURN_SURVEY_LIST -> bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity::class.java
+            RETURN_REINSPECT -> bitc.fullstack502.final_project_team1.ui.surveyList.ReinspectListActivity::class.java // ★ 추가
+            else -> bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity::class.java
         }
         startActivity(Intent(this, targetCls).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -252,7 +263,6 @@ class SurveyActivity : AppCompatActivity() {
         setResult(Activity.RESULT_OK)
         finish()
     }
-
 
 
     // === 불가 모드 판단 ===
@@ -272,8 +282,9 @@ class SurveyActivity : AppCompatActivity() {
         R.id.radioGroup_floor
     )
     private val editTextIds = listOf(R.id.input_extEtc, R.id.input_intEtc)
-    private val photoButtonIds = listOf(R.id.btn_extPhoto, R.id.btn_extEditPhoto, R.id.btn_intPhoto, R.id.btn_intEditPhoto)
-    private val photoImageIds  = listOf(R.id.img_extPhoto, R.id.img_intPhoto)
+    private val photoButtonIds =
+        listOf(R.id.btn_extPhoto, R.id.btn_extEditPhoto, R.id.btn_intPhoto, R.id.btn_intEditPhoto)
+    private val photoImageIds = listOf(R.id.img_extPhoto, R.id.img_intPhoto)
 
     // === 불가 선택 시/해제 시 UI 토글 ===
     // ▼ 기존 applyImpossibleModeIfNeeded() 완전히 교체
@@ -371,26 +382,35 @@ class SurveyActivity : AppCompatActivity() {
             ?: intent.getLongExtra(EXTRA_SURVEY_ID, -1L).takeIf { it > 0 }
 
         return SurveyResultRequest(
-            surveyId    = targetId,  // ★ 여기!
-            possible    = idxOfChecked(R.id.radioGroup_possible),
-            adminUse    = vOrZero(R.id.radioGroup_adminUse),
-            idleRate    = vOrZero(R.id.radioGroup_idleRate),
-            safety      = vOrZero(R.id.radioGroup_safety),
-            wall        = vOrZero(R.id.radioGroup_wall),
-            roof        = vOrZero(R.id.radioGroup_roof),
+            surveyId = targetId,  // ★ 여기!
+            possible = idxOfChecked(R.id.radioGroup_possible),
+            adminUse = vOrZero(R.id.radioGroup_adminUse),
+            idleRate = vOrZero(R.id.radioGroup_idleRate),
+            safety = vOrZero(R.id.radioGroup_safety),
+            wall = vOrZero(R.id.radioGroup_wall),
+            roof = vOrZero(R.id.radioGroup_roof),
             windowState = vOrZero(R.id.radioGroup_window),
-            parking     = vOrZero(R.id.radioGroup_parking),
-            entrance    = vOrZero(R.id.radioGroup_entrance),
-            ceiling     = vOrZero(R.id.radioGroup_ceiling),
-            floor       = vOrZero(R.id.radioGroup_floor),
-            extEtc      = if (impossible) "" else findViewById<EditText>(R.id.input_extEtc).text.toString(),
-            intEtc      = if (impossible) "" else findViewById<EditText>(R.id.input_intEtc).text.toString(),
-            buildingId  = assignedBuildingId.takeIf { it > 0 } ?: 1L,
-            userId      = bitc.fullstack502.final_project_team1.core.AuthManager.userId(this),
-            status      = desiredStatus
+            parking = vOrZero(R.id.radioGroup_parking),
+            entrance = vOrZero(R.id.radioGroup_entrance),
+            ceiling = vOrZero(R.id.radioGroup_ceiling),
+            floor = vOrZero(R.id.radioGroup_floor),
+            extEtc = if (impossible) "" else findViewById<EditText>(R.id.input_extEtc).text.toString(),
+            intEtc = if (impossible) "" else findViewById<EditText>(R.id.input_intEtc).text.toString(),
+            buildingId = assignedBuildingId.takeIf { it > 0 } ?: 1L,
+            userId = bitc.fullstack502.final_project_team1.core.AuthManager.userId(this),
+            status = desiredStatus
         )
     }
 
+    /** /upload/… 같은 상대경로를 절대 URL로 보정 */
+    private fun normalizeUrlMaybe(url: String?): String? {
+        val raw = url?.trim().orEmpty()
+        if (raw.isEmpty()) return null
+        if (raw.startsWith("http://") || raw.startsWith("https://")) return raw
+        val origin = ApiClient.originBaseUrl() // 예: http://10.0.2.2:8080
+        val path = if (raw.startsWith("/")) raw else "/$raw"
+        return origin + path
+    }
 
 
     // ===== 유틸 =====
@@ -448,6 +468,7 @@ class SurveyActivity : AppCompatActivity() {
                     }
                 }
             }
+
             REQ_CAPTURE_INT -> {
                 intPhotoFile = pendingOutputFile
                 pendingOutputFile = null
@@ -490,6 +511,7 @@ class SurveyActivity : AppCompatActivity() {
                     findViewById<ImageView>(R.id.img_extPhoto).setImageBitmap(bmp)
                 }
             }
+
             REQ_EDIT_INT -> {
                 val uriStr = data?.getStringExtra(EditActivity.EXTRA_EDITED_IMAGE_URI) ?: return
                 val file = File(Uri.parse(uriStr).path!!)
@@ -533,9 +555,9 @@ class SurveyActivity : AppCompatActivity() {
 
             val res = ApiClient.service.submitSurvey(
                 dto = Gson().toJson(dto).toRequestBody("application/json".toMediaTypeOrNull()),
-                extPhoto     = if (impossible) null else extPhotoFile?.toPart("extPhoto"),
+                extPhoto = if (impossible) null else extPhotoFile?.toPart("extPhoto"),
                 extEditPhoto = if (impossible) null else extEditPhotoFile?.toPart("extEditPhoto"),
-                intPhoto     = if (impossible) null else intPhotoFile?.toPart("intPhoto"),
+                intPhoto = if (impossible) null else intPhotoFile?.toPart("intPhoto"),
                 intEditPhoto = if (impossible) null else intEditPhotoFile?.toPart("intEditPhoto")
             )
 
@@ -556,9 +578,9 @@ class SurveyActivity : AppCompatActivity() {
 
             val res = ApiClient.service.saveTemp(
                 dto = Gson().toJson(dto).toRequestBody("application/json".toMediaTypeOrNull()),
-                extPhoto     = if (impossible) null else extPhotoFile?.toPart("extPhoto"),
+                extPhoto = if (impossible) null else extPhotoFile?.toPart("extPhoto"),
                 extEditPhoto = if (impossible) null else extEditPhotoFile?.toPart("extEditPhoto"),
-                intPhoto     = if (impossible) null else intPhotoFile?.toPart("intPhoto"),
+                intPhoto = if (impossible) null else intPhotoFile?.toPart("intPhoto"),
                 intEditPhoto = if (impossible) null else intEditPhotoFile?.toPart("intEditPhoto")
             )
 
@@ -566,7 +588,8 @@ class SurveyActivity : AppCompatActivity() {
                 Toast.makeText(this@SurveyActivity, "임시저장 완료", Toast.LENGTH_SHORT).show()
                 goBackToOrigin()
             } else {
-                Toast.makeText(this@SurveyActivity, "임시저장 실패: ${res.code()}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SurveyActivity, "임시저장 실패: ${res.code()}", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -575,58 +598,69 @@ class SurveyActivity : AppCompatActivity() {
     private fun prefillIfPossible() {
         lifecycleScope.launch {
             try {
-                val uid = bitc.fullstack502.final_project_team1.core.AuthManager.userId(this@SurveyActivity)
+                val uid =
+                    bitc.fullstack502.final_project_team1.core.AuthManager.userId(this@SurveyActivity)
                 if (uid <= 0) return@launch
 
                 val detail = when {
                     editingSurveyId != null ->
                         ApiClient.service.getSurveyDetail(uid, editingSurveyId!!)
+
                     mode == "REINSPECT" ->
                         ApiClient.service.getSurveyLatest(uid, assignedBuildingId)
+
                     else -> null
                 }
 
                 if (detail != null) {
                     // 기존 값 채우기
-                    setRadioByIndex(R.id.radioGroup_possible,    detail.possible)
-                    setRadioByIndex(R.id.radioGroup_adminUse,    detail.adminUse)
-                    setRadioByIndex(R.id.radioGroup_idleRate,    detail.idleRate)
-                    setRadioByIndex(R.id.radioGroup_safety,      detail.safety)
-                    setRadioByIndex(R.id.radioGroup_wall,        detail.wall)
-                    setRadioByIndex(R.id.radioGroup_roof,        detail.roof)
-                    setRadioByIndex(R.id.radioGroup_window,      detail.windowState)
-                    setRadioByIndex(R.id.radioGroup_parking,     detail.parking)
-                    setRadioByIndex(R.id.radioGroup_entrance,    detail.entrance)
-                    setRadioByIndex(R.id.radioGroup_ceiling,     detail.ceiling)
-                    setRadioByIndex(R.id.radioGroup_floor,       detail.floor)
+                    setRadioByIndex(R.id.radioGroup_possible, detail.possible)
+                    setRadioByIndex(R.id.radioGroup_adminUse, detail.adminUse)
+                    setRadioByIndex(R.id.radioGroup_idleRate, detail.idleRate)
+                    setRadioByIndex(R.id.radioGroup_safety, detail.safety)
+                    setRadioByIndex(R.id.radioGroup_wall, detail.wall)
+                    setRadioByIndex(R.id.radioGroup_roof, detail.roof)
+                    setRadioByIndex(R.id.radioGroup_window, detail.windowState)
+                    setRadioByIndex(R.id.radioGroup_parking, detail.parking)
+                    setRadioByIndex(R.id.radioGroup_entrance, detail.entrance)
+                    setRadioByIndex(R.id.radioGroup_ceiling, detail.ceiling)
+                    setRadioByIndex(R.id.radioGroup_floor, detail.floor)
 
                     findViewById<EditText>(R.id.input_extEtc).setText(detail.extEtc ?: "")
                     findViewById<EditText>(R.id.input_intEtc).setText(detail.intEtc ?: "")
 
-                    loadRemotePhotoFlag(detail.extPhoto)     { hasExtPhotoRemote = it }
+                    loadRemotePhotoFlag(detail.extPhoto) { hasExtPhotoRemote = it }
                     loadRemotePhotoFlag(detail.extEditPhoto) { hasExtEditPhotoRemote = it }
-                    loadRemotePhotoFlag(detail.intPhoto)     { hasIntPhotoRemote = it }
+                    loadRemotePhotoFlag(detail.intPhoto) { hasIntPhotoRemote = it }
                     loadRemotePhotoFlag(detail.intEditPhoto) { hasIntEditPhotoRemote = it }
 
+
                     // ▼ URL 보관
-                    extPhotoUrl     = detail.extPhoto
+                    extPhotoUrl = detail.extPhoto
                     extEditPhotoUrl = detail.extEditPhoto
-                    intPhotoUrl     = detail.intPhoto
+                    intPhotoUrl = detail.intPhoto
                     intEditPhotoUrl = detail.intEditPhoto
 
+                    Log.d(
+                        "SurveyPrefill",
+                        "detail ext=${detail?.extPhoto}, extEdit=${detail?.extEditPhoto}, int=${detail?.intPhoto}, intEdit=${detail?.intEditPhoto}"
+                    )
+
                     // ▼ 서버 보유 플래그
-                    hasExtPhotoRemote     = !extPhotoUrl.isNullOrBlank()
+                    hasExtPhotoRemote = !extPhotoUrl.isNullOrBlank()
                     hasExtEditPhotoRemote = !extEditPhotoUrl.isNullOrBlank()
-                    hasIntPhotoRemote     = !intPhotoUrl.isNullOrBlank()
+                    hasIntPhotoRemote = !intPhotoUrl.isNullOrBlank()
                     hasIntEditPhotoRemote = !intEditPhotoUrl.isNullOrBlank()
 
-                    // ▼ 화면에 표시: 편집본 우선, 없으면 원본
+                    // ▼ 화면에 표시: "편집본 우선, 없으면 원본"
+//    (normalizeUrlMaybe() + loadInto() 가 같은 클래스에 선언돼 있어야 함)
                     loadInto(R.id.img_extPhoto, extEditPhotoUrl ?: extPhotoUrl)
                     loadInto(R.id.img_intPhoto, intEditPhotoUrl ?: intPhotoUrl)
                 }
             } catch (e: Exception) {
                 val msg = if (e is retrofit2.HttpException) "HTTP ${e.code()}" else e.message ?: ""
-                Toast.makeText(this@SurveyActivity, "이전 결과 불러오기 실패: $msg", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SurveyActivity, "이전 결과 불러오기 실패: $msg", Toast.LENGTH_SHORT)
+                    .show()
             }
 
             applyImpossibleModeIfNeeded()
@@ -657,7 +691,7 @@ class SurveyActivity : AppCompatActivity() {
         rg.check(child.id)
     }
 
-    private fun loadRemotePhotoFlag(url: String?, onHas: (Boolean)->Unit) {
+    private fun loadRemotePhotoFlag(url: String?, onHas: (Boolean) -> Unit) {
         if (!url.isNullOrBlank()) onHas(true)
     }
 }

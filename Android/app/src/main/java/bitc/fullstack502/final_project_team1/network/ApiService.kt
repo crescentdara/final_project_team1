@@ -45,7 +45,6 @@ interface ApiService {
     @GET("building/detail")
     suspend fun getBuildingDetail(@Query("buildingId") buildingId: Long): BuildingDetailDto
 
-    // 설문 결과 제출/임시저장/수정  (※ 서버는 /app/survey/result/..., 클라는 /survey/result/... 만)
     @Multipart
     @POST("survey/result/submit")
     suspend fun submitSurvey(

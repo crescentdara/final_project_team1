@@ -34,19 +34,20 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
     List<StatusCount> countGroupByStatus(@Param("userId") Long userId);
 
     @Query("""
-        select s
-        from SurveyResultEntity s
-        where s.user.userId = :userId
-          and (:status is null or s.status = :status)
-        order by case when s.updatedAt is null then 1 else 0 end,
-                 s.updatedAt desc,
-                 s.createdAt desc
-        """)
+    select s
+    from SurveyResultEntity s
+    where s.user.userId = :userId
+      and (:status is null or upper(s.status) = upper(:status))
+    order by case when s.updatedAt is null then 1 else 0 end,
+             s.updatedAt desc,
+             s.createdAt desc
+    """)
     Page<SurveyResultEntity> findByUserAndStatusPage(
             @Param("userId") Long userId,
             @Param("status") String status,
             Pageable pageable
     );
+
 
     /** 무필터 전체 로딩에서도 user, building 같이 가져오기 (N+1 방지) */
     @Override

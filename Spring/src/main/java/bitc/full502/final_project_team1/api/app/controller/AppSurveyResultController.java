@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import bitc.full502.final_project_team1.core.service.SurveyService;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class AppSurveyResultController {
 
     private final SurveyResultService surveyResultService;
     private final FileStorageService fileStorageService;
-
+    private final SurveyService surveyService;
     // ─────────────────────────────────────────────────────────────────
     // ① 단건 조회 (권한 체크 + DTO 반환)
     //    - 기존: Entity 반환 → 변경: 응답 DTO로 반환
@@ -69,44 +70,35 @@ public class AppSurveyResultController {
     // ─────────────────────────────────────────────────────────────────
     // ③ 제출/임시저장/수정: 멀티파트 사용 → consumes 명시 (중요!)
     // ─────────────────────────────────────────────────────────────────
-    @PostMapping(
-            value = "/submit",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
+    @PostMapping(value="/submit", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AppSurveyResultResponse> submitSurvey(
             @RequestPart("dto") AppSurveyResultRequest dto,
-            @RequestPart(value = "extPhoto", required = false) MultipartFile extPhoto,
-            @RequestPart(value = "extEditPhoto", required = false) MultipartFile extEditPhoto,
-            @RequestPart(value = "intPhoto", required = false) MultipartFile intPhoto,
-            @RequestPart(value = "intEditPhoto", required = false) MultipartFile intEditPhoto
-    ) {
-        dto.setStatus("SENT"); // 최종 제출
+            @RequestPart(value="extPhoto",     required=false) MultipartFile extPhoto,
+            @RequestPart(value="extEditPhoto", required=false) MultipartFile extEditPhoto,
+            @RequestPart(value="intPhoto",     required=false) MultipartFile intPhoto,
+            @RequestPart(value="intEditPhoto", required=false) MultipartFile intEditPhoto
+    ){
+        dto.setStatus("SENT");
         handleFiles(dto, extPhoto, extEditPhoto, intPhoto, intEditPhoto);
-        SurveyResultEntity saved = surveyResultService.saveSurvey(dto);
-        return ResponseEntity.ok(toResponse(saved));
+        var res = surveyService.saveOrUpdate(dto, "SENT"); // ★ SurveyService만
+        return ResponseEntity.ok(res);
     }
 
-    @PostMapping(
-            value = "/save-temp",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
+    @PostMapping(value="/save-temp", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AppSurveyResultResponse> saveTemp(
             @RequestPart("dto") AppSurveyResultRequest dto,
-            @RequestPart(value = "extPhoto", required = false) MultipartFile extPhoto,
-            @RequestPart(value = "extEditPhoto", required = false) MultipartFile extEditPhoto,
-            @RequestPart(value = "intPhoto", required = false) MultipartFile intPhoto,
-            @RequestPart(value = "intEditPhoto", required = false) MultipartFile intEditPhoto
-    ) {
+            @RequestPart(value="extPhoto",     required=false) MultipartFile extPhoto,
+            @RequestPart(value="extEditPhoto", required=false) MultipartFile extEditPhoto,
+            @RequestPart(value="intPhoto",     required=false) MultipartFile intPhoto,
+            @RequestPart(value="intEditPhoto", required=false) MultipartFile intEditPhoto
+    ){
         dto.setStatus("TEMP");
         handleFiles(dto, extPhoto, extEditPhoto, intPhoto, intEditPhoto);
-        SurveyResultEntity saved = surveyResultService.saveSurvey(dto);
-        return ResponseEntity.ok(toResponse(saved));
+        var res = surveyService.saveOrUpdate(dto, "TEMP"); // ★ SurveyService만
+        return ResponseEntity.ok(res);
     }
 
-    @PutMapping(
-            value = "/edit/{id}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
+    @PutMapping(value="/edit/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AppSurveyResultResponse> updateSurvey(
             @PathVariable Long id,
             @RequestPart("dto") AppSurveyResultRequest dto,
@@ -115,10 +107,10 @@ public class AppSurveyResultController {
             @RequestPart(value = "intPhoto", required = false) MultipartFile intPhoto,
             @RequestPart(value = "intEditPhoto", required = false) MultipartFile intEditPhoto
     ) {
+        dto.setSurveyId(id);
         handleFiles(dto, extPhoto, extEditPhoto, intPhoto, intEditPhoto);
-        SurveyResultEntity updated = surveyResultService.updateSurvey(id, dto,
-                extPhoto, extEditPhoto, intPhoto, intEditPhoto);
-        return ResponseEntity.ok(toResponse(updated));
+        var res = surveyService.saveOrUpdate(dto, null); // 상태 강제 안 함(요청/기존값 유지)
+        return ResponseEntity.ok(res);
     }
 
     // 파일 저장 공통
@@ -134,7 +126,7 @@ public class AppSurveyResultController {
     // Entity → 응답 DTO 변환 (프리필/상세 공용)
     private AppSurveyResultResponse toResponse(SurveyResultEntity s) {
         return AppSurveyResultResponse.builder()
-                .id(s.getId())
+                .surveyId(s.getId())
                 .possible(s.getPossible())
                 .adminUse(s.getAdminUse())
                 .idleRate(s.getIdleRate())

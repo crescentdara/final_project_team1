@@ -1,9 +1,7 @@
 package bitc.full502.final_project_team1.core.service;
 
-import bitc.full502.final_project_team1.api.app.dto.AppUserSurveyStatusResponse;
-import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
-import bitc.full502.final_project_team1.api.app.dto.ListWithStatusResponse;
-import bitc.full502.final_project_team1.api.app.dto.SurveyListItemDto;
+import bitc.full502.final_project_team1.api.app.dto.*;
+import jakarta.annotation.Nullable;
 
 import java.util.List;
 
@@ -25,4 +23,6 @@ public interface SurveyService {
             Long userId, String status, int page, int size
     );
 
+    @org.springframework.transaction.annotation.Transactional
+    AppSurveyResultResponse saveOrUpdate(AppSurveyResultRequest req, @Nullable String forceStatus);
 }

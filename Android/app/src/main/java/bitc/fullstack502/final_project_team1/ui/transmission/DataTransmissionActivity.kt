@@ -13,6 +13,7 @@ import bitc.fullstack502.final_project_team1.MainActivity
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
+import bitc.fullstack502.final_project_team1.network.dto.ReturnTo
 import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.BuildingInfoBottomSheet
@@ -21,6 +22,7 @@ import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import bitc.fullstack502.final_project_team1.network.dto.EXTRA_RETURN_TO
 
 
 class DataTransmissionActivity : AppCompatActivity() {
@@ -109,7 +111,9 @@ class DataTransmissionActivity : AppCompatActivity() {
                     surveyId   = surveyId,
                     buildingId = buildingId,
                     address    = address
-                )
+                ).apply {
+                    arguments?.putString(EXTRA_RETURN_TO, ReturnTo.NOT_TRANSMITTED.name)
+                }
                 .show(supportFragmentManager, "tempDetail")
         }
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -150,7 +154,7 @@ class DataTransmissionActivity : AppCompatActivity() {
         sortedDataList.clear()
         when (sortType) {
             "최신순" -> sortedDataList.addAll(allDataList.sortedByDescending { key(it.assignedAtIso) })
-            "과거순" -> sortedDataList.addAll(allDataList.sortedBy { key(it.assignedAtIso) })
+            "오래된순" -> sortedDataList.addAll(allDataList.sortedBy { key(it.assignedAtIso) })
             else     -> sortedDataList.addAll(allDataList)
         }
         updateUI()

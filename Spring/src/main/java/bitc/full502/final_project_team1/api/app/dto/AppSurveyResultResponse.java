@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class AppSurveyResultResponse {
-    private Long id;
+    private Long surveyId;
     private Integer possible;
     private Integer adminUse;
     private Integer idleRate;

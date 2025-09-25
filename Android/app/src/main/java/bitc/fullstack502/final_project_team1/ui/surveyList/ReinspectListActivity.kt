@@ -24,6 +24,8 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import android.view.View
+import bitc.fullstack502.final_project_team1.network.dto.ReturnTo
+import bitc.fullstack502.final_project_team1.network.dto.EXTRA_RETURN_TO
 
 class ReinspectListActivity : AppCompatActivity() {
 
@@ -79,6 +81,7 @@ class ReinspectListActivity : AppCompatActivity() {
         loadAndRender()
     }
 
+
     private fun loadAndRender() {
         lifecycleScope.launch {
             try {
@@ -90,11 +93,14 @@ class ReinspectListActivity : AppCompatActivity() {
 
                 val res = ApiClient.service.getSurveysReJe(
                     userId = uid,
+                    status = "REJECTED",
                     page = 0,
                     size = 200
                 )
 
                 var items = res.page.content
+                    .filter { it.status.equals("REJECTED", ignoreCase = true) }
+
                 when (spinnerSort.selectedItemPosition) {
                     1 -> items = items.sortedBy { it.address ?: "" }                 // 주소순
                     2 -> items = items.sortedByDescending { it.assignedAtIso ?: "" } // 배정일자순(최신)
@@ -166,7 +172,9 @@ class ReinspectListActivity : AppCompatActivity() {
                     buildingName = item.buildingName,
                     rejectReason = item.rejectReason,
                     rejectedAt   = item.assignedAtIso
-                ).show(supportFragmentManager, "building_info")
+                ).apply {
+                    arguments?.putString(EXTRA_RETURN_TO, ReturnTo.REINSPECT.name)
+                }.show(supportFragmentManager, "building_info")
             }
 
             listContainer.addView(row)
@@ -229,6 +237,18 @@ class ReinspectListActivity : AppCompatActivity() {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
+    override fun onResume() {
+        super.onResume()
+        loadAndRender()   // ★ 복귀마다 강제 리프레시
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent != null) setIntent(intent) // FLAG_ACTIVITY_CLEAR_TOP|SINGLE_TOP 대비
+        loadAndRender()   // ★ CLEAR_TOP 재진입에서도 리프레시
+    }
+
+
     private fun openTmapRoute(
         startLat: Double, startLng: Double, startName: String,
         destLat: Double, destLng: Double, destName: String
@@ -281,5 +301,6 @@ class ReinspectListActivity : AppCompatActivity() {
             grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "다시 길찾기를 눌러주세요.", Toast.LENGTH_SHORT).show()
         }
+
     }
 }

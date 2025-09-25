@@ -18,19 +18,19 @@ import bitc.fullstack502.final_project_team1.network.dto.BuildingDetailDto
 import bitc.fullstack502.final_project_team1.ui.SurveyActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
 class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
-        private const val ARG_BUILDING_ID = "buildingId"
-        private const val ARG_SURVEY_ID = "surveyId"
-        private const val ARG_MODE = "mode"         // "REINSPECT" | "NEW" | "TEMP_DETAIL"
-        private const val ARG_ADDRESS = "address"
+        private const val ARG_BUILDING_ID   = "buildingId"
+        private const val ARG_SURVEY_ID     = "surveyId"
+        private const val ARG_MODE          = "mode"          // "REINSPECT" | "NEW" | "TEMP_DETAIL"
+        private const val ARG_ADDRESS       = "address"
         private const val ARG_BUILDING_NAME = "buildingName"
         private const val ARG_REJECT_REASON = "rejectReason"
-        private const val ARG_REJECTED_AT = "rejectedAt"
+        private const val ARG_REJECTED_AT   = "rejectedAt"
 
+        @JvmStatic
         fun newInstanceForReinspect(
             surveyId: Long,
             buildingId: Long,
@@ -50,6 +50,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
             )
         }
 
+        @JvmStatic
         fun newInstanceForNew(buildingId: Long): BuildingInfoBottomSheet =
             BuildingInfoBottomSheet().apply {
                 arguments = bundleOf(
@@ -57,7 +58,8 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                     ARG_MODE to "NEW"
                 )
             }
-        // ✅ 미전송(TEMP) 상세 보기용 팩토리
+
+        @JvmStatic
         fun newInstanceForTempDetail(
             surveyId: Long,
             buildingId: Long,
@@ -77,7 +79,6 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
     private var mode: String = "NEW"
     private var lotAddress: String? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -87,8 +88,21 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.bottomsheet_building_info, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = inflater.inflate(R.layout.bottomsheet_building_info, container, false)
+
+    /** 바텀시트에 전달된 returnTo가 있으면 그대로, 없으면 mode별 기본값으로 */
+    private fun resolveReturnTo(): String {
+        val arg = arguments?.getString(SurveyActivity.EXTRA_RETURN_TO)
+        if (!arg.isNullOrBlank()) return arg
+        return when (mode) {
+            "REINSPECT"   -> SurveyActivity.RETURN_REINSPECT       // 재조사 목록으로
+            "TEMP_DETAIL" -> SurveyActivity.RETURN_NOT_TRANSMITTED  // 미전송으로
+            else          -> SurveyActivity.RETURN_SURVEY_LIST      // 기본: 조사목록
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -110,7 +124,6 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                 btnStart.visibility = View.VISIBLE
                 btnStart.text = getString(R.string.reinspect_start)
                 btnStart.setOnClickListener { startReinspectThenOpenEditor() }
-                // 건물 상세 출력
                 fetchAndRenderBuilding(info)
             }
             "NEW" -> {
@@ -118,21 +131,20 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                 btnStart.visibility = View.VISIBLE
                 btnStart.text = getString(R.string.survey_start)
                 btnStart.setOnClickListener { openEditorNew() }
-                // 건물 상세 출력
                 fetchAndRenderBuilding(info)
             }
-            // ✅ 미전송 상세
             "TEMP_DETAIL" -> {
                 tempBar.visibility = View.VISIBLE
                 btnStart.visibility = View.GONE
-                // 주소(상단에 별도 표시가 없다면 info 첫 줄로 추가)
+
+                // 주소 헤더
                 info.removeAllViews()
                 info.addView(TextView(requireContext()).apply {
                     text = (arguments?.getString(ARG_ADDRESS) ?: "-")
                     setTextColor(resources.getColor(R.color.text_primary, null))
                     textSize = 16f
                     setTypeface(typeface, android.graphics.Typeface.BOLD)
-                    setPadding(0,0,0,8)
+                    setPadding(0, 0, 0, 8)
                 })
 
                 fetchAndRenderSurveyResult(info)
@@ -159,7 +171,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                         container.addView(TextView(requireContext()).apply {
                             text = "$label : ${value ?: "-"}"
                             textSize = 14f
-                            setPadding(0,6,0,6)
+                            setPadding(0, 6, 0, 6)
                         })
                     }
                     add("지번주소", b.lotAddress)
@@ -192,11 +204,11 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
                     container.addView(TextView(requireContext()).apply {
                         text = "$label : ${value ?: "-"}"
                         textSize = 14f
-                        setPadding(0,6,0,6)
+                        setPadding(0, 6, 0, 6)
                     })
                 }
                 fun opt(i: Int?, vararg labels: String) =
-                    i?.takeIf { it in 1..labels.size }?.let { labels[it-1] }
+                    i?.takeIf { it in 1..labels.size }?.let { labels[it - 1] }
 
                 add("조사불가", if (d.possible == 2) "불가" else "가능")
                 add("행정목적", opt(d.adminUse, "활용", "일부 활용", "미활용"))
@@ -219,7 +231,6 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-
     private fun startReinspectThenOpenEditor() {
         if (buildingId <= 0 || surveyId <= 0) {
             Toast.makeText(requireContext(), R.string.invalid_survey, Toast.LENGTH_SHORT).show()
@@ -229,7 +240,7 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
             putExtra(SurveyActivity.EXTRA_MODE, "REINSPECT")
             putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
             putExtra(SurveyActivity.EXTRA_SURVEY_ID, surveyId)
-            putExtra(SurveyActivity.EXTRA_RETURN_TO, SurveyActivity.RETURN_SURVEY_LIST)
+            putExtra(SurveyActivity.EXTRA_RETURN_TO, resolveReturnTo())
             putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
         startActivity(intent)
@@ -247,40 +258,37 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-
     private fun openEditorNew() {
         val i = Intent(requireContext(), SurveyActivity::class.java).apply {
             putExtra(SurveyActivity.EXTRA_MODE, "CREATE")
             putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
-            putExtra(SurveyActivity.EXTRA_RETURN_TO, SurveyActivity.RETURN_SURVEY_LIST)
+            putExtra(SurveyActivity.EXTRA_RETURN_TO, resolveReturnTo())
             putExtra("lotAddress", lotAddress ?: arguments?.getString(ARG_ADDRESS).orEmpty())
         }
-        startActivity(i); dismiss()
+        startActivity(i)
+        dismiss()
     }
 
     private fun openEditorForEdit(autoSubmit: Boolean) {
-        val i = Intent(requireContext(), bitc.fullstack502.final_project_team1.ui.SurveyActivity::class.java).apply {
+        val i = Intent(requireContext(), SurveyActivity::class.java).apply {
             putExtra(SurveyActivity.EXTRA_MODE, "EDIT")
             putExtra(SurveyActivity.EXTRA_BUILDING_ID, buildingId)
             putExtra(SurveyActivity.EXTRA_SURVEY_ID, surveyId)
             putExtra(SurveyActivity.EXTRA_AUTO_SUBMIT, autoSubmit)
-            putExtra(SurveyActivity.EXTRA_RETURN_TO, SurveyActivity.RETURN_NOT_TRANSMITTED)
+            putExtra(SurveyActivity.EXTRA_RETURN_TO, resolveReturnTo())
             putExtra("lotAddress", arguments?.getString(ARG_ADDRESS).orEmpty())
         }
         startActivity(i)
     }
 
-
     private fun renderBuilding(container: LinearLayout, b: BuildingDetailDto) {
         container.removeAllViews()
-
         fun add(label: String, value: String?) {
             container.addView(TextView(requireContext()).apply {
                 text = "$label : ${value ?: "-"}"
                 textSize = 14f
             })
         }
-
         add("지번주소", b.lotAddress)
         add("건물명", b.buildingName)
         add("지상층수", b.groundFloors?.toString())

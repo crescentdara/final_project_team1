@@ -30,6 +30,8 @@ import android.util.Log
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import android.location.Location
+import bitc.fullstack502.final_project_team1.network.dto.ReturnTo
+import bitc.fullstack502.final_project_team1.network.dto.EXTRA_RETURN_TO
 
 class SurveyListActivity : AppCompatActivity() {
 
@@ -246,8 +248,9 @@ class SurveyListActivity : AppCompatActivity() {
 
             // 카드 클릭 → 건물 상세
             row.setOnClickListener {
-                BuildingInfoBottomSheet.newInstanceForNew(item.id)
-                    .show(supportFragmentManager, "buildingInfo")
+                BuildingInfoBottomSheet.newInstanceForNew(item.id).apply {
+                    arguments?.putString(EXTRA_RETURN_TO, ReturnTo.SURVEY_LIST.name)
+                }.show(supportFragmentManager, "buildingInfo")
             }
 
             // 지도보기

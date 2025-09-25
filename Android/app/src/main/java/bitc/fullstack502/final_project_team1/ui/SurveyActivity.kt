@@ -46,6 +46,8 @@ class SurveyActivity : AppCompatActivity() {
         const val EXTRA_RETURN_TO = "return_to"           // "NOT_TRANSMITTED" | "SURVEY_LIST"
         const val RETURN_NOT_TRANSMITTED = "NOT_TRANSMITTED"
         const val RETURN_SURVEY_LIST     = "SURVEY_LIST"
+        const val RETURN_REINSPECT = "REINSPECT"
+
     }
 
     private var mode: String = "CREATE"
@@ -240,8 +242,9 @@ class SurveyActivity : AppCompatActivity() {
     private fun goBackToOrigin() {
         val target = intent.getStringExtra(EXTRA_RETURN_TO) ?: RETURN_NOT_TRANSMITTED
         val targetCls = when (target) {
-            RETURN_SURVEY_LIST -> bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity::class.java
-            else               -> bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity::class.java
+            RETURN_SURVEY_LIST  -> bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity::class.java
+            RETURN_REINSPECT    -> bitc.fullstack502.final_project_team1.ui.surveyList.ReinspectListActivity::class.java // ★ 추가
+            else                -> bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity::class.java
         }
         startActivity(Intent(this, targetCls).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -249,6 +252,7 @@ class SurveyActivity : AppCompatActivity() {
         setResult(Activity.RESULT_OK)
         finish()
     }
+
 
 
     // === 불가 모드 판단 ===
@@ -354,13 +358,21 @@ class SurveyActivity : AppCompatActivity() {
     }
 
     // === DTO 생성: 불가면 숫자 0, 문자열 ""로 보냄 ===
-    private fun buildDtoForSubmitOrTemp(): SurveyResultRequest {
+// desiredStatus: "TEMP" 또는 "SENT"
+    // desiredStatus: "TEMP" 또는 "SENT"
+    private fun buildDtoForSubmitOrTemp(desiredStatus: String): SurveyResultRequest {
         val impossible = isImpossible()
+
         fun vOrZero(id: Int): Int =
             if (impossible) 0 else idxOfChecked(id).takeIf { it > 0 } ?: 0
 
+        // 편집/재조사로 진입한 경우, 수정 대상 survey PK 확보
+        val targetId: Long? = editingSurveyId
+            ?: intent.getLongExtra(EXTRA_SURVEY_ID, -1L).takeIf { it > 0 }
+
         return SurveyResultRequest(
-            possible    = idxOfChecked(R.id.radioGroup_possible), // 불가(2) 그대로
+            surveyId    = targetId,  // ★ 여기!
+            possible    = idxOfChecked(R.id.radioGroup_possible),
             adminUse    = vOrZero(R.id.radioGroup_adminUse),
             idleRate    = vOrZero(R.id.radioGroup_idleRate),
             safety      = vOrZero(R.id.radioGroup_safety),
@@ -374,9 +386,12 @@ class SurveyActivity : AppCompatActivity() {
             extEtc      = if (impossible) "" else findViewById<EditText>(R.id.input_extEtc).text.toString(),
             intEtc      = if (impossible) "" else findViewById<EditText>(R.id.input_intEtc).text.toString(),
             buildingId  = assignedBuildingId.takeIf { it > 0 } ?: 1L,
-            userId      = bitc.fullstack502.final_project_team1.core.AuthManager.userId(this)
+            userId      = bitc.fullstack502.final_project_team1.core.AuthManager.userId(this),
+            status      = desiredStatus
         )
     }
+
+
 
     // ===== 유틸 =====
     private fun <T> View.findViewsByType(clazz: Class<T>): List<T> {
@@ -513,7 +528,7 @@ class SurveyActivity : AppCompatActivity() {
     // 제출
     private fun submitSurvey() {
         lifecycleScope.launch {
-            val dto = buildDtoForSubmitOrTemp()
+            val dto = buildDtoForSubmitOrTemp("SENT")   // ★ status 명시
             val impossible = isImpossible()
 
             val res = ApiClient.service.submitSurvey(
@@ -524,7 +539,6 @@ class SurveyActivity : AppCompatActivity() {
                 intEditPhoto = if (impossible) null else intEditPhotoFile?.toPart("intEditPhoto")
             )
 
-            // 제출 성공 시
             if (res.isSuccessful) {
                 Toast.makeText(this@SurveyActivity, "제출 성공!", Toast.LENGTH_SHORT).show()
                 goBackToOrigin()
@@ -534,11 +548,10 @@ class SurveyActivity : AppCompatActivity() {
         }
     }
 
-
     // 임시저장
     private fun saveTemp() {
         lifecycleScope.launch {
-            val dto = buildDtoForSubmitOrTemp()
+            val dto = buildDtoForSubmitOrTemp("TEMP")   // ★ status 명시
             val impossible = isImpossible()
 
             val res = ApiClient.service.saveTemp(
@@ -549,12 +562,10 @@ class SurveyActivity : AppCompatActivity() {
                 intEditPhoto = if (impossible) null else intEditPhotoFile?.toPart("intEditPhoto")
             )
 
-            // 임시저장 성공 시
             if (res.isSuccessful) {
                 Toast.makeText(this@SurveyActivity, "임시저장 완료", Toast.LENGTH_SHORT).show()
                 goBackToOrigin()
-            }
-            else {
+            } else {
                 Toast.makeText(this@SurveyActivity, "임시저장 실패: ${res.code()}", Toast.LENGTH_SHORT).show()
             }
         }

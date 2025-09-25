@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class AppSurveyResultRequest {
+    private Long surveyId;
     private Integer possible;
     private Integer adminUse;
     private Integer idleRate;

@@ -90,4 +90,9 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
   @Transactional
   @Query(value = "DELETE FROM user_building_assignment WHERE building_id = :buildingId", nativeQuery = true)
   int deleteByBuildingId(@Param("buildingId") Long buildingId);
+
+  // 대시보드에서 "배정된 건수" = status ∈ (1,2) 인 거 count
+  @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u WHERE u.status IN :statuses")
+  long countByStatusIn(@Param("statuses") List<Integer> statuses);
+
 }

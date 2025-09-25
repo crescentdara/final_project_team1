@@ -197,4 +197,11 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
    ORDER BY b.id DESC
 """, nativeQuery = true)
   List<BuildingEntity> findPendingApprovalBuildings(@Param("emd") String eupMyeonDong);
+
+    // 전체 건물 수
+    long count(); // 전체 building 행 개수
+
+    // 배정된 건물 수 (status = 1)
+    long countByStatus(int status);
+
 }

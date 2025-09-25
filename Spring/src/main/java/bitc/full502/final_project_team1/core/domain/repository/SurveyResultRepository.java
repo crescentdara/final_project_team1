@@ -79,6 +79,9 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
     // 최신 1건 가져오기
     Optional<SurveyResultEntity> findTopByBuilding_IdOrderByIdDesc(Long buildingId);
 
+    // 전체 survey_result 에서 status 값별 건수 카운트
+    long countByStatus(String status);
+
 
 }
 

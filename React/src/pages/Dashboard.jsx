@@ -14,11 +14,11 @@ function Dashboard() {
 
     if (!stats) return <p>로딩 중...</p>;
 
-    const total = stats.inProgress + stats.waitingApproval + stats.approved;
-
+    // 📌 전체 건물 수 기준
+    const totalBuildings = stats.totalBuildings;
     const getHeight = (value) => {
-        if (total === 0) return "0%";
-        return `${(value / total) * 100}%`;
+        if (totalBuildings === 0) return "0%";
+        return `${(value / totalBuildings) * 100}%`;
     };
 
     return (
@@ -31,7 +31,7 @@ function Dashboard() {
                 borderRadius: "16px",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                 background: "#fff",
-                display: "flex",            // ✅ 가로 레이아웃
+                display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 gap: "40px",
@@ -66,7 +66,6 @@ function Dashboard() {
                         fontWeight: "500",
                         marginTop: "10px",
                     }}
-
                     onClick={() => navigate("/approvals")}
                 >
                     미결재 건 확인 →
@@ -82,7 +81,7 @@ function Dashboard() {
                     gap: "40px",
                 }}
             >
-                {/* 조사 진행 중 */}
+                {/* 조사 진행 (전체 건물 대비 배정률) */}
                 <div style={{ textAlign: "center" }}>
                     <div
                         style={{
@@ -99,17 +98,17 @@ function Dashboard() {
                         <div
                             style={{
                                 width: "100%",
-                                height: getHeight(stats.inProgress),
+                                height: getHeight(stats.assignedBuildings),
                                 background: "#289eff",
                                 transition: "height 0.6s ease",
                             }}
                         ></div>
                     </div>
                     <p style={{ marginTop: "10px", fontWeight: "500" }}>
-                        조사 진행<br />
+                        배정률<br />
                         <span style={{ color: "#289eff", fontWeight: "bold" }}>
-              {stats.inProgress}건
-            </span>
+                            {stats.assignedBuildings}건
+                        </span>
                     </p>
                 </div>
 
@@ -139,8 +138,8 @@ function Dashboard() {
                     <p style={{ marginTop: "10px", fontWeight: "500" }}>
                         결재 대기<br />
                         <span style={{ color: "#ffc107", fontWeight: "bold" }}>
-              {stats.waitingApproval}건
-            </span>
+                            {stats.waitingApproval}건
+                        </span>
                     </p>
                 </div>
 
@@ -170,8 +169,8 @@ function Dashboard() {
                     <p style={{ marginTop: "10px", fontWeight: "500" }}>
                         결재 완료<br />
                         <span style={{ color: "#28a745", fontWeight: "bold" }}>
-              {stats.approved}건
-            </span>
+                            {stats.approved}건
+                        </span>
                     </p>
                 </div>
             </div>

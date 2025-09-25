@@ -421,4 +421,43 @@ public class BuildingController {
           .body("다른 데이터가 참조 중이라 삭제할 수 없습니다. 관련 배정/결재/조사결과를 먼저 정리하세요.");
     }
   }
+
+  /**
+   * ✅ 조사지(건물) 수정
+   * React: PUT /web/building/{id}
+   * Body: CreateSurvey가 보내는 payload (BuildingDTO 필드명과 1:1)
+   * - 문자열은 null이 오면 무시(기존 유지), 값이 오면 그대로 반영(비워서 "" 보내면 빈문자 저장)
+   * - 숫자는 null이면 무시, 값이 오면 반영
+   * - 배정/결재와 무관 (이 API는 순수 메타데이터 수정만)
+   */
+  @PutMapping("/{id}")
+  @Transactional
+  public ResponseEntity<?> updateBuilding(
+      @PathVariable Long id,
+      @RequestBody BuildingDTO dto
+  ) {
+    BuildingEntity b = buildingRepo.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("건물을 찾을 수 없습니다. id=" + id));
+
+    // ---- 문자열 계열 (null이 아닌 값만 반영) ----
+    if (dto.getLotAddress()    != null) b.setLotAddress(dto.getLotAddress());
+    if (dto.getBuildingName()  != null) b.setBuildingName(dto.getBuildingName());
+    if (dto.getMainUseName()   != null) b.setMainUseName(dto.getMainUseName());     // ← React mainUseName
+    if (dto.getStructureName() != null) b.setStructureName(dto.getStructureName()); // ← React structureName
+
+    // ---- 숫자 계열 (null이 아닌 값만 반영) ----
+    if (dto.getLatitude()       != null) b.setLatitude(dto.getLatitude());
+    if (dto.getLongitude()      != null) b.setLongitude(dto.getLongitude());
+    if (dto.getGroundFloors()   != null) b.setGroundFloors(dto.getGroundFloors());
+    if (dto.getBasementFloors() != null) b.setBasementFloors(dto.getBasementFloors());
+    if (dto.getLandArea()       != null) b.setLandArea(dto.getLandArea());
+    if (dto.getBuildingArea()   != null) b.setBuildingArea(dto.getBuildingArea());
+
+    buildingRepo.save(b);
+
+    return ResponseEntity.ok(Map.of(
+        "updated", true,
+        "id", b.getId()
+    ));
+  }
 }

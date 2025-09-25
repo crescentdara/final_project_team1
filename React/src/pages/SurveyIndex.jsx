@@ -2,6 +2,7 @@
 import {useEffect, useState} from "react";
 import Pagination from "../components/ui/Pagination.jsx";
 import BuildingDetailModal from "../components/modals/BuildingDetailModal.jsx";
+import {useNavigate} from "react-router-dom";
 
 const statusOptions = [
     { value: "ALL", label: "전체 상태" },
@@ -23,6 +24,8 @@ export default function SurveyIndex() {
     const [total, setTotal] = useState(0);
     const [selectedId, setSelectedId] = useState(null); // ✅ 선택된 건물 ID (모달 제어)
     const [deletingId, setDeletingId] = useState(null);
+
+    const navigate = useNavigate();
 
     // 검색 상태
     const [status, setStatus] = useState("ALL");
@@ -51,6 +54,12 @@ export default function SurveyIndex() {
     useEffect(() => { load(); }, [status, page]);
 
     const onSearch = () => { setPage(1); load(); };
+
+    const handleEdit = (e, buildingId) => {
+        e.stopPropagation(); // 행 클릭(모달 열림) 전파 방지
+        // 생성페이지를 그대로 쓰되 id 쿼리스트링으로 편집모드 진입
+        navigate(`/createSurvey?id=${buildingId}`);
+    };
 
     const handleDelete = async (e, buildingId) => {
         e.stopPropagation(); // 행 클릭(모달)로 전파 방지
@@ -133,7 +142,7 @@ export default function SurveyIndex() {
                             <td>
                                 <button
                                     className="btn btn-sm btn-outline-secondary me-3"
-                                    onClick={(e)=>{ e.stopPropagation(); alert(`수정: ${r.buildingId}`); }}
+                                    onClick={(e)=>handleEdit(e, r.buildingId)}
                                 >
                                     수정
                                 </button>

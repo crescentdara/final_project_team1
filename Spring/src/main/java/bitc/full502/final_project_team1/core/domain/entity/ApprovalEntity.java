@@ -32,13 +32,6 @@ public class ApprovalEntity {
     @Column(name = "approved_at")
     private LocalDateTime approvedAt;             // 일시
 
-    /** 결재 대상 '조사결과' */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "survey_result_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "fk_approval_survey_result"))
-    private SurveyResultEntity surveyResult;
-
   // 결재자
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "approver_id")
@@ -51,7 +44,7 @@ public class ApprovalEntity {
 
   // (선택) 설문 결과 – 아직 없을 수 있음
   @Column(name = "survey_result_id")
-  private Long surveyResultId;
+  private Long surveyResult;
 
   // 조사원(Researcher)
   @ManyToOne(fetch = FetchType.LAZY, optional = true)

@@ -1,11 +1,16 @@
 package bitc.full502.final_project_team1.api.web.controller;
 
 import bitc.full502.final_project_team1.api.web.dto.ApprovalItemDto;
+import bitc.full502.final_project_team1.api.web.dto.IdsRequestDto;
 import bitc.full502.final_project_team1.api.web.dto.PageResponseDto;
 import bitc.full502.final_project_team1.api.web.dto.ResultDetailDto;
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
+import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.repository.SurveyResultRepository;
+import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
+import bitc.full502.final_project_team1.core.service.ReportService;
 import bitc.full502.final_project_team1.core.service.SurveyResultService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +25,8 @@ public class SurveyResultController {
 
     private final SurveyResultService surveyResultService;
     private final SurveyResultRepository repo;
+    private final ReportService reportService;
+    private final UserAccountRepository userRepo;
 
     /** 📌 조사결과 리스트 (결재 대기 상태만 조회) */
     @GetMapping("/approvals")

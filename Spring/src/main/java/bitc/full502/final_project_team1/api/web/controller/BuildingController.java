@@ -225,6 +225,19 @@ public class BuildingController {
         );
     }
 
+//    @GetMapping("/surveys")
+//    public PageResponseDto<BuildingListItemDto> list(
+//            @RequestParam(defaultValue = "") String keyword,
+//            @RequestParam(defaultValue = "ALL") String filter,
+//            @RequestParam(defaultValue = "1") int page,
+//            @RequestParam(defaultValue = "20") int size
+//    ) {
+//        var pageable = PageRequest.of(Math.max(0, page - 1), Math.max(1, size), Sort.by(Sort.Direction.DESC, "id"));
+//        var data = buildingRepo.searchBuildings(keyword, filter, pageable);
+//        var items = data.getContent().stream().map(BuildingListItemDto::from).toList();
+//        return new PageResponseDto<>(items, data.getTotalElements(), data.getTotalPages(), data.getNumber() + 1, data.getSize());
+//    }
+
 
     // 📌 [수정] 미배정 조사지 + 조사원 목록 조회 (전체 리스트 반환)
     @GetMapping("/unassigned")
@@ -293,19 +306,6 @@ public class BuildingController {
                             .build()
             );
         }
-    }
-
-    @GetMapping("/surveys")
-    public PageResponseDto<BuildingListItemDto> list(
-        @RequestParam(defaultValue = "") String keyword,
-        @RequestParam(defaultValue = "ALL") String filter,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "20") int size
-    ) {
-        var pageable = PageRequest.of(Math.max(0, page - 1), Math.max(1, size), Sort.by(Sort.Direction.DESC, "id"));
-        var data = buildingRepo.searchBuildings(keyword, filter, pageable);
-        var items = data.getContent().stream().map(BuildingListItemDto::from).toList();
-        return new PageResponseDto<>(items, data.getTotalElements(), data.getTotalPages(), data.getNumber() + 1, data.getSize());
     }
 
     @GetMapping("/pending-approval")

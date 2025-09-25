@@ -49,7 +49,7 @@ public class ApprovalServiceImpl implements ApprovalService {
                 ApprovalEntity.builder()
                         .building(building)
                         .surveyor(surveyor)
-                        .surveyResult(surveyResult)
+                        .surveyResult(surveyResult.getId())
                         .build()
         );
 
@@ -89,7 +89,7 @@ public class ApprovalServiceImpl implements ApprovalService {
                 ApprovalEntity.builder()
                         .building(building)
                         .surveyor(surveyor)
-                        .surveyResult(surveyResult)
+                        .surveyResult(surveyResult.getId())
                         .build()
         );
 

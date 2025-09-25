@@ -16,6 +16,7 @@ import Message from "./pages/MessageTabs.jsx";
 import MessageTabs from "./pages/MessageTabs.jsx";
 import axios from "axios";
 import SurveyIndex from "./pages/SurveyIndex.jsx";
+import ApproverAssignment from "./pages/ApproverAssignment.jsx";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -69,6 +70,7 @@ function App() {
                                 <Link to="/buildingUpload" className="btn btn-primary mt-3 ms-2">다건 등록</Link>
                                 <Link to="/messageTabs" className="btn btn-primary mt-3 ms-2">메시지 전송</Link>
                                 <Link to="/surveyIndex" className="btn btn-primary mt-3 ms-2">전체 조사지 리스트</Link>
+                                <Link to="/approverAssignment" className="btn btn-primary mt-3 ms-2">결재자 배정</Link>
                             </div>
                         }
                     />
@@ -81,6 +83,7 @@ function App() {
                     <Route path="/resultReport" element={<ResultReport />} />
                     <Route path="/users" element={<UserDetail />} />
                     <Route path="/approvals" element={<ApprovalFilters />} />
+                    <Route path="/approverAssignment" element={<ApproverAssignment/>} />
 
                     {/* 로그인 페이지 */}
                     <Route path="/login" element={<Login onLogin={handleLogin} />} />

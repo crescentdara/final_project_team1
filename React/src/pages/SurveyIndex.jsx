@@ -1,7 +1,7 @@
 
 import {useEffect, useState} from "react";
 import Pagination from "../components/ui/Pagination.jsx";
-import BuildingDetailModal from "../components/modals/BuildingDetailModal.jsx"; // 모달 컴포넌트 import
+import BuildingDetailModal from "../components/modals/BuildingDetailModal.jsx";
 
 const statusOptions = [
     { value: "ALL", label: "전체 상태" },
@@ -14,6 +14,7 @@ const statusBadge = (label) =>
     label==="미배정"     ? "bg-secondary" :
         label==="배정"       ? "bg-info text-dark" :
             label==="승인"       ? "bg-success" :
+                label==="반려"    ? "bg-danger" :
                 "bg-light text-dark";
 
 export default function SurveyIndex() {
@@ -21,6 +22,7 @@ export default function SurveyIndex() {
     const [rows, setRows] = useState([]);
     const [total, setTotal] = useState(0);
     const [selectedId, setSelectedId] = useState(null); // ✅ 선택된 건물 ID (모달 제어)
+    const [deletingId, setDeletingId] = useState(null);
 
     // 검색 상태
     const [status, setStatus] = useState("ALL");
@@ -49,6 +51,30 @@ export default function SurveyIndex() {
     useEffect(() => { load(); }, [status, page]);
 
     const onSearch = () => { setPage(1); load(); };
+
+    const handleDelete = async (e, buildingId) => {
+        e.stopPropagation(); // 행 클릭(모달)로 전파 방지
+        if (!confirm("정말로 이 조사지(건물)를 완전히 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.")) return;
+
+        try {
+            setDeletingId(buildingId);
+            const r = await fetch(`/web/building/${buildingId}`, { method: "DELETE" });
+            if (!r.ok) {
+                const text = await r.text().catch(()=> "");
+                // FK 제약 충돌 등 서버 에러 메시지 토스트
+                alert(text || `삭제 실패 (HTTP ${r.status})`);
+                return;
+            }
+            // 현재 페이지에 항목이 1개뿐이면 이전 페이지로 이동(빈 페이지 방지)
+            if (rows.length === 1 && page > 1) {
+                setPage(p => p - 1);
+            } else {
+                load();
+            }
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     return (
         <div className="container py-4">
@@ -83,13 +109,14 @@ export default function SurveyIndex() {
                         <th>주소</th>
                         <th style={{width:140}}>조사원</th>
                         <th style={{width:120}}>상태</th>
+                        <th style={{width:140}}>관리</th>
                     </tr>
                     </thead>
                     <tbody className="text-center">
                     {loading ? (
-                        <tr><td colSpan={4} className="text-center text-muted py-5">로딩중…</td></tr>
+                        <tr><td colSpan={5} className="text-center text-muted py-5">로딩중…</td></tr>
                     ) : rows.length===0 ? (
-                        <tr><td colSpan={4} className="text-center text-muted py-5">표시할 데이터가 없습니다.</td></tr>
+                        <tr><td colSpan={5} className="text-center text-muted py-5">표시할 데이터가 없습니다.</td></tr>
                     ) : rows.map(r => (
                         <tr key={r.buildingId}
                             style={{cursor:"pointer"}}
@@ -102,6 +129,21 @@ export default function SurveyIndex() {
                                 <span className={`badge ${statusBadge(r.statusLabel)}`}>
                                     {r.statusLabel}
                                 </span>
+                            </td>
+                            <td>
+                                <button
+                                    className="btn btn-sm btn-outline-secondary me-3"
+                                    onClick={(e)=>{ e.stopPropagation(); alert(`수정: ${r.buildingId}`); }}
+                                >
+                                    수정
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-outline-danger"
+                                    disabled={deletingId === r.buildingId}
+                                    onClick={(e)=>handleDelete(e, r.buildingId)}
+                                >
+                                    {deletingId === r.buildingId ? "삭제 중…" : "삭제"}
+                                </button>
                             </td>
                         </tr>
                     ))}

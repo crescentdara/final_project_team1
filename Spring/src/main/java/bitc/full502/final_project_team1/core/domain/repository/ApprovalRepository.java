@@ -11,6 +11,7 @@ import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -35,4 +36,9 @@ public interface ApprovalRepository extends JpaRepository<ApprovalEntity, Long> 
            and a.approvedAt is null
     """)
   Optional<ApprovalEntity> findPendingByBuildingId(Long buildingId);
+
+  @Modifying
+  @Transactional
+  @Query(value = "DELETE FROM approval WHERE building_id = :buildingId", nativeQuery = true)
+  int deleteByBuildingId(@Param("buildingId") Long buildingId);
 }

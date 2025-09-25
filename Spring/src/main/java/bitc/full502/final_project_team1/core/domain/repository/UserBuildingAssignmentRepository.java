@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -84,4 +85,9 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
     ORDER BY b.id DESC
   """, nativeQuery = true)
   List<PendingApprovalRow> findAssignedWithoutApprover(@Param("emd") String eupMyeonDong);
+
+  @Modifying
+  @Transactional
+  @Query(value = "DELETE FROM user_building_assignment WHERE building_id = :buildingId", nativeQuery = true)
+  int deleteByBuildingId(@Param("buildingId") Long buildingId);
 }

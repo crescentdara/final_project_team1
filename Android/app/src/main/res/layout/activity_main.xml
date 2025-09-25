@@ -87,7 +87,7 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-            <!-- ✅ 조사원 현황 카드 -->
+            <!-- 조사원 현황 카드 -->
             <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardSurveyor"
                     android:layout_width="match_parent"
@@ -256,14 +256,14 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- ✅ 조사목록 보기 버튼 -->
+            <!-- 조사 목록 보기 버튼 -->
             <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSurveyList"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_marginBottom="24dp"
                     android:backgroundTint="@color/primary_blue"
-                    android:text="조사목록 보기"
+                    android:text="조사 목록 보기"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -273,7 +273,7 @@
                     app:iconGravity="textStart"
                     app:iconPadding="8dp" />
 
-            <!-- ✅ 조사현황 대시보드 -->
+            <!-- 조사 현황 대시보드 -->
             <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardDashboard"
                     android:layout_width="match_parent"
@@ -323,10 +323,10 @@
                     <LinearLayout
                             android:id="@+id/dashboardContainer"
                             android:layout_width="match_parent"
-                            android:layout_height="120dp"
+                            android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:weightSum="3"
-                            android:gravity="bottom|center"
+                            android:gravity="center_horizontal"
                             android:padding="8dp">
 
                         <!-- 조사 진행 -->
@@ -335,21 +335,21 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:orientation="vertical"
-                                android:gravity="bottom|center">
+                                android:gravity="center_horizontal">
 
                             <FrameLayout
                                     android:layout_width="32dp"
                                     android:layout_height="100dp"
                                     android:layout_marginBottom="4dp">
 
-                                <!-- 회색 배경 (100% 고정) -->
+                                <!-- 회색 배경 -->
                                 <View
                                         android:id="@+id/barInProgressBg"
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
                                         android:background="@drawable/bar_gray" />
 
-                                <!-- 색상 막대 (비율에 맞게 높이 변경) -->
+                                <!-- 파랑 bar -->
                                 <View
                                         android:id="@+id/barInProgress"
                                         android:layout_width="match_parent"
@@ -375,21 +375,34 @@
                                     android:textSize="12sp" />
                         </LinearLayout>
 
-
                         <!-- 결재 대기 -->
                         <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:orientation="vertical"
-                                android:gravity="bottom|center">
+                                android:gravity="center_horizontal">
 
-                            <View
-                                    android:id="@+id/barWaiting"
+                            <FrameLayout
                                     android:layout_width="32dp"
-                                    android:layout_height="0dp"
-                                    android:background="@drawable/bar_orange"
-                                    android:layout_marginBottom="4dp" />
+                                    android:layout_height="100dp"
+                                    android:layout_marginBottom="4dp">
+
+                                <!-- 회색 배경 -->
+                                <View
+                                        android:id="@+id/barWaitingBg"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@drawable/bar_gray" />
+
+                                <!-- 주황 bar -->
+                                <View
+                                        android:id="@+id/barWaiting"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="0dp"
+                                        android:layout_gravity="bottom"
+                                        android:background="@drawable/bar_orange" />
+                            </FrameLayout>
 
                             <TextView
                                     android:layout_width="wrap_content"
@@ -414,14 +427,28 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:orientation="vertical"
-                                android:gravity="bottom|center">
+                                android:gravity="center_horizontal">
 
-                            <View
-                                    android:id="@+id/barApproved"
+                            <FrameLayout
                                     android:layout_width="32dp"
-                                    android:layout_height="0dp"
-                                    android:background="@drawable/bar_green"
-                                    android:layout_marginBottom="4dp" />
+                                    android:layout_height="100dp"
+                                    android:layout_marginBottom="4dp">
+
+                                <!-- 회색 배경 -->
+                                <View
+                                        android:id="@+id/barApprovedBg"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@drawable/bar_gray" />
+
+                                <!-- 초록 bar -->
+                                <View
+                                        android:id="@+id/barApproved"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="0dp"
+                                        android:layout_gravity="bottom"
+                                        android:background="@drawable/bar_green" />
+                            </FrameLayout>
 
                             <TextView
                                     android:layout_width="wrap_content"

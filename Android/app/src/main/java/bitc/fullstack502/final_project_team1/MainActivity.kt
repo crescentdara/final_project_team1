@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ✅ 로그인 체크
+        // 로그인 체크
         if (!AuthManager.isLoggedIn(this) || AuthManager.isExpired(this)) {
             gotoLoginAndFinish()
             return
@@ -36,12 +36,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setupToolbar()
 
-        // ✅ 조사목록 버튼
+        // 조사 목록 버튼
         findViewById<MaterialButton>(R.id.btnSurveyList)?.setOnClickListener {
             startActivity(Intent(this, SurveyListActivity::class.java))
         }
 
-        // ✅ 사용자 정보
+        // 사용자 정보
         val userName = AuthManager.name(this) ?: "조사원"
         val empNo = AuthManager.empNo(this) ?: "-"
 
@@ -51,10 +51,16 @@ class MainActivity : AppCompatActivity() {
         val tvTotalCount = findViewById<TextView>(R.id.tvTotalCount)
         val tvTodayCount = findViewById<TextView>(R.id.tvTodayCount)
 
-        // ✅ 조사현황 뷰 (막대 + 숫자)
+        // 조사 현황 뷰 (캡슐 그래프 + 숫자)
         val barInProgress = findViewById<View>(R.id.barInProgress)
         val barWaiting = findViewById<View>(R.id.barWaiting)
         val barApproved = findViewById<View>(R.id.barApproved)
+
+        // 배경 캡슐 (고정 높이) → 필요시 애니메이션/효과용으로 접근 가능
+        val barInProgressBg = findViewById<View>(R.id.barInProgressBg)
+        val barWaitingBg = findViewById<View>(R.id.barWaitingBg)
+        val barApprovedBg = findViewById<View>(R.id.barApprovedBg)
+
         val tvBarInProgress = findViewById<TextView>(R.id.tvInProgressCount)
         val tvBarWaiting = findViewById<TextView>(R.id.tvWaitingCount)
         val tvBarApproved = findViewById<TextView>(R.id.tvApprovedCount)
@@ -65,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         val userId = AuthManager.userId(this) ?: -1L
         val token = AuthManager.token(this) ?: ""
 
-        // ✅ 대시보드 데이터 불러오기
+        // 대시보드 데이터 불러오기
         lifecycleScope.launch {
             try {
                 val stats: DashboardStatsResponse = ApiClient.service.getDashboardStats(
@@ -82,11 +88,11 @@ class MainActivity : AppCompatActivity() {
                 tvBarWaiting.text = "${stats.waitingApproval}건"
                 tvBarApproved.text = "${stats.approved}건"
 
-                // 막대 비율 적용 (회색 틀 대비)
+                // 막대 비율 적용 (최대값 대비 비율)
                 val maxValue = maxOf(stats.inProgress, stats.waitingApproval, stats.approved, 1)
                 val maxHeightPx = resources.getDimensionPixelSize(
                     R.dimen.dashboard_bar_max_height
-                ) // 예: 100dp 정의해두기
+                ) // 예: 100dp 정의
 
                 fun setBarHeight(bar: View, value: Long) {
                     val ratio = if (maxValue > 0) value.toFloat() / maxValue else 0f
@@ -105,7 +111,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // ✅ 환영 메시지
+        // 자세히 보기 클릭 -> 조사 내역 조회 페이지 이동
+        findViewById<TextView>(R.id.tvDetail)?.setOnClickListener {
+            startActivity(Intent(this, TransmissionCompleteActivity::class.java))
+        }
+
+        // 환영 메시지
         Toast.makeText(this, "${userName}님, 환영합니다!", Toast.LENGTH_SHORT).show()
     }
 
@@ -119,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ 카테고리 팝업
+    // 카테고리 팝업
     private fun showCategoryPopup(anchor: View) {
         val popupView = LayoutInflater.from(this).inflate(R.layout.modal_category, null)
         val displayMetrics = resources.displayMetrics

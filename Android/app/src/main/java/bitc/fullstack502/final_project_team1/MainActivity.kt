@@ -17,12 +17,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-<<<<<<< HEAD
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-=======
 import androidx.lifecycle.lifecycleScope
->>>>>>> origin/app/jgy/MainPage
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.DashboardStatsResponse
@@ -32,13 +29,10 @@ import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.TransmissionCompleteActivity
 import com.google.android.material.button.MaterialButton
-<<<<<<< HEAD
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
-=======
 import kotlinx.coroutines.launch
->>>>>>> origin/app/jgy/MainPage
 
 class MainActivity : AppCompatActivity() {
 
@@ -137,12 +131,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SurveyListActivity::class.java))
         }
 
-<<<<<<< HEAD
 
         // ✅ 사용자 이름 + 사번 표시
-=======
         // 사용자 정보
->>>>>>> origin/app/jgy/MainPage
         val userName = AuthManager.name(this) ?: "조사원"
         val empNo = AuthManager.empNo(this) ?: "-"
 
@@ -166,7 +157,7 @@ class MainActivity : AppCompatActivity() {
         val tvBarWaiting = findViewById<TextView>(R.id.tvWaitingCount)
         val tvBarApproved = findViewById<TextView>(R.id.tvApprovedCount)
 
-        tvUserName.text = "${userName} 조사원님"
+        tvUserName.text = "${userName} 님"
         tvEmpNo.text = "사번 : $empNo"
 
         val userId = AuthManager.userId(this) ?: -1L

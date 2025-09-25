@@ -69,16 +69,34 @@ public class AssignmentService {
     }
 
     /** 조사 거절 **/
-    @Transactional
-    public void rejectAssignment(Long buildingId) {
-        // 1. 배정 삭제
-        assignRepo.deleteById(buildingId);
+//    @Transactional
+//    public void rejectAssignment(Long buildingId) {
+//        // 1. 배정 삭제
+//        assignRepo.deleteById(buildingId);
+//
+//        // 2. 건물 상태 = 미배정(0)
+//        BuildingEntity building = buildingRepo.findById(buildingId)
+//                .orElseThrow(() -> new IllegalArgumentException("해당 건물이 존재하지 않습니다."));
+//        building.setStatus(0);
+//        buildingRepo.save(building);
+//    }
 
-        // 2. 건물 상태 = 미배정(0)
-        BuildingEntity building = buildingRepo.findById(buildingId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 건물이 존재하지 않습니다."));
-        building.setStatus(0);
-        buildingRepo.save(building);
+    @Transactional
+    public void rejectAssignment(Long userId, Long buildingId) {
+        // 배정 존재/소유자 확인
+        UserBuildingAssignmentEntity asg = assignRepo
+                .findByBuildingIdAndUser_UserId(buildingId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("배정 내역이 없습니다."));
+
+        // 배정 삭제
+        assignRepo.delete(asg);
+        // 또는: assignRepo.deleteByBuildingIdAndUser_UserId(buildingId, userId);
+
+        // 건물 상태 미배정(0)으로
+        BuildingEntity b = buildingRepo.findById(buildingId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 건물이 없습니다."));
+        b.setStatus(0); // dirty checking
     }
 
 }
+

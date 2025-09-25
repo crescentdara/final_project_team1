@@ -84,17 +84,25 @@ interface ApiService {
         @Path("id") id: Long
     ): SurveyResultDetailDto
 
-<<<<<<< HEAD
     @GET("survey/result/latest")
     suspend fun getSurveyLatest(
         @Header("X-USER-ID") userId: Long,
         @Query("buildingId") buildingId: Long
     ): SurveyResultDetailDto?
 
+//    @GET("surveys/{id}")
+//    suspend fun getSurveyDetail(
+//        @Header("X-USER-ID") userId: Long,
+//        @Path("id") id: Long
+//    ): SurveyResultDetailDto
+//
+//    @GET("surveys/latest")
+//    suspend fun getSurveyLatest(
+//        @Header("X-USER-ID") userId: Long,
+//        @Query("buildingId") buildingId: Long
+//    ): SurveyResultDetailDto?
+
     // 현황/목록 (서버: /app/survey/status..., 클라: /survey/status...)
-=======
-    // ===== 목록/카운트 경로 =====
->>>>>>> origin/app/jgy/MainPage
     @GET("survey/status/status")
     suspend fun getSurveyStatus(
         @Header("X-USER-ID") userId: Long
@@ -116,35 +124,27 @@ interface ApiService {
         @Query("size") size: Int = 50
     ): ListWithStatusResponse<SurveyListItemDto>
 
-<<<<<<< HEAD
-    // 재조사 시작 (서버쪽 경로에 app/가 붙어있다면 서버 기준으로 맞춰 변경)
-=======
->>>>>>> origin/app/jgy/MainPage
     @POST("survey/reinspect/{surveyId}/redo/start")
     suspend fun startRedo(
         @Header("X-USER-ID") userId: Long,
         @Path("surveyId") surveyId: Long
     ): ResponseBody
-<<<<<<< HEAD
-=======
 
-    @GET("surveys/{id}")
-    suspend fun getSurveyDetail(
-        @Header("X-USER-ID") userId: Long,
-        @Path("id") id: Long
-    ): SurveyResultDetailDto
 
-    @GET("surveys/latest")
-    suspend fun getSurveyLatest(
-        @Header("X-USER-ID") userId: Long,
-        @Query("buildingId") buildingId: Long
-    ): SurveyResultDetailDto?
 
     // 조사 거절 API 추가
+//    @POST("assigned/reject")
+//    suspend fun rejectAssignment(
+//        @Query("buildingId") buildingId: Long
+//    ): Response<Void>
+
     @POST("assigned/reject")
     suspend fun rejectAssignment(
+        @Header("X-USER-ID") userId: Long,
         @Query("buildingId") buildingId: Long
-    ): Response<Void>
+    ): retrofit2.Response<Void>
+
+
 
     @GET("survey/result/list")
     suspend fun getSurveyResults(
@@ -161,6 +161,5 @@ interface ApiService {
         @Header("X-AUTH-TOKEN") token: String
     ): DashboardStatsResponse
 
->>>>>>> origin/app/jgy/MainPage
 }
 

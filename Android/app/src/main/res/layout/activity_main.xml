@@ -273,7 +273,6 @@
                     app:iconGravity="textStart"
                     app:iconPadding="8dp" />
 
-<<<<<<< HEAD
             <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnMainCamera"
                     android:layout_width="match_parent"
@@ -292,9 +291,6 @@
                     android:onClick="onMainCameraClick"/>
 
             <!-- ✅ 조사현황 대시보드 -->
-=======
-            <!-- 조사 현황 대시보드 -->
->>>>>>> origin/app/jgy/MainPage
             <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardDashboard"
                     android:layout_width="match_parent"

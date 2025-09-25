@@ -131,38 +131,23 @@ class TransmissionCompleteActivity : AppCompatActivity() {
                 // 화면용 데이터로 매핑 (APPROVED/SENT만)
                 allDataList.clear()
                 allDataList.addAll(
-<<<<<<< HEAD
-                    items.map {
-                        CompletedSurveyItem(
-                            id = it.surveyId,
-                            address = it.address ?: "(주소 없음)",
-                            completedDate = it.assignedAtIso ?: "",
-                            status = when (it.status) {
-                                "APPROVED" -> "결재완료"
-                                "SENT"     -> "처리중"
-                                "REJECTED" -> "반려"
-                                else       -> "기타"
-                            }
-                        )
-=======
                     items.mapNotNull {
                         val formattedDate = formatDateOnly(it.updatedAt ?: it.createdAt)
                         when (it.status) {
                             "APPROVED" -> CompletedSurveyItem(
-                                id = it.id,
+                                id = it.surveyId,
                                 address = it.buildingAddress ?: "(주소 없음)",
                                 completedDate = formattedDate,
                                 status = "결재완료"
                             )
                             "SENT" -> CompletedSurveyItem(
-                                id = it.id,
+                                id = it.surveyId,
                                 address = it.buildingAddress ?: "(주소 없음)",
                                 completedDate = formattedDate,
                                 status = "결재대기"
                             )
                             else -> null // ✅ 기타 상태는 무시
                         }
->>>>>>> origin/app/jgy/MainPage
                     }
                 )
 

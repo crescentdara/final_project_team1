@@ -17,7 +17,6 @@ public class AppSurveyController {
     private final SurveyService appSurveyService;
     private final AssignmentService assignmentService;
 
-    // ex) GET /api/mobile/surveys/assigned?userId=7
     @GetMapping("/assigned")
     public List<AssignedBuildingDto> assigned(
             @RequestParam Long userId
@@ -25,7 +24,6 @@ public class AppSurveyController {
         return appSurveyService.assigned(userId);
     }
 
-    // ex) GET /api/mobile/surveys/assigned/nearby?userId=7&lat=37.5&lng=127.0&radiusKm=2
     @GetMapping("/assigned/nearby")
     public List<AssignedBuildingDto> assignedNearby(
             @RequestParam Long userId,
@@ -36,10 +34,20 @@ public class AppSurveyController {
         return appSurveyService.assignedWithin(userId, lat, lng, radiusKm);
     }
 
+//    @PostMapping("/assigned/reject")
+//    public ResponseEntity<Void> rejectAssignment(@RequestParam Long buildingId) {
+//        assignmentService.rejectAssignment(buildingId);
+//        return ResponseEntity.ok().build();
+//    }
+
     @PostMapping("/assigned/reject")
-    public ResponseEntity<Void> rejectAssignment(@RequestParam Long buildingId) {
-        assignmentService.rejectAssignment(buildingId);
+    public ResponseEntity<Void> rejectAssignment(
+            @RequestHeader("X-USER-ID") Long userId,
+            @RequestParam Long buildingId) {
+        assignmentService.rejectAssignment(userId, buildingId);
         return ResponseEntity.ok().build();
     }
+
+
 
 }

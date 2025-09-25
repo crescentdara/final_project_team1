@@ -1,6 +1,5 @@
 package bitc.full502.final_project_team1.core.domain.repository;
 
-import bitc.full502.final_project_team1.api.app.dto.AssignedBuildingDto;
 import bitc.full502.final_project_team1.core.domain.entity.UserBuildingAssignmentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -8,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuildingAssignmentEntity, Long> {
 
@@ -34,7 +34,8 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
 
     Long countByUser_UserIdAndStatus(Long userId, Integer status);
 
-
+    Optional<UserBuildingAssignmentEntity> findByBuildingIdAndUser_UserId(Long buildingId, Long userId);
+    void deleteByBuildingIdAndUser_UserId(Long buildingId, Long userId);
 
     @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u")
     Long countAllAssignments();

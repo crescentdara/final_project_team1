@@ -58,7 +58,6 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
     """)
     List<Object[]> findAssignedAll(@Param("userId") Long userId);
 
-<<<<<<< HEAD
     @Query(value = """
         SELECT b.id,
                t.max_assigned_at,
@@ -79,6 +78,4 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
             @Param("userId") Long userId,
             @Param("buildingIds") List<Long> buildingIds
     );
-=======
->>>>>>> origin/app/jgy/MainPage
 }

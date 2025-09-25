@@ -25,10 +25,9 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:5173")
 public class WebUserController {
 
-    private final UserAccountRepository repo;
-    private final UserAccountRepository userRepo;
     private final AssignmentService assignmentService;
-    private final BuildingRepository buildingRepository; // 선호지역 뽑기
+    private final BuildingRepository buildingRepository;
+    private final UserAccountRepository userRepo;
 
     /** 전체 조회 + 검색 (keyword 파라미터 optional) */
     @GetMapping("/users/search")
@@ -37,25 +36,25 @@ public class WebUserController {
 
         if (keyword != null && !keyword.isBlank()) {
             // 🔍 RESEARCHER만 검색
-            users = repo.findByRoleAndNameContainingOrRoleAndUsernameContaining(
-                    Role.RESEARCHER, keyword,
-                    Role.RESEARCHER, keyword
+            users = userRepo.findByRoleAndNameContainingOrRoleAndUsernameContaining(
+                Role.RESEARCHER, keyword,
+                Role.RESEARCHER, keyword
             );
         } else {
             // 📋 전체 조회 (RESEARCHER만)
-            users = repo.findByRole(Role.RESEARCHER);
+            users = userRepo.findByRole(Role.RESEARCHER);
         }
 
         return users.stream()
-                .map(UserSimpleDto::from)
-                .toList();
+            .map(UserSimpleDto::from)
+            .toList();
     }
 
     /** 전체 사용자 조회 + 검색 옵션 */
     @GetMapping("/users")
     public List<UserSimpleDto> users(
-            @RequestParam(defaultValue = "전체") String option,
-            @RequestParam(required = false) String keyword
+        @RequestParam(defaultValue = "전체") String option,
+        @RequestParam(required = false) String keyword
     ) {
         String field = normalize(option);
         String kw = keyword == null ? "" : keyword.trim();
@@ -104,7 +103,7 @@ public class WebUserController {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        repo.save(user);
+        userRepo.save(user);
         return ResponseEntity.ok("등록 완료");
     }
 
@@ -147,29 +146,22 @@ public class WebUserController {
         return assignmentService.getAssignments(userId);
     }
 
-    /** (관리) 라운드로빈 배정 생성 */
-    @PostMapping("/assignments/seed")
-    public Map<String, Object> seed(@RequestParam(defaultValue = "강동") String keyword) {
-        int created = assignmentService.assignRegionRoundRobin(keyword);
-        return java.util.Collections.singletonMap("created", created);
-    }
-
     /** 간단 조사원 리스트 조회 (처음 페이지 로드시 사용) */
     @GetMapping("/users/simple")
     public List<UserSimpleDto> getSimpleUsers() {
         List<UserAccountEntity> users = userRepo.findAllByRoleOrderByUserIdAsc(Role.RESEARCHER);
         return users.stream()
-                .map(UserSimpleDto::from)
-                .toList();
+            .map(UserSimpleDto::from)
+            .toList();
     }
 
     /** 페이징 조회 */
     @GetMapping("/users/page")
     public Page<UserSimpleDto> getPagedUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "all") String field,
-            @RequestParam(required = false) String keyword
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "all") String field,
+        @RequestParam(required = false) String keyword
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("userId").ascending());
         String kw = (keyword == null) ? "" : keyword.trim();

@@ -1,6 +1,5 @@
 package bitc.full502.final_project_team1.core.service;
 
-import bitc.full502.final_project_team1.api.web.dto.ReportListDto;
 import bitc.full502.final_project_team1.api.web.dto.ResultDetailDto;
 import bitc.full502.final_project_team1.api.web.util.PdfGenerator;
 import bitc.full502.final_project_team1.core.domain.entity.ReportEntity;
@@ -16,8 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 import java.time.LocalDateTime;

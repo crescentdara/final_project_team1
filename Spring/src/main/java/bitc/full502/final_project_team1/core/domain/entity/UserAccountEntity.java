@@ -1,18 +1,17 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
 import bitc.full502.final_project_team1.core.domain.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
+
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 @Entity
 @Table(name = "user_account", schema = "java502_team1_final_db")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class UserAccountEntity {
 
     @Id
@@ -27,7 +26,7 @@ public class UserAccountEntity {
     private String password;
 
     @Column(name = "name", length = 100, nullable = false)
-    private String name;                        // 사람 이름 컬럼
+    private String name;                        //  사람 이름 컬럼
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", length = 20, nullable = false)

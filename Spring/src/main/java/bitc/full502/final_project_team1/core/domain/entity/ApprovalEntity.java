@@ -1,3 +1,4 @@
+
 package bitc.full502.final_project_team1.core.domain.entity;
 
 import jakarta.persistence.*;
@@ -22,11 +23,6 @@ public class ApprovalEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** 결재자(승인/반려 수행자) - 생성 시 null 가능 */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approver_id",
-            foreignKey = @ForeignKey(name = "fk_approval_approver_user"))
-    private UserAccountEntity approver;           // 결재자**
 
     /** 반려 사유 */
     @Column(name = "reject_reason", length = 500)
@@ -36,18 +32,6 @@ public class ApprovalEntity {
     @Column(name = "approved_at")
     private LocalDateTime approvedAt;             // 일시
 
-    /** 대상 빌딩 */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "building_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_approval_building"))
-    private BuildingEntity building;              // 빌딩id**
-
-    /** 조사원 */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "surveyor_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_approval_surveyor_user"))
-    private UserAccountEntity surveyor;           // 조사원id**
-
     /** 결재 대상 '조사결과' */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "survey_result_id",
@@ -55,4 +39,22 @@ public class ApprovalEntity {
             foreignKey = @ForeignKey(name = "fk_approval_survey_result"))
     private SurveyResultEntity surveyResult;
 
+  // 결재자
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "approver_id")
+  private UserAccountEntity approver;
+
+  // 조사 대상 건물
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "building_id")
+  private BuildingEntity building;
+
+  // (선택) 설문 결과 – 아직 없을 수 있음
+  @Column(name = "survey_result_id")
+  private Long surveyResultId;
+
+  // 조사원(Researcher)
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @JoinColumn(name = "surveyor_id")
+  private UserAccountEntity surveyor;
 }

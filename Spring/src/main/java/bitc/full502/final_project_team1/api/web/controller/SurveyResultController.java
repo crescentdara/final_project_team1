@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/web/api")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -54,4 +56,43 @@ public class SurveyResultController {
         var e = repo.findByIdWithUserAndBuilding(id).orElseThrow();
         return ResultDetailDto.from(e);
     }
+
+    /** 일괄 승인 + PDF 생성 */
+    @PatchMapping("/approvals/bulk/approve")
+    @Transactional
+    public Map<String, Object> approve(@RequestBody IdsRequestDto req) {
+        var list = repo.findAllById(req.getIds());
+        int count = 0;
+
+        // 🔹 관리자 계정 approver로 지정
+        UserAccountEntity approver = userRepo.findById(9L)   // 관리자 PK
+                .orElseThrow(() -> new IllegalArgumentException("관리자 계정을 찾을 수 없습니다."));
+
+        for (var e : list) {
+            if (!"APPROVED".equalsIgnoreCase(e.getStatus())) {
+                e.setStatus("APPROVED");
+                count++;
+
+                // PDF 생성 + ReportEntity 저장
+                reportService.createReport(e.getId(), approver);
+            }
+        }
+        return Map.of("updated", count);
+    }
+
+    /** 일괄 반려 */
+    @PatchMapping("/approvals/bulk/reject")
+    @Transactional
+    public Map<String, Object> reject(@RequestBody IdsRequestDto req) {
+        var list = repo.findAllById(req.getIds());
+        int count = 0;
+        for (var e : list) {
+            if (!"REJECTED".equalsIgnoreCase(e.getStatus())) {
+                e.setStatus("REJECTED");
+                count++;
+            }
+        }
+        return Map.of("updated", count);
+    }
+
 }

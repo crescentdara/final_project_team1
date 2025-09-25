@@ -36,7 +36,7 @@ class DataTransmissionActivity : AppCompatActivity() {
     private val sortedDataList = mutableListOf<SurveyListItemDto>()
 
 
-    private val sortOptions = arrayOf("최신순", "과거순")
+    private val sortOptions = arrayOf("최신순", "오래된순")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,10 +1,13 @@
-// src/main/java/.../web/dto/ResultDetailDto.java
 package bitc.full502.final_project_team1.api.web.dto;
 
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
 import lombok.*;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ResultDetailDto {
     private Long id;
     private String caseNo;
@@ -24,6 +27,10 @@ public class ResultDetailDto {
     private String extEtc;
     private String intEtc;
 
+    // 🔹 지도 좌표 추가
+    private Double latitude;
+    private Double longitude;
+
     public static ResultDetailDto from(SurveyResultEntity e) {
         var u = e.getUser();
         var b = e.getBuilding();
@@ -36,7 +43,7 @@ public class ResultDetailDto {
                 .address(b == null ? "주소 없음" : b.getLotAddress())
                 .status(e.getStatus() != null ? e.getStatus() : "미정")
 
-                // ✅ null 값 → 0 으로 변환
+                // null 값 → 0 으로 변환
                 .possible(e.getPossible() != null ? e.getPossible() : 0)
                 .adminUse(e.getAdminUse() != null ? e.getAdminUse() : 0)
                 .idleRate(e.getIdleRate() != null ? e.getIdleRate() : 0)
@@ -59,9 +66,10 @@ public class ResultDetailDto {
                 .extEtc(e.getExtEtc())
                 .intEtc(e.getIntEtc())
 
+                // 🔹 좌표값 추가 (건물 엔티티에 값이 있을 경우만)
+                .latitude(b != null ? b.getLatitude() : null)
+                .longitude(b != null ? b.getLongitude() : null)
+
                 .build();
     }
-
-
-
 }

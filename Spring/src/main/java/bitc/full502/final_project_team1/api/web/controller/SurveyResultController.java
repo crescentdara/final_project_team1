@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,29 +27,22 @@ public class SurveyResultController {
     private final SurveyResultRepository repo;
     private final ReportService reportService;
     private final UserAccountRepository userRepo;
-    
-    // 리스트 조회
+
+    /** 📌 조사결과 리스트 (결재 대기 상태만 조회) */
     @GetMapping("/approvals")
     public PageResponseDto<ApprovalItemDto> list(
-            @RequestParam(defaultValue = "") String status,
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "latest") String sort,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "false") boolean requireKeyword
+            @RequestParam(defaultValue = "10") int size
     ) {
         Sort s = "oldest".equalsIgnoreCase(sort)
                 ? Sort.by(Sort.Direction.ASC, "id")
                 : Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(Math.max(0, page - 1), Math.max(1, size), s);
 
-        // 공백/빈 문자열 입력 시 조회 안되도록
-//        String kw = keyword == null ? "" : keyword.trim();
-//        if (requireKeyword && kw.isEmpty()) {
-//            return new PageResponseDto<>(List.of(), 0, 0, page, size);
-//        }
-
-        Page<SurveyResultEntity> data = surveyResultService.search(status, keyword, pageable);
+        // 🔹 status 무조건 SENT 로 강제 (결재 대기 건만 조회)
+        Page<SurveyResultEntity> data = surveyResultService.search("SENT", keyword, pageable);
 
         var rows = data.getContent().stream()
                 .map(ApprovalItemDto::from)
@@ -65,7 +57,7 @@ public class SurveyResultController {
         );
     }
 
-    /** 상세 */
+    /** 📌 조사결과 상세 */
     @GetMapping("/approvals/{id}")
     public ResultDetailDto detail(@PathVariable Long id) {
         var e = repo.findByIdWithUserAndBuilding(id).orElseThrow();
@@ -80,7 +72,7 @@ public class SurveyResultController {
         int count = 0;
 
         // 🔹 관리자 계정 approver로 지정
-        UserAccountEntity approver = userRepo.findById(9l)   // 관리자 PK
+        UserAccountEntity approver = userRepo.findById(9L)   // 관리자 PK
                 .orElseThrow(() -> new IllegalArgumentException("관리자 계정을 찾을 수 없습니다."));
 
         for (var e : list) {

@@ -20,6 +20,7 @@ public class AppSurveyController {
     @GetMapping("/assigned")
     public List<AssignedBuildingDto> assigned(
             @RequestParam Long userId
+            // TODO: 인증 연동 시 → userId를 토큰/세션에서 읽도록 변경 (기존 웹 미변경)
     ) {
         return appSurveyService.assigned(userId);
     }

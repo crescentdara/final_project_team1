@@ -1,12 +1,14 @@
 package bitc.full502.final_project_team1.core.domain.entity;
 
 import bitc.full502.final_project_team1.core.domain.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 @Entity
 @Table(name = "user_account", schema = "java502_team1_final_db")
 @Getter
@@ -43,4 +45,11 @@ public class UserAccountEntity {
     @Column(name = "emp_no", length = 50, nullable = false, unique = true)
     private String empNo;
 
+    /** 선호 지역 컬럼 추가 */
+    @Column(name = "preferred_region", length = 200)
+    private String preferredRegion;
+
+    /** 파이어베이스 FCM 토큰 **/
+    @Column(name = "fcm_token")
+    private String fcmToken;
 }

@@ -29,6 +29,7 @@ public class SurveyServiceImpl implements SurveyService {
     private final BuildingRepository buildingRepository;         // ★ 추가 주입
     private final ApprovalRepository approvalRepository;
 
+
     @Override
     public List<AssignedBuildingDto> assigned(Long userId) {
         List<Object[]> rows = appAssignmentQueryRepository.findAssignedAll(userId);
@@ -101,6 +102,9 @@ public class SurveyServiceImpl implements SurveyService {
             if (key == null) continue;            // 혹은 key = "UNKNOWN";
             counts.put(key, val == null ? 0L : val);
         }
+        // Map<String, Long> counts = surveyResultRepository.countGroupByStatus(userId).stream()
+        //         .collect(Collectors.toMap(SurveyResultRepository.StatusCount::getStatus,
+        //                 SurveyResultRepository.StatusCount::getCnt));
 
         Long approved = counts.getOrDefault("APPROVED", 0L);
         Long rejected = counts.getOrDefault("REJECTED", 0L);

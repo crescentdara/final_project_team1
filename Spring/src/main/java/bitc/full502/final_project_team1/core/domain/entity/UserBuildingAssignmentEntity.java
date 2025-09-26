@@ -7,18 +7,18 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "user_building_assignment",
-        schema = "java502_team1_final_db",
-        uniqueConstraints = {
-                // 건물 1개당 배정 1개를 강제
-                @UniqueConstraint(name = "uk_uba_building", columnNames = "building_id")
-        },
-        indexes = {
-                @Index(name = "idx_uba_user", columnList = "user_id"),
-                @Index(name = "idx_uba_building", columnList = "building_id"),
-                @Index(name = "idx_uba_approval", columnList = "approval_id"),
-                @Index(name = "idx_uba_status", columnList = "status")
-        }
+    name = "user_building_assignment",
+    schema = "java502_team1_final_db",
+    uniqueConstraints = {
+        // 건물 1개당 배정 1개를 강제
+        @UniqueConstraint(name = "uk_uba_building", columnNames = "building_id")
+    },
+    indexes = {
+        @Index(name = "idx_uba_user", columnList = "user_id"),
+        @Index(name = "idx_uba_building", columnList = "building_id"),
+        @Index(name = "idx_uba_approval", columnList = "approval_id"),
+        @Index(name = "idx_uba_status", columnList = "status")
+    }
 )
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
@@ -36,20 +36,20 @@ public class UserBuildingAssignmentEntity {
     /** 읽기 전용 연관 (동일 컬럼 공유) */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "building_id",
-            referencedColumnName = "id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(name = "fk_uba_building")
+        name = "building_id",
+        referencedColumnName = "id",
+        insertable = false,
+        updatable = false,
+        foreignKey = @ForeignKey(name = "fk_uba_building")
     )
     private BuildingEntity building;
 
     /** FK: user_account.id (배정 대상 유저/결재자) */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-            name = "user_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "fk_uba_user")
+        name = "user_id",
+        nullable = false,
+        foreignKey = @ForeignKey(name = "fk_uba_user")
     )
     private UserAccountEntity user;
 
@@ -60,11 +60,11 @@ public class UserBuildingAssignmentEntity {
     /** 읽기 전용 연관 (동일 컬럼 공유) */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "approval_id",
-            referencedColumnName = "id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(name = "fk_uba_approval")
+        name = "approval_id",
+        referencedColumnName = "id",
+        insertable = false,
+        updatable = false,
+        foreignKey = @ForeignKey(name = "fk_uba_approval")
     )
     private ApprovalEntity approval;
 

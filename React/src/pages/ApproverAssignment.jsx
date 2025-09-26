@@ -24,6 +24,7 @@ function ApproverAssignment() {
 
   // 체크된 건물들
   const [selectedBuildings, setSelectedBuildings] = useState([]);
+  const selectedCount = selectedBuildings.length;
 
   // -------------------------
   // 초기 로딩
@@ -197,7 +198,15 @@ function ApproverAssignment() {
             <div className="p-3 border rounded bg-white shadow-sm">
               <div className="d-flex justify-content-between align-items-center mb-2">
                 <h5 className="mb-0">결재자 미배정 조사지 목록</h5>
-                <small className="text-muted">총 {addresses.length}건</small>
+                <div className="d-flex align-items-center gap-2">
+                <span
+                    className="px-2 py-1 text-muted small" //
+                    title="현재 체크된 항목 수"
+                >
+                  선택 {selectedCount}건
+                </span>
+                  <small className="text-muted">총 {addresses.length}건</small>
+                </div>
               </div>
 
               <ul className="list-group" style={{ maxHeight: "450px", overflowY: "auto" }}>
@@ -211,12 +220,12 @@ function ApproverAssignment() {
                             key={addr.id}
                             className="list-group-item d-flex align-items-center"
                             style={{ cursor: "pointer" }}
+                            onClick={() => handleBuildingCheck(addr)}
                         >
                           <input
                               type="checkbox"
                               className="form-check-input me-2"
                               checked={selectedBuildings.includes(addr.id)}
-                              onChange={() => handleBuildingCheck(addr)}
                           />
 
                           <span className="text-truncate">

@@ -13,16 +13,16 @@ const statusOptions = [
 
 const statusBadge = (label) =>
     label==="미배정"     ? "bg-secondary" :
-        label==="배정"       ? "bg-info text-dark" :
-            label==="승인"       ? "bg-success" :
-                label==="반려"    ? "bg-danger" :
-                "bg-light text-dark";
+    label==="배정"       ? "bg-info text-dark" :
+    label==="결재 완료"  ? "bg-success" :
+    label==="반려"       ? "bg-danger" :
+    "bg-light text-dark";
 
 export default function SurveyIndex() {
     const [loading, setLoading] = useState(true);
     const [rows, setRows] = useState([]);
     const [total, setTotal] = useState(0);
-    const [selectedId, setSelectedId] = useState(null); // ✅ 선택된 건물 ID (모달 제어)
+    const [selectedId, setSelectedId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
 
     const navigate = useNavigate();
@@ -136,7 +136,7 @@ export default function SurveyIndex() {
                             <td>{r.assignedUserName ?? "-"}</td>
                             <td>
                                 <span className={`badge ${statusBadge(r.statusLabel)}`}>
-                                    {r.statusLabel}
+                                     {(r.statusLabel==="결재 완료" || r.statusLabel?.toUpperCase?.()==="APPROVED") ? "승인" : r.statusLabel}
                                 </span>
                             </td>
                             <td>

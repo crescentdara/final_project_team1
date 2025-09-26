@@ -11,7 +11,11 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 @Entity
 @Table(name = "user_account", schema = "java502_team1_final_db")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserAccountEntity {
 
     @Id

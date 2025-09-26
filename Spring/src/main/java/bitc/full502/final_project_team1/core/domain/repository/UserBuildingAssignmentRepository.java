@@ -95,4 +95,7 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
   @Query("SELECT COUNT(u) FROM UserBuildingAssignmentEntity u WHERE u.status IN :statuses")
   long countByStatusIn(@Param("statuses") List<Integer> statuses);
 
+  /** 조사원 삭제 - 특정 조사원에게 배정된 모든 UBA 엔터티 조회 **/
+  List<UserBuildingAssignmentEntity> findByUser_UserId(Long userId);
+
 }

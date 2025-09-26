@@ -41,4 +41,7 @@ public interface ApprovalRepository extends JpaRepository<ApprovalEntity, Long> 
   @Transactional
   @Query(value = "DELETE FROM approval WHERE building_id = :buildingId", nativeQuery = true)
   int deleteByBuildingId(@Param("buildingId") Long buildingId);
+
+  /** 조사원 삭제 - 특정 건물과 연관된 approval 삭제 **/
+  void deleteByBuilding_Id(Long buildingId);
 }

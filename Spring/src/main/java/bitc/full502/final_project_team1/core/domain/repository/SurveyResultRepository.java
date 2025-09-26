@@ -83,6 +83,12 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
     long countByStatus(String status);
 
 
+    // 조사자 삭제 - 특정 건물의 최신 조사 결과 조회
+    SurveyResultEntity findTop1ByBuilding_IdOrderByCreatedAtDesc(Long buildingId);
+
+    // 조사자 삭제 - 특정 건물 전체 결과 삭제 (TEMP/REJECTED 정리용)
+    void deleteByBuilding_Id(Long buildingId);
+
 }
 
 

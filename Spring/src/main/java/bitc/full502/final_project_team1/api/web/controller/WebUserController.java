@@ -3,11 +3,13 @@ package bitc.full502.final_project_team1.api.web.controller;
 import bitc.full502.final_project_team1.api.web.dto.UserCreateDTO;
 import bitc.full502.final_project_team1.api.web.dto.UserDetailDto;
 import bitc.full502.final_project_team1.api.web.dto.UserSimpleDto;
+import bitc.full502.final_project_team1.api.web.dto.UserUpdateDto;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.enums.Role;
 import bitc.full502.final_project_team1.core.domain.repository.BuildingRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
 import bitc.full502.final_project_team1.core.service.AssignmentService;
+import bitc.full502.final_project_team1.core.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ public class WebUserController {
     private final AssignmentService assignmentService;
     private final BuildingRepository buildingRepository;
     private final UserAccountRepository userRepo;
+    private final UserService userService;
 
     /** 전체 조회 + 검색 (keyword 파라미터 optional) */
     @GetMapping("/users/search")
@@ -205,5 +208,22 @@ public class WebUserController {
                 .filter(addr -> addr != null && !addr.isBlank())
                 .sorted()
                 .toList();
+    }
+
+    /** 조사원 상세 페이지 - 조사원 정보 수정 **/
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<String> updateUser(
+            @PathVariable Long userId,
+            @RequestBody UserUpdateDto dto
+    ) {
+        userService.updateUser(userId, dto);
+        return ResponseEntity.ok("수정 완료");
+    }
+
+    /** 조사원 상세 페이지 - 조사원 정보 삭제 **/
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.ok("삭제 완료");
     }
 }

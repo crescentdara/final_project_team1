@@ -204,4 +204,10 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
     // 배정된 건물 수 (status = 1)
     long countByStatus(int status);
 
+    // 건물 상태 업데이트 (status 변경)
+    @Modifying
+    @Query("update BuildingEntity b set b.status = :status where b.id = :buildingId")
+    void updateStatus(@Param("buildingId") Long buildingId, @Param("status") int status);
+
+
 }

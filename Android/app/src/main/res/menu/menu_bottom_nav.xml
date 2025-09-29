@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/nav_survey_list"
+            android:icon="@drawable/ic_list_24"
+            android:title="조사예정" />
+    <item
+            android:id="@+id/nav_reinspect"
+            android:icon="@drawable/ic_repeat_24"
+            android:title="재조사" />
+    <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home_24"
+            android:title="홈" />
+    <item
+            android:id="@+id/nav_history"
+            android:icon="@drawable/ic_history_24"
+            android:title="전송내역" />
+    <item
+            android:id="@+id/nav_not_transmitted"
+            android:icon="@drawable/ic_upload_24"
+            android:title="미전송" />
+</menu>

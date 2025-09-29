@@ -56,8 +56,6 @@
         <activity android:name=".ui.surveyList.SurveyListActivity" />
 
         <!-- 카테고리/상태 -->
-
-        <activity android:name=".ui.survey.SurveyStatusActivity" />
         <activity android:name=".ui.surveyList.ReinspectListActivity" />
 
         <!-- 조사 입력 화면 -->

@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.DashboardStatsResponse
+import bitc.fullstack502.final_project_team1.ui.BaseActivity
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.ReinspectListActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
@@ -34,7 +35,9 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
+
+    override fun bottomNavSelectedItemId(): Int = R.id.nav_home
 
     private var camOutputUri: Uri? = null
     private var camOutputFile: File? = null
@@ -124,12 +127,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContentView(R.layout.activity_main)
-        setupToolbar()
+        initHeader(title = "부동산 실태조사")
 
         // 조사 목록 버튼
         findViewById<MaterialButton>(R.id.btnSurveyList)?.setOnClickListener {
             startActivity(Intent(this, SurveyListActivity::class.java))
         }
+
+        findViewById<MaterialButton>(R.id.btnReinspectShortcut)?.setOnClickListener {
+            startActivity(Intent(this, ReinspectListActivity::class.java))
+        }
+        findViewById<MaterialButton>(R.id.btnNotTransmittedShortcut)?.setOnClickListener {
+            startActivity(Intent(this, DataTransmissionActivity::class.java))
+        }
+
 
 
         // ✅ 사용자 이름 + 사번 표시
@@ -212,53 +223,7 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "${userName}님, 환영합니다!", Toast.LENGTH_SHORT).show()
     }
 
-    private fun setupToolbar() {
-        findViewById<ImageView>(R.id.ivHamburger)?.setOnClickListener { view ->
-            showCategoryPopup(view)
-        }
-        findViewById<TextView>(R.id.tvLogout)?.setOnClickListener {
-            AuthManager.clear(this)
-            gotoLoginAndFinish()
-        }
-    }
 
-    // 카테고리 팝업
-    private fun showCategoryPopup(anchor: View) {
-        val popupView = LayoutInflater.from(this).inflate(R.layout.modal_category, null)
-        val displayMetrics = resources.displayMetrics
-        val popupWidth = (displayMetrics.widthPixels * 0.6).toInt()
-        val popupHeight = resources.getDimensionPixelSize(R.dimen.category_popup_height)
-
-        val popupWindow = PopupWindow(
-            popupView,
-            popupWidth,
-            popupHeight,
-            true
-        )
-
-        popupView.findViewById<ImageView>(R.id.btnClose)?.setOnClickListener {
-            popupWindow.dismiss()
-        }
-
-        popupView.findViewById<MaterialButton>(R.id.btnSurveyScheduled)?.setOnClickListener {
-            startActivity(Intent(this, SurveyListActivity::class.java))
-            popupWindow.dismiss()
-        }
-        popupView.findViewById<MaterialButton>(R.id.btnResurveyTarget)?.setOnClickListener {
-            startActivity(Intent(this, ReinspectListActivity::class.java))
-            popupWindow.dismiss()
-        }
-        popupView.findViewById<MaterialButton>(R.id.btnSurveyHistory)?.setOnClickListener {
-            startActivity(Intent(this, TransmissionCompleteActivity::class.java))
-            popupWindow.dismiss()
-        }
-        popupView.findViewById<MaterialButton>(R.id.btnNotTransmitted)?.setOnClickListener {
-            startActivity(Intent(this, DataTransmissionActivity::class.java))
-            popupWindow.dismiss()
-        }
-
-        popupWindow.showAsDropDown(anchor, 0, 0, Gravity.START)
-    }
 
     private fun gotoLoginAndFinish() {
         startActivity(Intent(this, LoginActivity::class.java).apply {

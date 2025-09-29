@@ -1,8 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_logout"
-        android:title="@string/main_logout"
-        app:showAsAction="always" />
+            android:id="@+id/action_logout"
+            android:title="LOGOUT"
+            app:showAsAction="always" />
+
+    <item
+            android:id="@+id/ivBell"
+            android:icon="@drawable/ic_notifications"
+            android:title="알림"
+            app:showAsAction="ifRoom" />
 </menu>

@@ -51,7 +51,6 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         setContentView(R.layout.activity_transmission_complete)
 
         initViews()
-        setupToolbar()
         setupFilter()
         setupRecyclerView()
 
@@ -66,14 +65,6 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         tvTotalCount = findViewById(R.id.tvTotalCount)
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabBack)
             ?.setOnClickListener { onBackPressed() }
-    }
-
-    private fun setupToolbar() {
-        findViewById<ImageView>(R.id.ivHamburger)?.setOnClickListener { view ->
-            showCategoryPopup(view)
-        }
-        findViewById<ImageView>(R.id.ivLogo)?.setOnClickListener { navigateToMain() }
-        findViewById<TextView>(R.id.tvLogout)?.setOnClickListener { performLogout() }
     }
 
     private fun setupFilter() {
@@ -208,32 +199,6 @@ class TransmissionCompleteActivity : AppCompatActivity() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
         finish()
-    }
-
-    private fun showCategoryPopup(anchor: View) {
-        val popupView = LayoutInflater.from(this).inflate(R.layout.modal_category, null)
-        val displayMetrics = resources.displayMetrics
-        val popupWidth = (displayMetrics.widthPixels * 0.6).toInt()
-        val popupHeight = resources.getDimensionPixelSize(R.dimen.category_popup_height)
-        val popup = PopupWindow(popupView, popupWidth, popupHeight, true)
-        setupPopupMenuItems(popupView, popup)
-        popup.showAsDropDown(anchor, 0, 0, Gravity.START)
-    }
-
-    private fun setupPopupMenuItems(popupView: View, popup: PopupWindow) {
-        popupView.findViewById<ImageView>(R.id.btnClose)?.setOnClickListener { popup.dismiss() }
-        popupView.findViewById<MaterialButton>(R.id.btnSurveyScheduled)?.setOnClickListener {
-            startActivity(Intent(this, SurveyListActivity::class.java)); popup.dismiss()
-        }
-        popupView.findViewById<MaterialButton>(R.id.btnResurveyTarget)?.setOnClickListener {
-            startActivity(Intent(this, SurveyListActivity::class.java)); popup.dismiss()
-        }
-        popupView.findViewById<MaterialButton>(R.id.btnSurveyHistory)?.setOnClickListener {
-            popup.dismiss() // 현재 화면
-        }
-        popupView.findViewById<MaterialButton>(R.id.btnNotTransmitted)?.setOnClickListener {
-            startActivity(Intent(this, DataTransmissionActivity::class.java)); popup.dismiss()
-        }
     }
 
     /** 조사내역 아이템 */

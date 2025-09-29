@@ -38,7 +38,7 @@
 }
 .brand img{
     display:block;
-    width: 200px;                  /* 요청: 가로 300px */
+    width: 190px;                  /* 요청: 가로 300px */
     height: auto;                  /* 비율 유지 */
     object-fit: contain;           /* 원본 비율 유지 */
     border-radius: 0;              /* 동그라미 마스크 제거 */

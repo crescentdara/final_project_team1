@@ -1,0 +1,116 @@
+.app-shell{
+    display: grid;
+    grid-template-columns: 300px 1fr; /* 사이드바 둥글게 만들 거라 폭 조금 여유 */
+    min-height: 100vh;
+    background: var(--bg);            /* 스크롤 시에도 바닥이 같은 색으로 */
+}
+
+/* ============ Sidebar ============ */
+.sidebar{
+    position: sticky;
+    top: 16px;
+    height: calc(100vh - 32px);  /* 위아래 margin(16px씩)을 뺀 높이 */
+    margin: 16px;                /* 바깥 마진 -> 예시처럼 여백 생김 */
+    padding: 20px 14px;
+    background: #fff;            /* 카드 배경 */
+    border: 1px solid var(--border);
+    border-radius: 20px;         /* 둥근 사각형 */
+    box-shadow: var(--shadow);
+    overflow: hidden;            /* 둥근 모서리 밖 내용 잘라냄 */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    --sb-font: 13px;   /* 메뉴 기본 */
+    --sb-small: 11.5px;/* 보조 텍스트(역할표시 등) */
+
+}
+
+.spacer{ flex:1 }
+
+/* === Brand image (sidebar top) === */
+.brand{
+    padding: 8px 6px;              /* 사이드바 여백만 살짝 */
+    background: transparent;       /* 배경/그라데이션 제거 */
+    box-shadow: none;              /* 그림자 제거 */
+    border-radius: 0;              /* 둥근 모서리 제거 */
+    display: flex;
+    justify-content: center;       /* 중앙 정렬 */
+}
+.brand img{
+    display:block;
+    width: 200px;                  /* 요청: 가로 300px */
+    height: auto;                  /* 비율 유지 */
+    object-fit: contain;           /* 원본 비율 유지 */
+    border-radius: 0;              /* 동그라미 마스크 제거 */
+    filter: none;                  /* 혹시 모를 스타일 초기화 */
+}
+
+.nav-group{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.nav-item{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:12px; color:#333; border:1px solid transparent;
+}
+.nav-item:hover{background:#f7f9ff}
+.nav-item.active{background:var(--primary); color:#fff; box-shadow: var(--shadow)}
+.nav-sep{margin:6px 6px 0; height:1px; background:var(--border)}
+
+/* ============ Main ============ */
+.main{
+    padding: 24px 28px;
+    background: var(--bg);            /* 메인영역 자체 배경도 통일 */
+}
+.top-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
+}
+.user-card{
+    display:flex; align-items:center; gap:12px;
+    background:var(--card); border:1px solid var(--border);
+    padding:10px 14px; border-radius:14px; box-shadow: var(--shadow);
+}
+.user-avatar{width:32px;height:32px;border-radius:50%; background:var(--primary-200)}
+.user-meta{display:flex;flex-direction:column;line-height:1.1}
+.user-name{font-weight:700}
+.user-role{font-size:12px;color:var(--muted)}
+
+.banner{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    background: var(--card); border:1px solid var(--border);
+    padding:16px 18px; border-radius: var(--radius); box-shadow: var(--shadow);
+    background-image: repeating-linear-gradient(45deg, rgba(104,152,255,0.08) 0 10px, rgba(84,120,230,0.08) 10px 20px);
+}
+.banner h3{margin:0;font-size:18px}
+.banner .cta{padding:10px 14px;border-radius:12px;border:1px solid var(--primary-200);background:var(--primary);color:#fff;font-weight:600}
+
+.card-grid{
+    margin-top:18px;
+    display:grid; gap:16px;
+    grid-template-columns: repeat(12, 1fr);
+}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:16px}
+.span-4{grid-column: span 4}
+.span-8{grid-column: span 8}
+.span-12{grid-column: span 12}
+
+.user-footer{
+    margin-top:auto;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 12px;
+    box-shadow:var(--shadow);
+    display:flex; align-items:center; gap:10px;
+}
+.user-footer .avatar{width:28px;height:28px;border-radius:50%;background:var(--primary-200)}
+.user-footer .name{font-weight:700;line-height:1}
+.user-footer .role{font-size:12px;color:var(--muted)}
+.user-footer .logout {
+    margin-left: auto;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--primary-200);
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+
+}

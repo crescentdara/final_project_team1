@@ -1,0 +1,61 @@
+:root{
+    --primary: #6898FF;      /* main */
+    --primary-600:#5478E6;   /* darker */
+    --primary-200:#8AB4FF;   /* lighter */
+    --bg:#F5F7FF;
+    --card:#FFFFFF;
+    --text:#1A1A1A;
+    --muted:#8A8A8A;
+    --border:#ECEEF5;
+    --radius:16px;
+    --shadow: 0 10px 30px rgba(0,0,0,0.06);
+    font-family: "SCD", sans-serif; /* 프로젝트 전역 기본 폰트 */
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+a {
+    font-weight: 500;
+    color: #646cff;
+    text-decoration: inherit;
+}
+a:hover {
+    color: #535bf2;
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: "SCD", sans-serif;
+}
+
+@font-face{
+    font-family:"SCD";
+    src:url("/fonts/scd_3.ttf") format("truetype");
+    font-weight:400;
+    font-display:swap;
+}
+@font-face{
+    font-family:"SCD";
+    src:url("/fonts/scd_6.ttf") format("truetype");
+    font-weight:700;
+    font-display:swap;
+}
+
+/* 하나만 남기고 SCD 유지 */
+html,body,#root{height:100%}
+body{
+    margin:0;
+    min-width:320px;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"SCD", sans-serif;  /* ✅ 여기 유지 */
+}
+
+/* ✅ 4. 라이트 모드 */
+@media (prefers-color-scheme: light){
+    :root{ color:#213547; background-color:#ffffff; }
+}
+

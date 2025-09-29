@@ -1,4 +1,7 @@
-import { Routes, Route, Link } from "react-router-dom";
+import {useEffect, useState} from "react";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
+import Header from "./components/ui/Header";
+
 import SurveyList from "./pages/SurveyList.jsx";
 import CreateSurvey from "./pages/CreateSurvey.jsx";
 import CreateUser from "./pages/CreateUser.jsx";
@@ -6,86 +9,105 @@ import ApprovalFilters from "./pages/ApprovalFilters.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ResultReport from "./pages/ResultReport.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
-import TotalSurveyList from "./pages/TotalSurveyList.jsx"; // ✅ 추가
+import TotalSurveyList from "./pages/TotalSurveyList.jsx";
+import Login from "./pages/Login.jsx";
+import BuildingUpload from "./pages/BuildingUpload.jsx";
+import Message from "./pages/MessageTabs.jsx";
+import MessageTabs from "./pages/MessageTabs.jsx";
+import axios from "axios";
+import SurveyIndex from "./pages/SurveyIndex.jsx";
+import ApproverAssignment from "./pages/ApproverAssignment.jsx";
 
 function App() {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); // ✅ 초기 로딩 상태
+
+    const handleLogin = (userInfo) => {
+        setUser(userInfo); // 로그인 시 상태 저장
+    };
+
+    const handleLogout = () => {
+        setUser(null); // 로그아웃 시 상태 비우기
+    };
+
+    // ✅ 앱 시작할 때 세션 확인
+    useEffect(() => {
+        axios.get("/web/api/auth/me", { withCredentials: true })
+            .then((res) => {
+                if (res.data) {
+                    setUser(res.data); // 세션에 로그인 정보 있으면 복원
+                }
+            })
+            .catch(() => {
+                console.log("세션 없음");
+            })
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) return <div>로딩 중...</div>; // 세션 확인 끝나기 전까지 잠깐 표시
+
     return (
-        <div className="container mt-5">
-            <Routes>
-                {/* 메인 페이지 */}
-                <Route
-                    path="/"
-                    element={
-                        <div>
-                            <h2>메인 페이지</h2>
+        <>
+            {/* ✅ 모든 페이지 공통 Header */}
+            <Header user={user} onLogout={handleLogout} />
 
-                            <Link to="/surveyList" className="btn btn-primary mt-3">
-                                SurveyList 페이지로 이동
-                            </Link>
+            <div className="container mt-5">
+                <Routes>
+                    {/* 메인 페이지 */}
+                    <Route
+                        path="/"
+                        element={
+                            <div>
+                                <h2>메인 페이지</h2>
+                                <Link to="/surveyList" className="btn btn-primary mt-3">미배정 조사지 목록</Link>
+                                <Link to="/createSurvey" className="btn btn-primary mt-3 ms-2">조사지 생성</Link>
+                                <Link to="/createUser" className="btn btn-primary mt-3 ms-2">조사원 생성</Link>
+                                <Link to="/dashboard" className="btn btn-primary mt-3 ms-2">통계</Link>
+                                <Link to="/resultReport" className="btn btn-primary mt-3 ms-2">결재 완료</Link>
+                                <Link to="/users" className="btn btn-primary mt-3 ms-2">조사원 상세정보</Link>
+                                <Link to="/approvals" className="btn btn-primary mt-3 ms-2">결재 대기 중</Link>
+                                <Link to="/login" className="btn btn-primary mt-3 ms-2">로그인</Link>
+                                <Link to="/buildingUpload" className="btn btn-primary mt-3 ms-2">다건 등록</Link>
+                                <Link to="/messageTabs" className="btn btn-primary mt-3 ms-2">메시지 전송</Link>
+                                <Link to="/surveyIndex" className="btn btn-primary mt-3 ms-2">전체 조사지 리스트</Link>
+                                <Link to="/approverAssignment" className="btn btn-primary mt-3 ms-2">결재자 배정</Link>
+                            </div>
+                        }
+                    />
 
-                            <Link to="/createSurvey" className="btn btn-primary mt-3">
-                                CreateSurvey 페이지로 이동
-                            </Link>
+                    {/* 페이지 라우트들 */}
+                    <Route path="/surveyList" element={<SurveyList />} />
+                    <Route path="/createSurvey" element={<CreateSurvey />} />
+                    <Route path="/createUser" element={<CreateUser />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/resultReport" element={<ResultReport />} />
+                    <Route path="/users" element={<UserDetail />} />
+                    <Route path="/approvals" element={<ApprovalFilters />} />
+                    <Route path="/approverAssignment" element={<ApproverAssignment/>} />
 
-                            <Link to="/createUser" className="btn btn-primary mt-3">
-                                CreateUser 페이지로 이동
-                            </Link>
+                    {/* 로그인 페이지 */}
+                    <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
-                            <Link to="/dashboard" className="btn btn-primary mt-3">
-                                Dashboard 페이지로 이동
-                            </Link>
+                    {/* 로그인 필요 페이지 예시 */}
+                    <Route
+                        path="/admin-only"
+                        element={user?.role === "ADMIN" ? <Dashboard /> : <Navigate to="/login" />}
+                    />
 
-                            <Link to="/resultReport" className="btn btn-primary mt-3">
-                                Report 페이지로 이동
-                            </Link>
+                    {/* Excel */}
+                    <Route path="/buildingUpload" element={<BuildingUpload />} />
 
-                            <Link to="/users" className={'btn btn-outline-secondary me-3'}>
-                                조사원 상세정보
-                            </Link>
+                    <Route
+                        path="/messageTabs"
+                        element={<MessageTabs senderId={user?.id} />}
+                    />
 
-                            <Link to="/approvals" className={'btn btn-outline-primary me-3'}>
-                                결재 대기 중
-                            </Link>
+                    <Route path="/surveyIndex" element={<SurveyIndex />} />
 
-                            <Link to="/survey" className={'btn btn-outline-info'}>
-                                전체 조사 목록
-                            </Link>
-
-                            <Link to="/resultReport" className={'btn btn-outline-info'}>
-                                resultReport 페이지로 이동
-                            </Link>
-                        </div>
-                    }
-                />
-
-                {/* SurveyList 페이지 */}
-                <Route path="/surveyList" element={<SurveyList />} />
-
-                {/* CreateSurvey 페이지 */}
-                <Route path="/createSurvey" element={<CreateSurvey />} />
-
-                {/* CreateUser 페이지 */}
-                <Route path="/createUser" element={<CreateUser />} />
-
-                {/* Dashboard 페이지 */}
-                <Route path="/dashboard" element={<Dashboard />} />
-
-                {/* Dashboard 페이지 */}
-                <Route path="/resultReport" element={<ResultReport />} />
-
-                {/* 조사원 상세정보 */}
-                <Route path="/users" element={<UserDetail />} />
-
-                {/* 결재 대기 중 페이지 */}
-                <Route path="/approvals" element={<ApprovalFilters />} />
-
-                {/* 전체 조사 목록 페이지 */}
-                <Route path="/survey" element={<TotalSurveyList />} />
-
-                {/* 전체 조사 목록 페이지 */}
-                <Route path="/resultReport" element={<ResultReport />} />
-            </Routes>
-        </div>
+                </Routes>
+            </div>
+        </>
     );
 }
+
 export default App;

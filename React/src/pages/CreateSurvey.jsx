@@ -1,14 +1,21 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 function CreateSurvey() {
+    const navigate = useNavigate();
+    const [sp] = useSearchParams();
+    const editingId = sp.get("id");                // ← ?id=123 이 있으면 편집모드
+    const editMode = useMemo(() => Boolean(editingId), [editingId]);
+    const [saving, setSaving] = useState(false);
+
     const [formData, setFormData] = useState({
         lotAddress: "",
         latitude: "",
         longitude: "",
         buildingName: "",
-        mainUse: "",
-        structure: "",
+        mainUseName: "",
+        structureName: "",
         groundFloors: "",
         basementFloors: "",
         landArea: "",
@@ -17,39 +24,104 @@ function CreateSurvey() {
 
     const [step, setStep] = useState(1);
     const [errors, setErrors] = useState({});
+    const [loadingPrefill, setLoadingPrefill] = useState(false);
 
     const requiredFields = {
         1: ["lotAddress", "latitude", "longitude"],
-        2: ["buildingName", "mainUse", "structure", "groundFloors", "basementFloors"],
+        2: ["buildingName", "mainUseName", "structureName", "groundFloors", "basementFloors"],
         3: ["landArea", "buildingArea"],
     };
 
-    const isStepValid = () => {
-        return requiredFields[step].every(
-            (field) => formData[field] !== "" && !errors[field]
-        );
-    };
+    const hasValue = (v) => v !== "" && v !== null && v !== undefined;
 
+    const isStepValid = () =>
+        requiredFields[step].every((field) => hasValue(formData[field]) && !errors[field]);
+
+    // 숫자 핸들러
     const handleNumberChange = (e, allowDecimal = false) => {
         const { name, value } = e.target;
         const regex = allowDecimal ? /^\d*\.?\d*$/ : /^\d*$/;
 
         if (regex.test(value)) {
-            setFormData({ ...formData, [name]: value });
-            setErrors({ ...errors, [name]: "" });
+            setFormData((prev) => ({ ...prev, [name]: value }));
+            setErrors((prev) => ({ ...prev, [name]: "" }));
         } else {
-            setErrors({ ...errors, [name]: "숫자를 입력해주세요" });
+            setErrors((prev) => ({ ...prev, [name]: "숫자를 입력해주세요" }));
         }
     };
 
+    // 편집모드: 프리필
+    useEffect(() => {
+        if (!editMode) return;
+        (async () => {
+            try {
+                setLoadingPrefill(true);
+                const { data } = await axios.get(`/web/building/${editingId}`);
+                // 서버 엔티티 → 폼 키에 매핑
+                setFormData({
+                    lotAddress: data?.lotAddress ?? "",
+                    latitude: data?.latitude ?? "",
+                    longitude: data?.longitude ?? "",
+                    buildingName: data?.buildingName ?? "",
+                    mainUseName: data?.mainUseName ?? "",
+                    structureName: data?.structureName ?? "",
+                    groundFloors: data?.groundFloors ?? "",
+                    basementFloors: data?.basementFloors ?? "",
+                    landArea: data?.landArea ?? "",
+                    buildingArea: data?.buildingArea ?? "",
+                });
+            } catch (e) {
+                console.error(e);
+                alert("대상 조사지(건물)를 불러올 수 없습니다.");
+                navigate(-1);
+            } finally {
+                setLoadingPrefill(false);
+            }
+        })();
+    }, [editMode, editingId, navigate]);
+
+    // 전송 전에 문자열 → 숫자/널 변환
+    const toIntOrNull = (s) => (s === "" || s == null ? null : parseInt(s, 10));
+    const toFloatOrNull = (s) => (s === "" || s == null ? null : parseFloat(s));
+
+    const buildPayload = () => ({
+        lotAddress: formData.lotAddress,
+        latitude: toFloatOrNull(formData.latitude),
+        longitude: toFloatOrNull(formData.longitude),
+        buildingName: formData.buildingName,
+        mainUseName: formData.mainUseName,
+        structureName: formData.structureName,
+        groundFloors: toIntOrNull(formData.groundFloors),
+        basementFloors: toIntOrNull(formData.basementFloors),
+        landArea: toFloatOrNull(formData.landArea),
+        buildingArea: toFloatOrNull(formData.buildingArea),
+    });
+
     const handleSubmit = async () => {
+        // 마지막 스텝 유효성 체크(원하면 전체 스텝 검사로 확장 가능)
+        if (!isStepValid()) {
+            alert("필수 입력값을 확인해 주세요.");
+            return;
+        }
+
         try {
-            const response = await axios.post("/web/building", formData);
-            alert("저장 성공");
-            console.log("서버 응답:", response.data);
+            setSaving(true);
+            const payload = buildPayload();
+            if (editMode) {
+                await axios.put(`/web/building/${editingId}`, payload);
+                alert("수정되었습니다.");
+            } else {
+                await axios.post("/web/building", payload);
+                alert("저장 성공");
+            }
+            // 히스토리 대체 → 뒤로 가도 폼으로 안돌아옴
+            navigate("/", { replace: true });
         } catch (error) {
-            alert("저장 실패");
             console.error("저장 중 오류 발생:", error);
+            const msg = error?.response?.data?.message || error?.message || "저장 실패";
+            alert(msg);
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -87,24 +159,25 @@ function CreateSurvey() {
 
     return (
         <div style={cardStyle}>
-            <h2 style={{ textAlign: "center", marginBottom: "20px" }}>조사목록 생성</h2>
-            <p style={{ textAlign: "center", color: "#666" }}>
-                Step {step} / 3
+            <h2 style={{ textAlign: "center", marginBottom: "8px" }}>
+                {editMode ? "조사목록 수정" : "조사목록 생성"}
+            </h2>
+            <p style={{ textAlign: "center", color: "#666", marginBottom: 16 }}>
+                {loadingPrefill ? "기존 데이터를 불러오는 중…" : `Step ${step} / 3`}
             </p>
 
             {/* Step 1 */}
             {step === 1 && (
                 <div>
                     <h3>위치 정보</h3>
+
                     <label>번지주소</label>
                     <input
                         style={inputStyle}
                         type="text"
                         name="lotAddress"
                         value={formData.lotAddress}
-                        onChange={(e) =>
-                            setFormData({ ...formData, lotAddress: e.target.value })
-                        }
+                        onChange={(e) => setFormData({ ...formData, lotAddress: e.target.value })}
                     />
 
                     <label>위도</label>
@@ -137,9 +210,9 @@ function CreateSurvey() {
 
                     <div style={{ textAlign: "right" }}>
                         <button
-                            style={buttonStyle(isStepValid())}
+                            style={buttonStyle(isStepValid() && !loadingPrefill)}
                             onClick={() => setStep(2)}
-                            disabled={!isStepValid()}
+                            disabled={!isStepValid() || loadingPrefill}
                         >
                             다음
                         </button>
@@ -158,31 +231,25 @@ function CreateSurvey() {
                         type="text"
                         name="buildingName"
                         value={formData.buildingName}
-                        onChange={(e) =>
-                            setFormData({ ...formData, buildingName: e.target.value })
-                        }
+                        onChange={(e) => setFormData({ ...formData, buildingName: e.target.value })}
                     />
 
                     <label>주용도</label>
                     <input
                         style={inputStyle}
                         type="text"
-                        name="mainUse"
-                        value={formData.mainUse}
-                        onChange={(e) =>
-                            setFormData({ ...formData, mainUse: e.target.value })
-                        }
+                        name="mainUseName"
+                        value={formData.mainUseName}
+                        onChange={(e) => setFormData({ ...formData, mainUseName: e.target.value })}
                     />
 
                     <label>구조명</label>
                     <input
                         style={inputStyle}
                         type="text"
-                        name="structure"
-                        value={formData.structure}
-                        onChange={(e) =>
-                            setFormData({ ...formData, structure: e.target.value })
-                        }
+                        name="structureName"
+                        value={formData.structureName}
+                        onChange={(e) => setFormData({ ...formData, structureName: e.target.value })}
                     />
 
                     <label>지상층수</label>
@@ -228,7 +295,6 @@ function CreateSurvey() {
                 </div>
             )}
 
-
             {/* Step 3 */}
             {step === 3 && (
                 <div>
@@ -267,16 +333,15 @@ function CreateSurvey() {
                             이전
                         </button>
                         <button
-                            style={buttonStyle(isStepValid())}
+                            style={buttonStyle(isStepValid() && !saving)}
                             onClick={handleSubmit}
-                            disabled={!isStepValid()}
+                            disabled={!isStepValid() || saving}
                         >
-                            저장
+                            {saving ? (editMode ? "수정 중…" : "저장 중…") : (editMode ? "수정 저장" : "저장")}
                         </button>
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

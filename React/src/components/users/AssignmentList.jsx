@@ -2,7 +2,7 @@
 export default function AssignmentList({ loading, items = [] }) {
   return (
       <div className="mt-4">
-        <h6 className="mb-2">배정 건물 목록</h6>
+        {/*<h6 className="mb-2">배정 건물 목록</h6>*/}
         <div className="table-responsive">
           <table className="table table-sm table-striped">
             <thead className="table-light">

@@ -5,8 +5,11 @@ import bitc.full502.final_project_team1.api.web.dto.UserDetailDto;
 import bitc.full502.final_project_team1.api.web.dto.UserSimpleDto;
 import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import bitc.full502.final_project_team1.core.domain.enums.Role;
+import bitc.full502.final_project_team1.api.web.dto.UserUpdateDto;
+import bitc.full502.final_project_team1.core.domain.repository.BuildingRepository;
 import bitc.full502.final_project_team1.core.domain.repository.UserAccountRepository;
 import bitc.full502.final_project_team1.core.service.AssignmentService;
+import bitc.full502.final_project_team1.core.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,8 @@ public class WebUserController {
     private final UserAccountRepository repo;
     private final UserAccountRepository userRepo;
     private final AssignmentService assignmentService;
+    private final BuildingRepository buildingRepository;
+    private final UserService userService;
 
     /** 전체 조회 + 검색 (keyword 파라미터 optional) */
     @GetMapping("/users/search")
@@ -39,21 +44,28 @@ public class WebUserController {
                     Role.RESEARCHER, keyword,
                     Role.RESEARCHER, keyword
             );
+//        } else {
+//            // 📋 전체 조회 (RESEARCHER만)
+//            users = repo.findByRole(Role.RESEARCHER);
+//            users = userRepo.findByRoleAndNameContainingOrRoleAndUsernameContaining(
+//                Role.RESEARCHER, keyword,
+//                Role.RESEARCHER, keyword
+//            );
         } else {
             // 📋 전체 조회 (RESEARCHER만)
-            users = repo.findByRole(Role.RESEARCHER);
+            users = userRepo.findByRole(Role.RESEARCHER);
         }
 
         return users.stream()
-                .map(UserSimpleDto::from)
-                .toList();
+            .map(UserSimpleDto::from)
+            .toList();
     }
 
     /** 전체 사용자 조회 + 검색 옵션 */
     @GetMapping("/users")
     public List<UserSimpleDto> users(
-            @RequestParam(defaultValue = "전체") String option,
-            @RequestParam(required = false) String keyword
+        @RequestParam(defaultValue = "전체") String option,
+        @RequestParam(required = false) String keyword
     ) {
         String field = normalize(option);
         String kw = keyword == null ? "" : keyword.trim();
@@ -98,10 +110,11 @@ public class WebUserController {
                 .empNo(generateEmpNo())                 // 사번 자동 생성
                 .role(Role.RESEARCHER)                  // 무조건 조사원
                 .status(1)                              // 무조건 활성
+                .preferredRegion(dto.getPreferredRegion()) // 선호지역 매핑
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        repo.save(user);
+        userRepo.save(user);
         return ResponseEntity.ok("등록 완료");
     }
 
@@ -145,28 +158,28 @@ public class WebUserController {
     }
 
     /** (관리) 라운드로빈 배정 생성 */
-    @PostMapping("/assignments/seed")
-    public Map<String, Object> seed(@RequestParam(defaultValue = "강동") String keyword) {
-        int created = assignmentService.assignRegionRoundRobin(keyword);
-        return java.util.Collections.singletonMap("created", created);
-    }
+//    @PostMapping("/assignments/seed")
+//    public Map<String, Object> seed(@RequestParam(defaultValue = "강동") String keyword) {
+//        int created = assignmentService.assignRegionRoundRobin(keyword);
+//        return java.util.Collections.singletonMap("created", created);
+//    }
 
     /** 간단 조사원 리스트 조회 (처음 페이지 로드시 사용) */
     @GetMapping("/users/simple")
     public List<UserSimpleDto> getSimpleUsers() {
         List<UserAccountEntity> users = userRepo.findAllByRoleOrderByUserIdAsc(Role.RESEARCHER);
         return users.stream()
-                .map(UserSimpleDto::from)
-                .toList();
+            .map(UserSimpleDto::from)
+            .toList();
     }
 
     /** 페이징 조회 */
     @GetMapping("/users/page")
     public Page<UserSimpleDto> getPagedUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "all") String field,
-            @RequestParam(required = false) String keyword
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "all") String field,
+        @RequestParam(required = false) String keyword
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("userId").ascending());
         String kw = (keyword == null) ? "" : keyword.trim();
@@ -202,4 +215,31 @@ public class WebUserController {
         boolean exists = userRepo.existsByUsername(username);
         return ResponseEntity.ok(exists);
     }
+
+    /** 선호 지역 리스트 API (읍/면/동까지만 추출) */
+    @GetMapping("/users/preferred-regions")
+    public List<String> getPreferredRegions(@RequestParam(defaultValue = "김해시") String city) {
+        return buildingRepository.findDistinctRegions(city).stream()
+                .filter(addr -> addr != null && !addr.isBlank())
+                .sorted()
+                .toList();
+    }
+
+    /** 조사원 상세 페이지 - 조사원 정보 수정 **/
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<String> updateUser(
+            @PathVariable Long userId,
+            @RequestBody UserUpdateDto dto
+    ) {
+        userService.updateUser(userId, dto);
+        return ResponseEntity.ok("수정 완료");
+    }
+
+    /** 조사원 상세 페이지 - 조사원 정보 삭제 **/
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.ok("삭제 완료");
+    }
+
 }

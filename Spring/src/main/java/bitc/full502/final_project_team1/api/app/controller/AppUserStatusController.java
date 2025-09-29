@@ -37,16 +37,17 @@ public class AppUserStatusController {
     // AppUserStatusController.java
     @GetMapping
     public ListWithStatusResponse<SurveyListItemDto> list(
-            @RequestHeader(value = "X-USER-ID", required = false) Long xUserId,
-            @RequestHeader(value = "userId",   required = false) Long userIdHeader, // 일부 클라/도구 대응
-            @RequestParam(value = "userId", required = false) Long userIdParam,     // 쿼리 파라미터도 허용
+//            @RequestHeader(value = "X-USER-ID", required = false) Long xUserId,
+//            @RequestHeader(value = "userId",   required = false) Long userIdHeader, // 일부 클라/도구 대응
+//            @RequestParam(value = "userId", required = false) Long userIdParam,     // 쿼리 파라미터도 허용
+            @RequestHeader("X-USER-ID") Long userId,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        Long userId = (userIdParam != null) ? userIdParam
-                : (xUserId != null)    ? xUserId
-                : userIdHeader;
+//        Long userId = (userIdParam != null) ? userIdParam
+//                : (xUserId != null)    ? xUserId
+//                : userIdHeader;
 
         if (userId == null) {
             throw new org.springframework.web.server.ResponseStatusException(

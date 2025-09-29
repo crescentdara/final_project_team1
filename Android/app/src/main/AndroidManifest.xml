@@ -51,6 +51,7 @@
             android:name=".ui.surveyList.ArActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".ui.surveyList.FullMapActivity" />
+        <activity android:name=".ui.surveyList.RouteActivity" />
         <activity android:name=".ui.surveyList.SurveyListActivity" />
 
         <!-- 카테고리/상태 -->
@@ -62,6 +63,8 @@
         <activity android:name=".ui.SurveyActivity"/>
 
         <activity android:name=".ui.transmission.CameraActivity" />
+
+        <activity android:name=".ui.transmission.PhotoEditActivity" />
 
         <activity android:name=".ui.transmission.EditActivity" />
 

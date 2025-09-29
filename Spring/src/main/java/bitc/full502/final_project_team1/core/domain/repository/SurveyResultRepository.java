@@ -21,6 +21,7 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
     List<SurveyResultEntity> findByUser_UserIdAndStatus(Long userId, String status);
 
     Long countByUser_UserIdAndStatus(Long userId, String status);
+    // long countByUser_UserIdAndStatus(Long userId, String status);
 
     interface StatusCount {
         String getStatus();
@@ -93,7 +94,18 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
       and s.createdAt >= :todayStart
 """)
     long countSentToday(@Param("userId") Long userId, @Param("todayStart") LocalDateTime todayStart);
+    // 최신 1건 가져오기
+    Optional<SurveyResultEntity> findTopByBuilding_IdOrderByIdDesc(Long buildingId);
 
+    // 전체 survey_result 에서 status 값별 건수 카운트
+    long countByStatus(String status);
+
+
+    // 조사자 삭제 - 특정 건물의 최신 조사 결과 조회
+    SurveyResultEntity findTop1ByBuilding_IdOrderByCreatedAtDesc(Long buildingId);
+
+    // 조사자 삭제 - 특정 건물 전체 결과 삭제 (TEMP/REJECTED 정리용)
+    void deleteByBuilding_Id(Long buildingId);
 
 }
 

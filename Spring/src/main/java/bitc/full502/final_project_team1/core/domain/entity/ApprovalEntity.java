@@ -55,4 +55,6 @@ public class ApprovalEntity {
             foreignKey = @ForeignKey(name = "fk_approval_survey_result"))
     private SurveyResultEntity surveyResult;
 
+//    @Column(name = "survey_result_id")
+//    private Long surveyResultId;
 }

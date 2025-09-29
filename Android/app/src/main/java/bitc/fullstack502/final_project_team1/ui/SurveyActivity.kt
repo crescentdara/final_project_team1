@@ -138,6 +138,11 @@ class SurveyActivity : AppCompatActivity() {
                 REQ_CAPTURE_EXT
             )
         }
+
+        findViewById<ImageButton>(R.id.btn_intPhoto).setOnClickListener {
+            startCamera(REQ_CAPTURE_INT)
+        }
+
         findViewById<ImageButton>(R.id.btn_extEditPhoto).setOnClickListener {
             lifecycleScope.launch {
                 val src = pickSrcFileForEdit(extEditPhotoFile, extEditPhotoUrl, extPhotoFile, extPhotoUrl)

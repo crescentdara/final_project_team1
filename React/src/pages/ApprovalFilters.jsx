@@ -1,6 +1,6 @@
 // src/pages/PendingApprovals.jsx
 import { useEffect, useState } from "react";
-import ResultModal from "../components/modals/ResultModal.jsx";
+import SurveyResultModal from "../components/modals/SurveyResultModal.jsx";
 import Pagination from "../components/ui/Pagination.jsx";
 
 /** 상태 배지 */
@@ -255,7 +255,7 @@ export default function PendingApprovals() {
             />
 
             {/* 조사 결과 모달 */}
-            <ResultModal
+            <SurveyResultModal
                 open={modalOpen}
                 item={modalItem}
                 loading={detailLoading}

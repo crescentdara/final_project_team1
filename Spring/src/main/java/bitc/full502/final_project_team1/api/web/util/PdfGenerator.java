@@ -6,35 +6,46 @@ import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Component
 public class PdfGenerator {
 
-    public static String generateSurveyReport(ResultDetailDto detail,
-                                              UserAccountEntity approver,
-                                              String clientId,
-                                              String clientSecret) {
+    @Value("${file.report-dir}")
+    private String reportDir;
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
+    public String generateSurveyReport(ResultDetailDto detail,
+                                       UserAccountEntity approver,
+                                       String clientId,
+                                       String clientSecret) {
         try {
-            String basePath = "reports/";
-            File dir = new File(basePath);
+            // === PDF 저장 경로 ===
+            File dir = new File(reportDir);
             if (!dir.exists()) dir.mkdirs();
 
-            String fileName = basePath + "report-" + detail.getId() + ".pdf";
+            String fileName = "report-" + detail.getId() + ".pdf";
+            Path filePath = Paths.get(reportDir, fileName);
 
             Document document = new Document(PageSize.A4, 50, 50, 50, 50);
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(fileName));
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filePath.toFile()));
             document.open();
 
             // ✅ 한글 폰트
             BaseFont bfKorean = BaseFont.createFont("c:/windows/fonts/malgun.ttf",
-                    BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font coverTitleFont = new Font(bfKorean, 24, Font.BOLD, Color.BLACK);
             Font coverSubFont = new Font(bfKorean, 14, Font.NORMAL, Color.DARK_GRAY);
             Font infoFont = new Font(bfKorean, 12, Font.NORMAL, Color.BLACK);
@@ -44,19 +55,19 @@ public class PdfGenerator {
 
             // ------------------ 1. 표지 ------------------
             ColumnText.showTextAligned(
-                    cb, Element.ALIGN_CENTER,
-                    new Phrase("건축물 현장조사 보고서", coverTitleFont),
-                    document.getPageSize().getWidth() / 2,
-                    document.getPageSize().getHeight() / 2 + 60,
-                    0
+                cb, Element.ALIGN_CENTER,
+                new Phrase("건축물 현장조사 보고서", coverTitleFont),
+                document.getPageSize().getWidth() / 2,
+                document.getPageSize().getHeight() / 2 + 60,
+                0
             );
 
             ColumnText.showTextAligned(
-                    cb, Element.ALIGN_CENTER,
-                    new Phrase("사례 번호: M-" + detail.getId(), coverSubFont),
-                    document.getPageSize().getWidth() / 2,
-                    document.getPageSize().getHeight() / 2 + 30,
-                    0
+                cb, Element.ALIGN_CENTER,
+                new Phrase("사례 번호: M-" + detail.getId(), coverSubFont),
+                document.getPageSize().getWidth() / 2,
+                document.getPageSize().getHeight() / 2 + 30,
+                0
             );
 
             Paragraph footerPara = new Paragraph();
@@ -64,17 +75,17 @@ public class PdfGenerator {
             footerPara.add(new Phrase("조사자: " + detail.getInvestigator(), infoFont));
             footerPara.add(Chunk.NEWLINE);
             footerPara.add(new Phrase("승인자: " + approver.getName() +
-                    " (" + approver.getUsername() + ")", infoFont));
+                " (" + approver.getUsername() + ")", infoFont));
             footerPara.add(Chunk.NEWLINE);
             footerPara.add(new Phrase("승인일시: " +
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(LocalDateTime.now()), infoFont));
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(LocalDateTime.now()), infoFont));
 
             ColumnText ct = new ColumnText(cb);
             ct.setSimpleColumn(
-                    document.getPageSize().getWidth() / 2 - 200,
-                    document.getPageSize().getHeight() / 2 - 80,
-                    document.getPageSize().getWidth() / 2 + 200,
-                    document.getPageSize().getHeight() / 2 - 10
+                document.getPageSize().getWidth() / 2 - 200,
+                document.getPageSize().getHeight() / 2 - 80,
+                document.getPageSize().getWidth() / 2 + 200,
+                document.getPageSize().getHeight() / 2 - 10
             );
             ct.addElement(footerPara);
             ct.go();
@@ -91,7 +102,7 @@ public class PdfGenerator {
             addGrayRow(table, "주소", detail.getAddress(), bfKorean);
             addGrayRow(table, "승인자", approver.getName() + "(" + approver.getUsername() + ")", bfKorean);
             addGrayRow(table, "승인일시",
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), bfKorean);
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), bfKorean);
 
             addGrayRow(table, "조사 가능 여부", mapPossible(detail.getPossible()), bfKorean);
             addGrayRow(table, "행정 목적 활용", mapAdminUse(detail.getAdminUse()), bfKorean);
@@ -119,9 +130,9 @@ public class PdfGenerator {
             if (detail.getLatitude() != null && detail.getLongitude() != null) {
                 try {
                     String mapUrl = String.format(
-                            "https://static-maps.yandex.ru/1.x/?ll=%f,%f&z=16&size=600,400&l=map&pt=%f,%f,pm2rdm",
-                            detail.getLongitude(), detail.getLatitude(),
-                            detail.getLongitude(), detail.getLatitude()
+                        "https://static-maps.yandex.ru/1.x/?ll=%f,%f&z=16&size=600,400&l=map&pt=%f,%f,pm2rdm",
+                        detail.getLongitude(), detail.getLatitude(),
+                        detail.getLongitude(), detail.getLatitude()
                     );
 
                     Image mapImg = Image.getInstance(new URL(mapUrl));
@@ -138,7 +149,7 @@ public class PdfGenerator {
             }
 
             document.close();
-            return fileName;
+            return filePath.toString();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -159,7 +170,7 @@ public class PdfGenerator {
         keyCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
         PdfPCell valCell = new PdfPCell(new Phrase(
-                (value == null || value.isBlank()) ? "-" : value, valFont));
+            (value == null || value.isBlank()) ? "-" : value, valFont));
         valCell.setBackgroundColor(Color.WHITE);
         valCell.setPadding(10);
 
@@ -167,12 +178,16 @@ public class PdfGenerator {
         table.addCell(valCell);
     }
 
-    private static void addImageIfExists(Document document, String label, String path) throws Exception {
-        if (path == null || path.isBlank()) {
+    private void addImageIfExists(Document document, String label, String relativePath) throws Exception {
+        if (relativePath == null || relativePath.isBlank()) {
             document.add(new Paragraph(label + " : 이미지 없음"));
             return;
         }
-        File file = new File(path);
+
+        // DB에는 "/upload/..." 형태로 저장 → 실제 경로 변환
+        String normalized = relativePath.startsWith("/") ? relativePath.substring(1) : relativePath;
+        File file = new File(uploadDir, normalized.replace("upload", "")); // uploadDir + /ext/xxx.jpg
+
         if (file.exists()) {
             document.add(new Paragraph(label));
             Image img = Image.getInstance(file.getAbsolutePath());
@@ -185,7 +200,6 @@ public class PdfGenerator {
     }
 
     // ================= 매핑 메서드 =================
-
     private static String mapPossible(Integer v) {
         return v == null ? "-" : (v == 1 ? "가능" : v == 2 ? "불가" : "-");
     }

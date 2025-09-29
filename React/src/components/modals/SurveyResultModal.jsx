@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import NaverMap from "../NaverMap.jsx";
 import RejectReasonModal from "./RejectReasonModal.jsx"; // ✅ 추가
 
+const titleAddress = (it) =>
+    (it?.lotAddress || it?.roadAddress || it?.address || "-");
+
 const label = {
     possible: "조사 가능 여부",
     adminUse: "행정목적 활용",
@@ -31,7 +34,7 @@ const codeText = {
     floor: (v) => ({ 1: "양호", 2: "보통", 3: "불량" }[v] ?? "-"),
 };
 
-export default function ResultModal({
+export default function SurveyResultModal({
                                         open,
                                         item,
                                         loading,
@@ -53,15 +56,16 @@ export default function ResultModal({
             >
                 <div className="modal-dialog modal-xl modal-dialog-scrollable">
                     <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title">
-                                조사내역 · {item?.caseNo ?? "-"}{" "}
-                                <small className="text-muted ms-2">
-                                    {item?.lotAddress ?? ""}
-                                </small>
-                            </h5>
-                            <button type="button" className="btn-close" onClick={onClose} />
-                        </div>
+                      <div className="modal-header">
+                        <h5
+                            className="modal-title text-truncate"
+                            title={titleAddress(item)}
+                            style={{ maxWidth: "calc(100% - 40px)" }} // 닫기 버튼 폭만큼 줄여서 말줄임 안전
+                        >
+                          {titleAddress(item)}
+                        </h5>
+                        <button type="button" className="btn-close" onClick={onClose} />
+                      </div>
 
                         <div className="modal-body">
                             {/* 로딩/에러 상태 */}
@@ -78,7 +82,7 @@ export default function ResultModal({
                                     {/* 상단 요약 */}
                                     <div className="mb-3">
                                         <div className="fw-semibold">
-                                            {item.investigator ?? "-"} · {item.lotAddress ?? "-"}
+                                            {item.investigator ?? "-"}
                                         </div>
                                         <div className="text-muted small">
                                             상태: {item.status ?? "-"}

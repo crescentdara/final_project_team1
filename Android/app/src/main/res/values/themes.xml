@@ -1,11 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Final_Project_Team1" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        
-        
 
+    <style name="Base.Theme.Final_Project_Team1" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- 새로운 색상 테마 적용 -->
         <item name="colorPrimary">@color/primary_blue</item>
         <item name="colorPrimaryVariant">@color/primary_blue_dark</item>
@@ -16,8 +11,13 @@
         <item name="android:windowBackground">@color/background_light_gray</item>
         <item name="colorControlActivated">@color/primary_blue</item>
         <item name="colorSecondary">@color/primary_blue</item>    <!-- 보조 색상 -->
-        
     </style>
 
-    <style name="Theme.Final_Project_Team1" parent="Base.Theme.Final_Project_Team1" />
+    <style name="Theme.App.Starting" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowBackground">@color/launcher_color</item>
+        <item name="android:statusBarColor">@color/primary_blue</item>
+        <item name="android:navigationBarColor">@color/primary_blue</item>
+    </style>
+
+
 </resources>

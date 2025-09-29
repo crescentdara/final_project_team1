@@ -3,6 +3,7 @@ package bitc.fullstack502.final_project_team1.ui.intro
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.MainActivity
@@ -12,6 +13,7 @@ import com.google.android.material.button.MaterialButton
 class IntroActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.Base_Theme_Final_Project_Team1)
         super.onCreate(savedInstanceState)
 
         // 이미 로그인 & 세션 유효 → 바로 메인으로

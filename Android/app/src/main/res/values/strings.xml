@@ -19,11 +19,11 @@
     <string name="menu_data_transmission">데이터 전송</string>
 
     <!-- 로그인 화면 -->
-    <string name="login_title">로그인</string>
-    <string name="login_subtitle">계정 정보를 입력하세요</string>
-    <string name="login_id_hint">아이디</string>
-    <string name="login_password_hint">비밀번호</string>
-    <string name="login_button">로그인</string>
+    <string name="login_title">LOGIN</string>
+    <string name="login_subtitle">로그인 정보를 입력하세요</string>
+    <string name="login_id_hint">ID</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_button">LOGIN</string>
 
     <!-- 카테고리 메뉴 -->
     <string name="category_survey_status">조사현황</string>

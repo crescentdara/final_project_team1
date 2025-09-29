@@ -9,6 +9,7 @@
     <color name="my_blue">#6898FF</color>
     <color name="primary_blue_dark">#5478E6</color>
     <color name="primary_blue_light">#8AB4FF</color>
+    <color name="launcher_color">#72C6F8</color>
     
     <!-- 상태 색상 -->
     <color name="green">#28A745</color>

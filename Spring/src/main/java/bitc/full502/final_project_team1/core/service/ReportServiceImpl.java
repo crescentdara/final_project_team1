@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +26,9 @@ public class ReportServiceImpl implements ReportService {
 
     private final ReportRepository reportRepo;
     private final SurveyResultRepository surveyResultRepo;
+
+    // PdfGenerator 주입 (이제 static 호출 대신 인스턴스 사용)
+    private final PdfGenerator pdfGenerator;
 
     @Value("${naver.client.id}")
     private String clientId;
@@ -40,8 +42,8 @@ public class ReportServiceImpl implements ReportService {
         SurveyResultEntity surveyResult = surveyResultRepo.findByIdWithUserAndBuilding(surveyResultId)
                 .orElseThrow(() -> new IllegalArgumentException("조사 결과를 찾을 수 없습니다. id=" + surveyResultId));
 
-        // ✅ 키를 같이 전달
-        String pdfPath = PdfGenerator.generateSurveyReport(
+        // PdfGenerator 인스턴스 메서드 사용
+        String pdfPath = pdfGenerator.generateSurveyReport(
                 ResultDetailDto.from(surveyResult),
                 approvedBy,
                 clientId,
@@ -61,8 +63,6 @@ public class ReportServiceImpl implements ReportService {
 
         return reportRepo.save(report);
     }
-
-
 
     /** 📌 전체 보고서 조회 */
     @Override

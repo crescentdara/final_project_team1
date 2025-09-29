@@ -51,7 +51,7 @@ public class ReportController {
                     .map(ReportListDto::fromEntity)
                     .toList();
 
-            // ✅ 페이징 적용 (subList 잘라내기)
+            // 페이징 적용 (subList 잘라내기)
             int start = (int) pageable.getOffset();
             int end = Math.min(start + pageable.getPageSize(), dtoList.size());
             List<ReportListDto> pageContent = (start < end) ? dtoList.subList(start, end) : List.of();

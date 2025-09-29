@@ -46,6 +46,7 @@ server:
 # === 파일 업로드 경로 ===
 file:
   upload-dir: src/main/resources/static/upload
+  report-dir: reports
 
 # === 외부 API ===
 naver:

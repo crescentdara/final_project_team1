@@ -3,14 +3,12 @@ import axios from "axios";
 import { Table, Form, Button } from "react-bootstrap";
 
 function MessageSent({ senderId, newMessage }) {
-    console.log("✅ MessageSent senderId:", senderId); // 디버깅
-
     const [messages, setMessages] = useState([]);
     const [receivers, setReceivers] = useState([]);
     const [receiverId, setReceiverId] = useState("");
     const [keyword, setKeyword] = useState("");
 
-    // 📌 조사원 목록 불러오기 (한 번만 실행)
+    // 조사원 목록 불러오기 (한 번만 실행)
     useEffect(() => {
         axios
             .get("/web/api/users/simple")
@@ -18,7 +16,7 @@ function MessageSent({ senderId, newMessage }) {
             .catch((err) => console.error("조사원 목록 불러오기 실패:", err));
     }, []);
 
-    // 📌 보낸 메시지 기본 조회
+    // 보낸 메시지 기본 조회
     useEffect(() => {
         if (!senderId) return;
         axios
@@ -27,14 +25,14 @@ function MessageSent({ senderId, newMessage }) {
             .catch((err) => console.error("보낸 메시지 조회 실패:", err));
     }, [senderId]);
 
-    // 📌 새 메시지가 전송되면 즉시 리스트에 반영
+    // 새 메시지가 전송되면 즉시 리스트에 반영
     useEffect(() => {
         if (newMessage) {
             setMessages((prev) => [newMessage, ...prev]);
         }
     }, [newMessage]);
 
-    // 📌 검색 실행
+    // 검색 실행
     const handleSearch = () => {
         if (!senderId) return;
         axios
@@ -49,15 +47,17 @@ function MessageSent({ senderId, newMessage }) {
     };
 
     return (
-        <div>
-            <h4 className="mb-3">보낸 메시지함</h4>
+        <div className="p-3 border rounded bg-white shadow-sm">
+            <h5 className="mb-4" style={{ color: "#6898FF", fontWeight: "bold" }}>
+                보낸 메시지함
+            </h5>
 
             {/* 검색 영역 */}
-            <div className="d-flex gap-2 mb-3">
+            <div className="d-flex gap-2 mb-4">
                 <Form.Select
                     value={receiverId}
                     onChange={(e) => setReceiverId(e.target.value)}
-                    style={{ maxWidth: "200px" }}
+                    style={{ maxWidth: "200px", borderRadius: "8px" }}
                 >
                     <option value="">전체 조사원</option>
                     {receivers.map((r) => (
@@ -72,17 +72,26 @@ function MessageSent({ senderId, newMessage }) {
                     placeholder="메시지 내용 검색"
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
-                    style={{ maxWidth: "250px" }}
+                    style={{ maxWidth: "250px", borderRadius: "8px" }}
                 />
 
-                <Button variant="secondary" onClick={handleSearch}>
+                <Button
+                    onClick={handleSearch}
+                    className="fw-bold"
+                    style={{
+                        backgroundColor: "#6898FF",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "6px 16px",
+                    }}
+                >
                     검색
                 </Button>
             </div>
 
             {/* 메시지 리스트 */}
-            <Table striped bordered hover>
-                <thead>
+            <Table bordered hover responsive className="align-middle">
+                <thead style={{ backgroundColor: "#F5F7FF" }}>
                 <tr>
                     <th>수신자</th>
                     <th>제목</th>
@@ -97,18 +106,26 @@ function MessageSent({ senderId, newMessage }) {
                         <tr key={msg.messageId}>
                             <td>{msg.receiverName || "전체"}</td>
                             <td>{msg.title}</td>
-                            <td>{msg.content}</td>
+                            <td className="text-truncate" style={{ maxWidth: "200px" }}>
+                                {msg.content}
+                            </td>
                             <td>
                                 {msg.sentAt
                                     ? new Date(msg.sentAt).toLocaleString()
                                     : "-"}
                             </td>
-                            <td>{msg.readFlag ? "읽음" : "안읽음"}</td>
+                            <td>
+                                {msg.readFlag ? (
+                                    <span className="badge bg-success">읽음</span>
+                                ) : (
+                                    <span className="badge bg-secondary">안읽음</span>
+                                )}
+                            </td>
                         </tr>
                     ))
                 ) : (
                     <tr>
-                        <td colSpan="5" className="text-center">
+                        <td colSpan="5" className="text-center text-muted py-4">
                             보낸 메시지가 없습니다.
                         </td>
                     </tr>

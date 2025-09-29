@@ -2,10 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import NaverMap from "../components/NaverMap"; // 지도 컴포넌트
 
-
-
 function SurveyList() {
-
+    // 👉 useState 훅들 먼저 선언
     const [addresses, setAddresses] = useState([]);
     const [emdList, setEmdList] = useState([]);
     const [selectedEmd, setSelectedEmd] = useState("");
@@ -18,6 +16,9 @@ function SurveyList() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [userKeyword, setUserKeyword] = useState("");
     const [selectedBuildings, setSelectedBuildings] = useState([]);
+
+    // 👉 상태 변수 이후에 count 계산
+    const selectedCount = selectedBuildings.length;
 
     useEffect(() => {
         axios
@@ -169,14 +170,18 @@ function SurveyList() {
                 <div className="col-md-8 h-100 d-flex flex-column">
                     <div
                         className="p-3 border rounded bg-white shadow-sm d-flex flex-column"
-                        style={{ height: "616px" }}   // 고정 높이
+                        style={{ height: "616px" }} // 고정 높이
                     >
                         <div className="d-flex justify-content-between align-items-center mb-2">
                             <h5 className="mb-0" style={{ color: "#6898FF", fontWeight: "bold" }}>
                                 미배정 조사지 목록
                             </h5>
-                            <small className="text-muted">총 {addresses.length}건</small>
+                            <div className="d-flex align-items-center" style={{ gap: "12px" }}>
+                                <span className="text-muted small">선택 {selectedCount}건</span>
+                                <small className="text-muted">총 {addresses.length}건</small>
+                            </div>
                         </div>
+
                         {/* 리스트만 스크롤 */}
                         <ul
                             className="list-group flex-grow-1"
@@ -206,7 +211,7 @@ function SurveyList() {
                     {/* 지도 카드 */}
                     <div
                         className="p-3 border rounded bg-white shadow-sm flex-grow-1"
-                        style={{ height: "300px" }}   // 높이 조정
+                        style={{ height: "300px" }} // 높이 조정
                     >
                         <h5 className="mb-3" style={{ color: "#6898FF", fontWeight: "bold" }}>
                             지도
@@ -222,7 +227,7 @@ function SurveyList() {
                     {/* 조사원 조회 */}
                     <div
                         className="p-3 border rounded bg-white shadow-sm"
-                        style={{ height: "300px" }}   // 높이 조정
+                        style={{ height: "300px" }} // 높이 조정
                     >
                         <h5 className="mb-3" style={{ color: "#6898FF", fontWeight: "bold" }}>
                             조사원 조회
@@ -293,7 +298,10 @@ function SurveyList() {
                     </div>
                 </div>
             </div>
-            <br></br><br></br><br></br><br></br>
+            <br />
+            <br />
+            <br />
+            <br />
         </div>
     );
 }

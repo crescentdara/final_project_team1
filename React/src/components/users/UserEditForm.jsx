@@ -85,19 +85,6 @@ export default function UserEditForm({ detail, onSave}) {
                 </Form.Select>
             </Form.Group>
 
-            <Form.Group className="mb-3">
-                <Form.Label>역할(Role)</Form.Label>
-                <Form.Select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                >
-                    <option value="RESEARCHER">조사원</option>
-                    <option value="APPROVER">결재자</option>
-                    <option value="ADMIN">관리자</option>
-                </Form.Select>
-            </Form.Group>
-
         </Form>
     );
 }

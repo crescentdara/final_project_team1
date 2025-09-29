@@ -67,94 +67,77 @@ export default function UserDetailModal({
                 </Modal.Title>
             </Modal.Header>
 
-            <Modal.Body>
-                {loadingDetail ? (
-                    <div className="text-center my-4">
+          <Modal.Body>
+            {loadingDetail ? (
+                <div className="text-center my-4">
+                  <Spinner animation="border" />
+                </div>
+            ) : isEditMode ? (
+                <UserEditForm
+                    detail={detail}
+                    onSave={handleSave}
+                    onCancel={() => setIsEditMode(false)}
+                />
+            ) : (
+                <UserDetailCard detail={detail} />
+            )}
+
+            {/* ✅ 배정된 건물 리스트: 보기 모드에서만 렌더 */}
+            {!isEditMode && (
+                <>
+                  <hr />
+                  <h5>배정된 건물</h5>
+                  {loadingAssign ? (
+                      <div className="text-center my-4">
                         <Spinner animation="border" />
-                    </div>
-                ) : isEditMode ? (
-                    <UserEditForm
-                        detail={detail}
-                        onSave={handleSave}
-                        onCancel={() => setIsEditMode(false)}
-                    />
-                ) : (
-                    <UserDetailCard detail={detail} />
-                )}
+                      </div>
+                  ) : (
+                      <AssignmentList
+                          items={(assignments ?? []).slice((page - 1) * size, page * size)}
+                      />
+                  )}
+                </>
+            )}
+          </Modal.Body>
 
-                {!isEditMode && (
-                    <>
-                        <hr />
-                        <h5>배정된 건물</h5>
-                        {loadingAssign ? (
-                            <div className="text-center my-4">
-                                <Spinner animation="border" />
-                            </div>
-                        ) : (
-                            // ✅ 현재 페이지에 맞는 데이터만 slice 해서 전달
-                            <AssignmentList
-                                items={assignments.slice(
-                                    (page - 1) * size,
-                                    page * size
-                                )}
-                            />
-                        )}
-                    </>
-                )}
-            </Modal.Body>
+          {/* ❌ 기존: 항상 보이던 Pagination 제거하고, 보기 모드에서만 조건부 렌더 */}
+          {!isEditMode && !loadingAssign && total > size && (
+              <Pagination
+                  page={page}
+                  total={total}
+                  size={size}
+                  onChange={setPage}
+                  siblings={1}
+                  boundaries={1}
+                  className="justify-content-center"
+                  lastAsLabel={false}
+              />
+          )}
 
-            <Pagination
-                page={page}
-                total={total}
-                size={size}
-                onChange={setPage}
-                siblings={1}
-                boundaries={1}
-                className="justify-content-center"
-                lastAsLabel={false}
-            />
-
-            <Modal.Footer>
-                {isEditMode ? (
-                    <>
-                        <Button
-                            variant="secondary"
-                            onClick={() => setIsEditMode(false)}
-                        >
-                            취소
-                        </Button>
-                        <Button
-                            style={{
-                                backgroundColor: "#289eff",
-                                borderColor: "#289eff",
-                            }}
-                            onClick={() =>
-                                document.querySelector("form")?.requestSubmit()
-                            }
-                        >
-                            저장
-                        </Button>
-                    </>
-                ) : (
-                    <>
-                        <Button variant="danger" onClick={handleDelete}>
-                            삭제
-                        </Button>
-                        <Button
-                            style={{
-                                backgroundColor: "#289eff",
-                                borderColor: "#289eff",
-                            }}
-                            onClick={() => setIsEditMode(true)}
-                        >
-                            수정
-                        </Button>
-                        <Button variant="secondary" onClick={onHide}>
-                            닫기
-                        </Button>
-                    </>
-                )}
-            </Modal.Footer>
+          <Modal.Footer>
+            {isEditMode ? (
+                <>
+                  <Button variant="secondary" onClick={() => setIsEditMode(false)}>취소</Button>
+                  <Button
+                      style={{ backgroundColor: "#289eff", borderColor: "#289eff" }}
+                      onClick={() => document.querySelector("form")?.requestSubmit()}
+                  >
+                    저장
+                  </Button>
+                </>
+            ) : (
+                <>
+                  <Button variant="danger" onClick={handleDelete}>삭제</Button>
+                  <Button
+                      style={{ backgroundColor: "#289eff", borderColor: "#289eff" }}
+                      onClick={() => setIsEditMode(true)}
+                  >
+                    수정
+                  </Button>
+                  <Button variant="secondary" onClick={onHide}>닫기</Button>
+                </>
+            )}
+          </Modal.Footer>
         </Modal>
     );
 }

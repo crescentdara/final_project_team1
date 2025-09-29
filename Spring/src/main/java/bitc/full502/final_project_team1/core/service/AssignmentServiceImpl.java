@@ -202,20 +202,25 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     @Transactional
     public void rejectAssignment(Long userId, Long buildingId) {
-        // 배정 존재/소유자 확인
-        UserBuildingAssignmentEntity asg = assignmentRepo
+        // 1) 본인 배정건 검증 후 삭제 (FK 기준으로 정확히)
+        var asg = assignmentRepo
                 .findByBuildingIdAndUser_UserId(buildingId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("배정 내역이 없습니다."));
-
-        // 배정 삭제
         assignmentRepo.delete(asg);
-        // 또는: assignRepo.deleteByBuildingIdAndUser_UserId(buildingId, userId);
+        // 필요시: assignmentRepo.deleteByBuildingIdAndUser_UserId(buildingId, userId);
 
-        // 건물 상태 미배정(0)으로
+        // 2) 건물 상태/배정자 초기화
         BuildingEntity b = buildingRepo.findById(buildingId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 건물이 없습니다."));
-        b.setStatus(0); // dirty checking
+        b.setStatus(0);            // 미배정
+        b.setAssignedUser(null);   // 배정자 해제
+
+        // 3) 명시 저장(더티체킹이 환경에 따라 안 먹는 경우 대비)
+        buildingRepo.save(b);
+        // 선택: 강제 플러시 (디버깅 중엔 확실히 반영)
+        // buildingRepo.flush();
     }
+
 
 
 

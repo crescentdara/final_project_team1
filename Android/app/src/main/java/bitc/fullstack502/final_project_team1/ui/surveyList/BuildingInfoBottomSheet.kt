@@ -106,59 +106,60 @@ class BuildingInfoBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val btnStart = view.findViewById<Button>(R.id.btnStartSurvey)
-        val info = view.findViewById<LinearLayout>(R.id.infoContainer)
-        val tempBar = view.findViewById<LinearLayout>(R.id.layoutTempActions)
-        val btnEdit = view.findViewById<Button>(R.id.btnEditResult)
+        val btnStart  = view.findViewById<Button>(R.id.btnStartSurvey)
+        val info      = view.findViewById<LinearLayout>(R.id.infoContainer)
+        val tempBar   = view.findViewById<LinearLayout>(R.id.layoutTempActions)
+        val btnEdit   = view.findViewById<Button>(R.id.btnEditResult)
         val btnSubmit = view.findViewById<Button>(R.id.btnSubmitResult)
         val btnReject = view.findViewById<Button>(R.id.btnRejectSurvey)
 
-        btnReject.setOnClickListener {
-            if (buildingId <= 0) {
-                Toast.makeText(requireContext(), "잘못된 건물 ID입니다.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+        // ✅ 어디서 열렸는지 판단 (명시값 없으면 mode 기반 기본값)
+        val returnTo = arguments?.getString(SurveyActivity.EXTRA_RETURN_TO) ?: resolveReturnTo()
 
-            val uid =
-                bitc.fullstack502.final_project_team1.core.AuthManager.userId(requireContext())
-            if (uid <= 0) {
-                Toast.makeText(requireContext(), "로그인이 필요합니다.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+        // ✅ 재조사/미전송에서 열리면 '조사 거절' 숨김
+        val shouldHideReject =
+            (mode == "REINSPECT" || mode == "TEMP_DETAIL") ||
+                    (returnTo == SurveyActivity.RETURN_REINSPECT || returnTo == SurveyActivity.RETURN_NOT_TRANSMITTED)
 
-            it.isEnabled = false
-            viewLifecycleOwner.lifecycleScope.launch {
-                runCatching { ApiClient.service.rejectAssignment(uid, buildingId) }
-                    .onSuccess { resp ->
-                        if (resp.isSuccessful) {
-                            Toast.makeText(
-                                requireContext(),
-                                "조사를 거절했습니다.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            dismiss()
-                            (activity as? SurveyListActivity)?.refreshAssignments()
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "거절 실패: ${resp.code()}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            it.isEnabled = true
+        if (shouldHideReject) {
+            btnReject.visibility = View.GONE
+        } else {
+            btnReject.visibility = View.VISIBLE
+            // ▼ 보일 때만 리스너 연결
+            btnReject.setOnClickListener { v ->
+                if (buildingId <= 0) {
+                    Toast.makeText(requireContext(), "잘못된 건물 ID입니다.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                val uid = AuthManager.userId(requireContext())
+                if (uid <= 0) {
+                    Toast.makeText(requireContext(), "로그인이 필요합니다.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                v.isEnabled = false
+                viewLifecycleOwner.lifecycleScope.launch {
+                    runCatching { ApiClient.service.rejectAssignment(uid, buildingId) }
+                        .onSuccess { resp ->
+                            if (resp.isSuccessful) {
+                                Toast.makeText(requireContext(), "조사를 거절했습니다.", Toast.LENGTH_SHORT).show()
+                                dismiss()
+                                (activity as? SurveyListActivity)?.refreshAssignments()
+                            } else {
+                                Toast.makeText(requireContext(), "거절 실패: ${resp.code()}", Toast.LENGTH_SHORT).show()
+                                v.isEnabled = true
+                            }
                         }
-                    }
-                    .onFailure { e ->
-                        Toast.makeText(
-                            requireContext(),
-                            "네트워크 오류: ${e.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        it.isEnabled = true
-                    }
+                        .onFailure { e ->
+                            Toast.makeText(requireContext(), "네트워크 오류: ${e.message}", Toast.LENGTH_SHORT).show()
+                            v.isEnabled = true
+                        }
+                }
             }
         }
 
-        // 반려 정보: 기존 로직 유지
+
+    // 반려 정보: 기존 로직 유지
         view.findViewById<TextView>(R.id.tvRejectReason)
             .setTextOrGone(arguments?.getString(ARG_REJECT_REASON), R.string.reject_reason_fmt)
 

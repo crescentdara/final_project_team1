@@ -1,0 +1,71 @@
+/* ===== CreateSurvey: compact, dashboard-like ===== */
+:root{
+    --cs-border: #e5e7eb;
+    --cs-text: #111827;
+    --cs-muted: #6b7280;
+    --cs-primary: #289eff;
+    --cs-shadow: 0 10px 20px rgba(0,0,0,.04), 0 2px 6px rgba(0,0,0,.04);
+}
+
+/* 카드 */
+.cs-card{
+    max-width: 1200px;          /* 3열이 한 화면에 들어오도록 넓힘 */
+    margin: 24px auto;
+    background: #fff;
+    border: 1px solid var(--cs-border);
+    border-radius: 16px;
+    box-shadow: var(--cs-shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 헤더 */
+.cs-header{
+    padding: 16px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--cs-border);
+}
+.cs-title{ margin: 0; font-weight: 800; font-size: 20px; letter-spacing: .2px; color: var(--cs-text); }
+.cs-sub{ margin: 4px 0 0; font-size: 12px; color: var(--cs-muted); }
+
+/* 본문 (컴팩트) */
+.cs-body{ padding: 16px 20px; }
+.cs-grid{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(240px, 1fr)); /* 3열 */
+    gap: 10px 16px;                                       /* 촘촘한 간격 */
+}
+/* 화면이 줄면 2열/1열로 자동 접힘 */
+@media (max-width: 1100px){ .cs-grid{ grid-template-columns: repeat(2, minmax(240px, 1fr)); } }
+@media (max-width: 720px){ .cs-grid{ grid-template-columns: 1fr; } }
+
+.cs-field{ display: flex; flex-direction: column; min-width: 0; }
+.cs-label{ font-size: 12px; font-weight: 700; margin-bottom: 4px; color: var(--cs-text); }
+.cs-input{
+    width: 100%;
+    border: 1px solid var(--cs-border);
+    border-radius: 10px;
+    padding: 8px 10px;                /* 높이 줄여 한 화면에 들어오게 */
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+.cs-input::placeholder{ color:#9aa3af; }
+.cs-input:focus{ border-color: var(--cs-primary); box-shadow: 0 0 0 4px rgba(40,158,255,.15); }
+.cs-input.is-invalid{ border-color:#d93025; }
+.cs-error{ color:#d93025; font-size: 11px; margin-top: 4px; }
+
+/* 액션 */
+.cs-actions{
+    display: flex; justify-content: flex-end; gap: 10px;
+    padding: 12px 20px 18px; border-top: 1px solid var(--cs-border);
+}
+.cs-btn{
+    padding: 10px 16px; border-radius: 10px; border: 1px solid transparent;
+    font-weight: 700; cursor: pointer;
+}
+.cs-btn:disabled{ cursor: not-allowed; }
+.cs-btn-secondary{ background:#eef2f7; color:#111827; border-color: var(--cs-border); }
+.cs-btn-secondary:hover{ background:#e8edf4; }
+.cs-btn-primary{ background: var(--cs-primary); color:#fff; border-color: var(--cs-primary); }
+.cs-btn-primary:disabled{ background:#bcdcff; border-color:#bcdcff; }

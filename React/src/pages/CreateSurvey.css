@@ -1,0 +1,107 @@
+/* ===== CreateSurvey (page-scope) ===== */
+.cs-card{
+    max-width: 960px;
+    margin: 32px auto;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0,0,0,.04), 0 2px 6px rgba(0,0,0,.04);
+    overflow: hidden;
+}
+
+.cs-header{
+    padding: 20px 24px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+.cs-title{
+    margin: 0;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: .2px;
+    color: #111827;
+}
+.cs-sub{
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.cs-section{
+    padding: 20px 24px;
+}
+.cs-section + .cs-section{
+    border-top: 1px solid #eef0f3;
+}
+
+.cs-section-title{
+    font-weight: 700;
+    font-size: 14px;
+    margin: 4px 0 12px;
+    color: #111827;
+}
+
+.cs-grid{
+    display: grid;
+    gap: 14px 16px;
+    grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 768px){
+    .cs-grid{ grid-template-columns: 1fr; }
+}
+
+.cs-field{ display: flex; flex-direction: column; }
+.cs-label{
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 6px;
+}
+.cs-input{
+    width: 100%;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+.cs-input::placeholder{ color:#9aa3af; }
+.cs-input:focus{
+    border-color: #289eff;
+    box-shadow: 0 0 0 4px rgba(40,158,255,.15);
+}
+.cs-input.is-invalid{ border-color:#d93025; }
+.cs-error{ color:#d93025; font-size:12px; margin-top:6px; }
+
+.cs-actions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 0 24px 24px;
+}
+.cs-btn{
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    font-weight: 700;
+    cursor: pointer;
+}
+.cs-btn:disabled{ cursor: not-allowed; }
+
+.cs-btn-secondary{
+    background: #eef2f7;
+    color: #111827;
+    border-color: #e5e7eb;
+}
+.cs-btn-secondary:hover{ background: #e8edf4; }
+
+.cs-btn-primary{
+    background: #289eff;
+    color: #fff;
+    border-color: #289eff;
+}
+.cs-btn-primary:disabled{
+    background: #bcdcff;
+    border-color: #bcdcff;
+}

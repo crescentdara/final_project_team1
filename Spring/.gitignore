@@ -38,9 +38,4 @@ out/
 
 # 파이어베이스 서비스키 깃 제외
 # Ignore all firebase keys
-<<<<<<< HEAD
 #src/main/resources/firebase/
-
-=======
-src/main/resources/firebase/
->>>>>>> origin/merge/his/WebMergeBeforeEditError

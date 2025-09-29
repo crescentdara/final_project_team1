@@ -92,6 +92,161 @@ class SurveyActivity : AppCompatActivity() {
     // 카메라 촬영 시 output 파일 임시 보관
     private var pendingOutputFile: File? = null
 
+    // ===== 아코디언 보조 타입 =====
+    private data class Accordion(
+        val headerId: Int,
+        val contentId: Int,
+        val badgeId: Int,
+        val chevronId: Int,
+        val isCompleted: () -> Boolean
+    )
+
+    private val accordions by lazy {
+        listOf(
+            Accordion(
+                headerId = R.id.header_investigation,
+                contentId = R.id.content_investigation,
+                badgeId = R.id.badge_investigation,
+                chevronId = R.id.chevron_investigation
+            ) {
+                // 조사불가 여부만 체크되면 완료로 간주
+                findViewById<RadioGroup>(R.id.radioGroup_possible).checkedRadioButtonId != -1
+            },
+            Accordion(
+                headerId = R.id.header_purpose,
+                contentId = R.id.content_purpose,
+                badgeId = R.id.badge_purpose,
+                chevronId = R.id.chevron_purpose
+            ) {
+                findViewById<RadioGroup>(R.id.radioGroup_adminUse).checkedRadioButtonId != -1
+            },
+            Accordion(
+                headerId = R.id.header_idle,
+                contentId = R.id.content_idle,
+                badgeId = R.id.badge_idle,
+                chevronId = R.id.chevron_idle
+            ) {
+                findViewById<RadioGroup>(R.id.radioGroup_idleRate).checkedRadioButtonId != -1
+            },
+            Accordion(
+                headerId = R.id.header_safety,
+                contentId = R.id.content_safety,
+                badgeId = R.id.badge_safety,
+                chevronId = R.id.chevron_safety
+            ) {
+                findViewById<RadioGroup>(R.id.radioGroup_safety).checkedRadioButtonId != -1
+            },
+            Accordion(
+                headerId = R.id.header_external,
+                contentId = R.id.content_external,
+                badgeId = R.id.badge_external,
+                chevronId = R.id.chevron_external
+            ) {
+                val wallOk = findViewById<RadioGroup>(R.id.radioGroup_wall).checkedRadioButtonId != -1
+                val roofOk = findViewById<RadioGroup>(R.id.radioGroup_roof).checkedRadioButtonId != -1
+                val winOk  = findViewById<RadioGroup>(R.id.radioGroup_window).checkedRadioButtonId != -1
+                val parkOk = findViewById<RadioGroup>(R.id.radioGroup_parking).checkedRadioButtonId != -1
+                val photoOk = (extPhotoFile != null || hasExtPhotoRemote) &&
+                        (extEditPhotoFile != null || hasExtEditPhotoRemote)
+                wallOk && roofOk && winOk && parkOk && photoOk
+            },
+            Accordion(
+                headerId = R.id.header_internal,
+                contentId = R.id.content_internal,
+                badgeId = R.id.badge_internal,
+                chevronId = R.id.chevron_internal
+            ) {
+                val entOk = findViewById<RadioGroup>(R.id.radioGroup_entrance).checkedRadioButtonId != -1
+                val ceilOk = findViewById<RadioGroup>(R.id.radioGroup_ceiling).checkedRadioButtonId != -1
+                val floorOk= findViewById<RadioGroup>(R.id.radioGroup_floor).checkedRadioButtonId != -1
+                val photoOk = (intPhotoFile != null || hasIntPhotoRemote) &&
+                        (intEditPhotoFile != null || hasIntEditPhotoRemote)
+                entOk && ceilOk && floorOk && photoOk
+            }
+        )
+    }
+
+    private fun setupAccordions() {
+        // 헤더 클릭 토글 + 최초 상태 반영
+        accordions.forEach { acc ->
+            findViewById<View>(acc.headerId).setOnClickListener {
+                toggleContent(acc)
+            }
+        }
+        refreshAccordions(autoCollapse = false) // 최초에는 펼친 상태로 시작
+    }
+
+    // 완료 → 자동 접힘 / 배지 표시 / 체브론 회전
+    private fun refreshAccordions(autoCollapse: Boolean = true) {
+        accordions.forEach { acc ->
+            val content = findViewById<View>(acc.contentId)
+            val badge = findViewById<View>(acc.badgeId)
+            val chevron = findViewById<View>(acc.chevronId)
+
+            val done = acc.isCompleted()
+            badge.visibility = if (done) View.VISIBLE else View.GONE
+
+            if (autoCollapse && done && content.visibility == View.VISIBLE) {
+                collapse(content) { chevron.rotation = 0f } // 접힘: 0°
+            } else if (!done && content.visibility == View.GONE) {
+                expand(content) { chevron.rotation = 90f }  // 펼침: 90°
+            } else {
+                // 상태 유지 + 회전 동기화
+                chevron.rotation = if (content.visibility == View.VISIBLE) 90f else 0f
+            }
+        }
+    }
+
+    private fun toggleContent(acc: Accordion) {
+        val content = findViewById<View>(acc.contentId)
+        val chevron = findViewById<View>(acc.chevronId)
+        if (content.visibility == View.VISIBLE) {
+            collapse(content) { chevron.rotation = 0f }
+        } else {
+            expand(content) { chevron.rotation = 90f }
+        }
+    }
+
+    // 부드러운 펼침/접힘 애니메이션 (height 애니메이션)
+    private fun expand(v: View, end: (() -> Unit)? = null) {
+        v.measure(
+            View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        val target = v.measuredHeight
+        v.layoutParams.height = 0
+        v.visibility = View.VISIBLE
+
+        val anim = android.animation.ValueAnimator.ofInt(0, target)
+        anim.duration = 160
+        anim.addUpdateListener {
+            v.layoutParams.height = it.animatedValue as Int
+            v.requestLayout()
+        }
+        anim.doOnEnd { v.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT; end?.invoke() }
+        anim.start()
+    }
+
+    private fun collapse(v: View, end: (() -> Unit)? = null) {
+        val initial = v.height
+        val anim = android.animation.ValueAnimator.ofInt(initial, 0)
+        anim.duration = 160
+        anim.addUpdateListener {
+            v.layoutParams.height = it.animatedValue as Int
+            v.requestLayout()
+        }
+        anim.doOnEnd { v.visibility = View.GONE; end?.invoke() }
+        anim.start()
+    }
+
+    // Kotlin 확장(애니 끝 콜백)
+    private inline fun android.animation.ValueAnimator.doOnEnd(crossinline block: () -> Unit) {
+        addListener(object : android.animation.AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: android.animation.Animator) { block() }
+        })
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mode = intent.getStringExtra(EXTRA_MODE) ?: "CREATE"
@@ -102,6 +257,7 @@ class SurveyActivity : AppCompatActivity() {
             intent.getLongExtra(EXTRA_SURVEY_ID, -1L).takeIf { it > 0 } else null
 
         setContentView(R.layout.activity_survey)
+        setupAccordions()
 
         // 주소 표시
         tvAddress = findViewById(R.id.tv_address)
@@ -341,6 +497,7 @@ class SurveyActivity : AppCompatActivity() {
         submitButton.alpha = if (enabled) 1f else 0.5f
         tempButton.isEnabled = true
         tempButton.alpha = 1f
+        refreshAccordions(autoCollapse = true)
     }
 
     // === 완료 조건 ===

@@ -30,566 +30,816 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-            <!-- ▼ 1. 조사불가 -->
+            <!-- ▼ 1. 조사불가 (아코디언) -->
             <LinearLayout
                     android:id="@+id/stage_investigation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:background="#FFFFFF"
-                    android:elevation="1dp"
-                    android:orientation="vertical"
-                    android:padding="12dp">
+                    android:background="@drawable/bg_accordion_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="조사불가 여부"
-                        android:textColor="#333333"
-                        android:textStyle="bold" />
+                <!-- 헤더 -->
+                <LinearLayout
+                        android:id="@+id/header_investigation"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                <RadioGroup
-                        android:id="@+id/radioGroup_possible"
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="조사불가 여부"
+                            android:textColor="#1A1A1A"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
+
+                    <TextView
+                            android:id="@+id/badge_investigation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:gravity="center"
+                            android:text="완료"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="#2F6FED"
+                            android:background="#E9F0FF"
+                            android:visibility="gone"
+                            android:layout_marginEnd="8dp"
+                            android:includeFontPadding="false"/>
+
+                    <ImageView
+                            android:id="@+id/chevron_investigation"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_chevron"
+                            android:rotation="90"/>
+                </LinearLayout>
+
+                <!-- 콘텐츠 -->
+                <LinearLayout
+                        android:id="@+id/content_investigation"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:padding="12dp"
                         android:orientation="vertical">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
+                    <RadioGroup
+                            android:id="@+id/radioGroup_possible"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="가능"
-                            android:textColor="#333333" />
+                            android:orientation="vertical">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="불가"
-                            android:textColor="#333333" />
-                </RadioGroup>
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="가능"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="불가"
+                                android:textColor="#333333" />
+                    </RadioGroup>
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- ▼ 2. 행정목적 -->
+            <!-- ▼ 2. 행정목적 (아코디언) -->
             <LinearLayout
                     android:id="@+id/stage_purpose"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:background="#FFFFFF"
-                    android:elevation="1dp"
-                    android:orientation="vertical"
-                    android:padding="12dp">
+                    android:background="@drawable/bg_accordion_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="행정목적 활용여부"
-                        android:textColor="#333333"
-                        android:textStyle="bold" />
+                <LinearLayout
+                        android:id="@+id/header_purpose"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                <RadioGroup
-                        android:id="@+id/radioGroup_adminUse"
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="행정목적 활용여부"
+                            android:textColor="#1A1A1A"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
+
+                    <TextView
+                            android:id="@+id/badge_purpose"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:gravity="center"
+                            android:text="완료"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="#2F6FED"
+                            android:background="#E9F0FF"
+                            android:visibility="gone"
+                            android:layout_marginEnd="8dp"
+                            android:includeFontPadding="false"/>
+
+                    <ImageView
+                            android:id="@+id/chevron_purpose"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_chevron"
+                            android:rotation="90"/>
+                </LinearLayout>
+
+                <LinearLayout
+                        android:id="@+id/content_purpose"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:padding="12dp"
                         android:orientation="vertical">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
+                    <RadioGroup
+                            android:id="@+id/radioGroup_adminUse"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="활용"
-                            android:textColor="#333333" />
+                            android:orientation="vertical">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="일부 활용"
-                            android:textColor="#333333" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="활용"
+                                android:textColor="#333333" />
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="미활용"
-                            android:textColor="#333333" />
-                </RadioGroup>
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="일부 활용"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="미활용"
+                                android:textColor="#333333" />
+                    </RadioGroup>
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- ▼ 3. 유휴비율 -->
+            <!-- ▼ 3. 유휴비율 (아코디언) -->
             <LinearLayout
                     android:id="@+id/stage_idle_ratio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:background="#FFFFFF"
-                    android:elevation="1dp"
-                    android:orientation="vertical"
-                    android:padding="12dp">
+                    android:background="@drawable/bg_accordion_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="유휴비율"
-                        android:textColor="#333333"
-                        android:textStyle="bold" />
+                <LinearLayout
+                        android:id="@+id/header_idle"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                <RadioGroup
-                        android:id="@+id/radioGroup_idleRate"
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="유휴비율"
+                            android:textColor="#1A1A1A"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
+
+                    <TextView
+                            android:id="@+id/badge_idle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:gravity="center"
+                            android:text="완료"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="#2F6FED"
+                            android:background="#E9F0FF"
+                            android:visibility="gone"
+                            android:layout_marginEnd="8dp"
+                            android:includeFontPadding="false"/>
+
+                    <ImageView
+                            android:id="@+id/chevron_idle"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_chevron"
+                            android:rotation="90"/>
+                </LinearLayout>
+
+                <LinearLayout
+                        android:id="@+id/content_idle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:padding="12dp"
                         android:orientation="vertical">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
+                    <RadioGroup
+                            android:id="@+id/radioGroup_idleRate"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="0~10%"
-                            android:textColor="#333333" />
+                            android:orientation="vertical">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="10~30%"
-                            android:textColor="#333333" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0~10%"
+                                android:textColor="#333333" />
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="30~50%"
-                            android:textColor="#333333" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="10~30%"
+                                android:textColor="#333333" />
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="50% 이상"
-                            android:textColor="#333333" />
-                </RadioGroup>
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="30~50%"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="50% 이상"
+                                android:textColor="#333333" />
+                    </RadioGroup>
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- ▼ 4. 안전등급 -->
+            <!-- ▼ 4. 안전등급 (아코디언) -->
             <LinearLayout
                     android:id="@+id/stage_safety"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:background="#FFFFFF"
-                    android:elevation="1dp"
-                    android:orientation="vertical"
-                    android:padding="12dp">
+                    android:background="@drawable/bg_accordion_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="안전등급"
-                        android:textColor="#333333"
-                        android:textStyle="bold" />
+                <LinearLayout
+                        android:id="@+id/header_safety"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                <RadioGroup
-                        android:id="@+id/radioGroup_safety"
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="안전등급"
+                            android:textColor="#1A1A1A"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
+
+                    <TextView
+                            android:id="@+id/badge_safety"
+                            android:layout_width="wrap_content"
+                            android:layout_height="28dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:gravity="center"
+                            android:text="완료"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="#2F6FED"
+                            android:background="#E9F0FF"
+                            android:visibility="gone"
+                            android:layout_marginEnd="8dp"
+                            android:includeFontPadding="false"/>
+
+                    <ImageView
+                            android:id="@+id/chevron_safety"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_chevron"
+                            android:rotation="90"/>
+                </LinearLayout>
+
+                <LinearLayout
+                        android:id="@+id/content_safety"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:padding="12dp"
                         android:orientation="vertical">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
+                    <RadioGroup
+                            android:id="@+id/radioGroup_safety"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="A"
-                            android:textColor="#333333" />
+                            android:orientation="vertical">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="B"
-                            android:textColor="#333333" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="A"
+                                android:textColor="#333333" />
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="C"
-                            android:textColor="#333333" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="B"
+                                android:textColor="#333333" />
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="D"
-                            android:textColor="#333333" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="C"
+                                android:textColor="#333333" />
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="E"
-                            android:textColor="#333333" />
-                </RadioGroup>
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="D"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="E"
+                                android:textColor="#333333" />
+                    </RadioGroup>
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- ▼ 5. 외부상태 + 사진 -->
+            <!-- ▼ 5. 외부상태 + 사진 (아코디언) -->
             <LinearLayout
                     android:id="@+id/stage_external_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:background="#FFFFFF"
-                    android:elevation="1dp"
-                    android:orientation="vertical"
-                    android:padding="12dp">
+                    android:background="@drawable/bg_accordion_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="외부상태"
-                        android:textColor="#333333"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp"/>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="외벽"
-                        android:textColor="#333333" />
-
-                <RadioGroup
-                        android:id="@+id/radioGroup_wall"
+                <LinearLayout
+                        android:id="@+id/header_external"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="56dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
+                    <TextView
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="양호"
-                            android:textColor="#333333" />
+                            android:layout_weight="1"
+                            android:text="외부상태"
+                            android:textColor="#1A1A1A"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
 
-                    <RadioButton
+                    <TextView
+                            android:id="@+id/badge_external"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="보통"
-                            android:textColor="#333333" />
+                            android:layout_height="28dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:gravity="center"
+                            android:text="완료"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="#2F6FED"
+                            android:background="#E9F0FF"
+                            android:visibility="gone"
+                            android:layout_marginEnd="8dp"
+                            android:includeFontPadding="false"/>
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="불량"
-                            android:textColor="#333333" />
-                </RadioGroup>
+                    <ImageView
+                            android:id="@+id/chevron_external"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_chevron"
+                            android:rotation="90"/>
+                </LinearLayout>
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="옥상"
-                        android:textColor="#333333" />
-
-                <RadioGroup
-                        android:id="@+id/radioGroup_roof"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="양호"
-                            android:textColor="#333333" />
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="보통"
-                            android:textColor="#333333" />
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="불량"
-                            android:textColor="#333333" />
-                </RadioGroup>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="창호"
-                        android:textColor="#333333" />
-
-                <RadioGroup
-                        android:id="@+id/radioGroup_window"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="양호"
-                            android:textColor="#333333" />
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="보통"
-                            android:textColor="#333333" />
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="불량"
-                            android:textColor="#333333" />
-                </RadioGroup>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="주차"
-                        android:textColor="#333333" />
-
-                <RadioGroup
-                        android:id="@+id/radioGroup_parking"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="가능"
-                            android:textColor="#333333" />
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="불가"
-                            android:textColor="#333333" />
-                </RadioGroup>
-
-                <EditText
-                        android:id="@+id/input_extEtc"
+                <LinearLayout
+                        android:id="@+id/content_external"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp"
-                        android:background="#EEEEEE"
-                        android:hint="외부 기타사항 입력"
-                        android:textColor="#333333" />
+                        android:padding="12dp"
+                        android:orientation="vertical">
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="외부 사진"
-                        android:textColor="#333333"
-                        android:textStyle="bold" />
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="외벽"
+                            android:textColor="#333333" />
 
-                <ImageView
-                        android:id="@+id/img_extPhoto"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:adjustViewBounds="true"
-                        android:background="#CCCCCC"
-                        android:scaleType="centerCrop" />
+                    <RadioGroup
+                            android:id="@+id/radioGroup_wall"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
-                <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp">
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="양호"
+                                android:textColor="#333333" />
 
-                    <ImageButton
-                            android:id="@+id/btn_extGallery"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_gravity="start|center_vertical"
-                            android:layout_marginStart="12dp"
-                            android:backgroundTint="#C5C7CA"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_gallery" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="보통"
+                                android:textColor="#333333" />
 
-                    <ImageButton
-                            android:id="@+id/btn_extPhoto"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/circle_border"
-                            android:padding="8dp"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_camera" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="불량"
+                                android:textColor="#333333" />
+                    </RadioGroup>
 
-                    <ImageButton
-                            android:id="@+id/btn_extEditPhoto"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_gravity="end|center_vertical"
-                            android:layout_marginEnd="12dp"
-                            android:backgroundTint="#C5C7CA"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_edit" />
-                </FrameLayout>
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="옥상"
+                            android:textColor="#333333" />
 
+                    <RadioGroup
+                            android:id="@+id/radioGroup_roof"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="양호"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="보통"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="불량"
+                                android:textColor="#333333" />
+                    </RadioGroup>
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="창호"
+                            android:textColor="#333333" />
+
+                    <RadioGroup
+                            android:id="@+id/radioGroup_window"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="양호"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="보통"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="불량"
+                                android:textColor="#333333" />
+                    </RadioGroup>
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="주차"
+                            android:textColor="#333333" />
+
+                    <RadioGroup
+                            android:id="@+id/radioGroup_parking"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="가능"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="불가"
+                                android:textColor="#333333" />
+                    </RadioGroup>
+
+                    <EditText
+                            android:id="@+id/input_extEtc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="#EEEEEE"
+                            android:hint="외부 기타사항 입력"
+                            android:textColor="#333333" />
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="외부 사진"
+                            android:textColor="#333333"
+                            android:textStyle="bold" />
+
+                    <ImageView
+                            android:id="@+id/img_extPhoto"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:adjustViewBounds="true"
+                            android:background="#CCCCCC"
+                            android:scaleType="centerCrop" />
+
+                    <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp">
+
+                        <ImageButton
+                                android:id="@+id/btn_extGallery"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_gravity="start|center_vertical"
+                                android:layout_marginStart="12dp"
+                                android:backgroundTint="#C5C7CA"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_gallery" />
+
+                        <ImageButton
+                                android:id="@+id/btn_extPhoto"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/circle_border"
+                                android:padding="8dp"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_camera" />
+
+                        <ImageButton
+                                android:id="@+id/btn_extEditPhoto"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_gravity="end|center_vertical"
+                                android:layout_marginEnd="12dp"
+                                android:backgroundTint="#C5C7CA"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_edit" />
+                    </FrameLayout>
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- ▼ 6. 내부상태 + 사진 -->
+            <!-- ▼ 6. 내부상태 + 사진 (아코디언) -->
             <LinearLayout
                     android:id="@+id/stage_internal_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
-                    android:background="#FFFFFF"
-                    android:elevation="1dp"
-                    android:orientation="vertical"
-                    android:padding="12dp">
+                    android:background="@drawable/bg_accordion_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="내부상태"
-                        android:textColor="#333333"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp"/>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="현관"
-                        android:textColor="#333333" />
-
-                <RadioGroup
-                        android:id="@+id/radioGroup_entrance"
+                <LinearLayout
+                        android:id="@+id/header_internal"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="56dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
+                    <TextView
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="양호"
-                            android:textColor="#333333" />
+                            android:layout_weight="1"
+                            android:text="내부상태"
+                            android:textColor="#1A1A1A"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
 
-                    <RadioButton
+                    <TextView
+                            android:id="@+id/badge_internal"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="보통"
-                            android:textColor="#333333" />
+                            android:layout_height="28dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:gravity="center"
+                            android:text="완료"
+                            android:textStyle="bold"
+                            android:textSize="12sp"
+                            android:textColor="#2F6FED"
+                            android:background="#E9F0FF"
+                            android:visibility="gone"
+                            android:layout_marginEnd="8dp"
+                            android:includeFontPadding="false"/>
 
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="불량"
-                            android:textColor="#333333" />
-                </RadioGroup>
+                    <ImageView
+                            android:id="@+id/chevron_internal"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_chevron"
+                            android:rotation="90"/>
+                </LinearLayout>
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="천장"
-                        android:textColor="#333333" />
-
-                <RadioGroup
-                        android:id="@+id/radioGroup_ceiling"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="양호"
-                            android:textColor="#333333" />
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="보통"
-                            android:textColor="#333333" />
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="불량"
-                            android:textColor="#333333" />
-                </RadioGroup>
-
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="바닥"
-                        android:textColor="#333333" />
-
-                <RadioGroup
-                        android:id="@+id/radioGroup_floor"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="양호"
-                            android:textColor="#333333" />
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="보통"
-                            android:textColor="#333333" />
-
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="불량"
-                            android:textColor="#333333" />
-                </RadioGroup>
-
-                <EditText
-                        android:id="@+id/input_intEtc"
+                <LinearLayout
+                        android:id="@+id/content_internal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="12dp"
-                        android:background="#EEEEEE"
-                        android:hint="내부 기타사항 입력"
-                        android:textColor="#333333" />
+                        android:padding="12dp"
+                        android:orientation="vertical">
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="내부 사진"
-                        android:textColor="#333333"
-                        android:textStyle="bold" />
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="현관"
+                            android:textColor="#333333" />
 
-                <ImageView
-                        android:id="@+id/img_intPhoto"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:adjustViewBounds="true"
-                        android:background="#CCCCCC"
-                        android:scaleType="centerCrop" />
+                    <RadioGroup
+                            android:id="@+id/radioGroup_entrance"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
-                <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp">
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="양호"
+                                android:textColor="#333333" />
 
-                    <ImageButton
-                            android:id="@+id/btn_intGallery"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_gravity="start|center_vertical"
-                            android:layout_marginStart="12dp"
-                            android:backgroundTint="#C5C7CA"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_gallery" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="보통"
+                                android:textColor="#333333" />
 
-                    <ImageButton
-                            android:id="@+id/btn_intPhoto"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/circle_border"
-                            android:padding="8dp"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_camera" />
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="불량"
+                                android:textColor="#333333" />
+                    </RadioGroup>
 
-                    <ImageButton
-                            android:id="@+id/btn_intEditPhoto"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_gravity="end|center_vertical"
-                            android:layout_marginEnd="12dp"
-                            android:backgroundTint="#C5C7CA"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_edit" />
-                </FrameLayout>
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="천장"
+                            android:textColor="#333333" />
 
+                    <RadioGroup
+                            android:id="@+id/radioGroup_ceiling"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="양호"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="보통"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="불량"
+                                android:textColor="#333333" />
+                    </RadioGroup>
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="바닥"
+                            android:textColor="#333333" />
+
+                    <RadioGroup
+                            android:id="@+id/radioGroup_floor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="양호"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="보통"
+                                android:textColor="#333333" />
+
+                        <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="불량"
+                                android:textColor="#333333" />
+                    </RadioGroup>
+
+                    <EditText
+                            android:id="@+id/input_intEtc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="#EEEEEE"
+                            android:hint="내부 기타사항 입력"
+                            android:textColor="#333333" />
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="내부 사진"
+                            android:textColor="#333333"
+                            android:textStyle="bold" />
+
+                    <ImageView
+                            android:id="@+id/img_intPhoto"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:adjustViewBounds="true"
+                            android:background="#CCCCCC"
+                            android:scaleType="centerCrop" />
+
+                    <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp">
+
+                        <ImageButton
+                                android:id="@+id/btn_intGallery"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_gravity="start|center_vertical"
+                                android:layout_marginStart="12dp"
+                                android:backgroundTint="#C5C7CA"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_gallery" />
+
+                        <ImageButton
+                                android:id="@+id/btn_intPhoto"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/circle_border"
+                                android:padding="8dp"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_camera" />
+
+                        <ImageButton
+                                android:id="@+id/btn_intEditPhoto"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_gravity="end|center_vertical"
+                                android:layout_marginEnd="12dp"
+                                android:backgroundTint="#C5C7CA"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_edit" />
+                    </FrameLayout>
+                </LinearLayout>
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
     <!-- 하단 고정 액션바: 항상 화면에 보임 -->
-    <!-- ✅ 이 블록만 남깁니다 (ID 유일) -->
     <LinearLayout
             android:id="@+id/bottomBar"
             android:layout_width="match_parent"
@@ -620,6 +870,5 @@
                 android:textColor="#FFFFFF"
                 android:backgroundTint="#1D3557" />
     </LinearLayout>
-
 
 </FrameLayout>

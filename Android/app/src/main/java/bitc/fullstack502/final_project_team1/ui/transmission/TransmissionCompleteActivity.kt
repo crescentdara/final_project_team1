@@ -36,6 +36,9 @@ class TransmissionCompleteActivity : AppCompatActivity() {
     private lateinit var emptyStateLayout: LinearLayout
     private lateinit var adapter: CompletedListAdapter
 
+    private lateinit var tvTotalCount: TextView
+
+
     // 데이터
     private val allDataList = mutableListOf<CompletedSurveyItem>()
     private val filteredDataList = mutableListOf<CompletedSurveyItem>()
@@ -60,6 +63,7 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         spinnerFilter = findViewById(R.id.spinnerFilter)
         recyclerView = findViewById(R.id.recyclerCompletedList)
         emptyStateLayout = findViewById(R.id.emptyStateLayout)
+        tvTotalCount = findViewById(R.id.tvTotalCount)
         findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabBack)
             ?.setOnClickListener { onBackPressed() }
     }
@@ -179,6 +183,9 @@ class TransmissionCompleteActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
+
+        tvTotalCount.text = "총 ${filteredDataList.size}건"
+
         if (filteredDataList.isEmpty()) {
             recyclerView.visibility = View.GONE
             emptyStateLayout.visibility = View.VISIBLE

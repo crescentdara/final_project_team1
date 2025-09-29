@@ -98,43 +98,57 @@
             android:layout_height="0dp"
             android:visibility="gone" />
 
-        <!-- ✅ 필터 영역 (우측 정렬, 작은 크기) -->
+        <!-- ✅ 필터 영역 (좌: 총 개수, 우: 필터) -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end|center_vertical"
-            android:padding="12dp"
-            android:background="@android:color/white">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:background="@android:color/white">
 
+            <!-- 🔴 새로 추가: 총 개수 표시 -->
             <TextView
-                android:id="@+id/tvFilterLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="필터:"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginEnd="6dp"
-                android:gravity="center_vertical" />
+                    android:id="@+id/tvTotalCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="총 0건"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
+            <!-- (기존) '필터:' 라벨 -->
+            <TextView
+                    android:id="@+id/tvFilterLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="필터:"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="6dp"
+                    android:gravity="center_vertical" />
+
+            <!-- (기존) 스피너 카드 + 스피너 -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="6dp"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/border_light"
-                app:strokeWidth="1dp">
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="6dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/border_light"
+                    app:strokeWidth="1dp">
 
                 <Spinner
-                    android:id="@+id/spinnerFilter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_margin="2dp"
-                    android:spinnerMode="dropdown"
-                    android:popupBackground="@android:color/white" />
+                        android:id="@+id/spinnerFilter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_margin="2dp"
+                        android:spinnerMode="dropdown"
+                        android:popupBackground="@android:color/white" />
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
+
 
         <!-- ✅ 구분선 -->
         <View

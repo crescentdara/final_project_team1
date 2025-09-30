@@ -87,5 +87,9 @@
         <!-- ✅ 미전송 내역 (데이터 전송 페이지) -->
         <activity android:name=".ui.transmission.DataTransmissionActivity" />
 
+        <!-- 메시지 보관함 화면 -->
+        <activity android:name=".ui.message.MessageInboxActivity" />
+
+
     </application>
 </manifest>

@@ -10,5 +10,8 @@
             android:id="@+id/ivBell"
             android:icon="@drawable/ic_notifications"
             android:title="알림"
-            app:showAsAction="ifRoom" />
+            app:actionLayout="@layout/action_inbox_bell"
+            app:showAsAction="always" />
+
+
 </menu>

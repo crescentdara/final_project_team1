@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 단체 메시지 뱃지 배경 (주황색) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+        android:shape="rectangle">
+    <solid android:color="@color/orange" />
+    <corners android:radius="12dp" />
+</shape>

@@ -3,7 +3,6 @@ package bitc.fullstack502.final_project_team1.ui.intro
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.MainActivity
@@ -29,7 +28,7 @@ class IntroActivity : AppCompatActivity() {
 
         findViewById<MaterialButton>(R.id.btnStartLogin).setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
-            finish() // Intro로 뒤로가기 방지
+            finish()
         }
     }
 }

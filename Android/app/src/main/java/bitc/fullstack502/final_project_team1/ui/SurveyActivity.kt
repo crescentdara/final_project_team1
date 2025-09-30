@@ -596,12 +596,33 @@ class SurveyActivity : AppCompatActivity() {
     // ===== 카메라 & 편집 =====
     private fun startCamera(requestCode: Int) {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        // 1) 출력 파일 준비
         val file = createImageFile()
         pendingOutputFile = file
         val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
+
+        // 2) 카메라 앱이 쓸 수 있게 임시 권한 부여
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        // 3) 실제로 해당 인텐트를 받을 모든 카메라 앱에 URI 권한 그랜트
+        val resInfoList = packageManager.queryIntentActivities(intent, 0)
+        for (resolveInfo in resInfoList) {
+            val pkg = resolveInfo.activityInfo.packageName
+            grantUriPermission(
+                pkg,
+                uri,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        }
+
+        // (선택) 디버그 확인
+//         Toast.makeText(this, "capture to: $uri", Toast.LENGTH_SHORT).show()
+
         startActivityForResult(intent, requestCode)
     }
+
 
     private fun startEdit(requestCode: Int, srcFile: File) {
         val i = Intent(this, EditActivity::class.java).apply {

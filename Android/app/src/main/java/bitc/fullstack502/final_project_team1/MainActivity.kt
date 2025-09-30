@@ -107,6 +107,7 @@ class MainActivity : BaseActivity() {
         val dir = getExternalFilesDir(null) ?: filesDir
         return File.createTempFile("IMG_${ts}_", ".jpg", dir)
     }
+
     private fun timeStampFileName(): String {
         val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
             .format(System.currentTimeMillis())
@@ -129,18 +130,20 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.activity_main)
         initHeader(title = "부동산 실태조사")
 
-        // 조사 목록 버튼
-        findViewById<MaterialButton>(R.id.btnSurveyList)?.setOnClickListener {
+        // 조사예정
+        findViewById<View>(R.id.btnSurveyList)?.setOnClickListener {
             startActivity(Intent(this, SurveyListActivity::class.java))
         }
 
-        findViewById<MaterialButton>(R.id.btnReinspectShortcut)?.setOnClickListener {
+// 재조사
+        findViewById<View>(R.id.btnReinspectShortcut)?.setOnClickListener {
             startActivity(Intent(this, ReinspectListActivity::class.java))
         }
-        findViewById<MaterialButton>(R.id.btnNotTransmittedShortcut)?.setOnClickListener {
+
+// 미전송
+        findViewById<View>(R.id.btnNotTransmittedShortcut)?.setOnClickListener {
             startActivity(Intent(this, DataTransmissionActivity::class.java))
         }
-
 
 
         // ✅ 사용자 이름 + 사번 표시
@@ -222,7 +225,6 @@ class MainActivity : BaseActivity() {
         // 환영 메시지
         Toast.makeText(this, "${userName}님, 환영합니다!", Toast.LENGTH_SHORT).show()
     }
-
 
 
     private fun gotoLoginAndFinish() {

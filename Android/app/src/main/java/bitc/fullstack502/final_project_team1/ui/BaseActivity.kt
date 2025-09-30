@@ -1,4 +1,3 @@
-// bitc/fullstack502/final_project_team1/ui/BaseActivity.kt
 package bitc.fullstack502.final_project_team1.ui
 
 import android.content.Intent
@@ -45,48 +44,75 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
+    // BaseActivity.kt
+    fun navigateHomeOrFinish() {
+        if (this !is MainActivity) {
+            startActivity(
+                Intent(this, MainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            )
+            overridePendingTransition(0, 0)
+        } else {
+            // 메인에서 백: 앱 종료 행동을 원하면 moveTaskToBack(true) 또는 기본 동작 유지
+            onBackPressedDispatcher.onBackPressed()
+        }
+    }
+
+
+    // BaseActivity.kt
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
+        val bottom = findViewById<BottomNavigationView?>(R.id.bottomNav) ?: return
 
-        // 하단 탭 공통
-        findViewById<BottomNavigationView?>(R.id.bottomNav)?.let { bottom ->
-            bottom.selectedItemId = bottomNavSelectedItemId()
-            bottom.setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.nav_survey_list -> {
-                        if (this !is SurveyListActivity) {
-                            startActivity(Intent(this, SurveyListActivity::class.java))
-                            overridePendingTransition(0, 0); finish()
-                        }; true
-                    }
-                    R.id.nav_reinspect -> {
-                        if (this !is ReinspectListActivity) {
-                            startActivity(Intent(this, ReinspectListActivity::class.java))
-                            overridePendingTransition(0, 0); finish()
-                        }; true
-                    }
-                    R.id.nav_home -> {
-                        if (this !is MainActivity) {
-                            startActivity(Intent(this, MainActivity::class.java)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
-                            overridePendingTransition(0, 0); finish()
-                        }; true
-                    }
-                    R.id.nav_history -> {
-                        if (this !is TransmissionCompleteActivity) {
-                            startActivity(Intent(this, TransmissionCompleteActivity::class.java))
-                            overridePendingTransition(0, 0); finish()
-                        }; true
-                    }
-                    R.id.nav_not_transmitted -> {
-                        if (this !is DataTransmissionActivity) {
-                            startActivity(Intent(this, DataTransmissionActivity::class.java))
-                            overridePendingTransition(0, 0); finish()
-                        }; true
-                    }
-                    else -> false
+        bottom.selectedItemId = bottomNavSelectedItemId()
+
+        // 같은 아이템 다시 누르면 아무 것도 안 함 (선택)
+        bottom.setOnItemReselectedListener { /* no-op or 스크롤탑 */ }
+
+        bottom.setOnItemSelectedListener { item ->
+            if (item.itemId == bottomNavSelectedItemId()) {
+                // 이미 현재 탭이면 이동 안 함
+                return@setOnItemSelectedListener true
+            }
+            when (item.itemId) {
+                R.id.nav_survey_list -> {
+                    val i = Intent(this, SurveyListActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    startActivity(i)
+                    overridePendingTransition(0, 0)
+                    true
                 }
+                R.id.nav_reinspect -> {
+                    val i = Intent(this, ReinspectListActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    startActivity(i)
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.nav_home -> {
+                    val i = Intent(this, MainActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    startActivity(i)
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.nav_history -> {
+                    val i = Intent(this, TransmissionCompleteActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    startActivity(i)
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.nav_not_transmitted -> {
+                    val i = Intent(this, DataTransmissionActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    startActivity(i)
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                else -> false
             }
         }
     }
+
 }

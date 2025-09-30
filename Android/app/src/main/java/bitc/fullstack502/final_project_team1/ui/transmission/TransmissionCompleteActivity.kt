@@ -14,9 +14,11 @@ import bitc.fullstack502.final_project_team1.R
 import bitc.fullstack502.final_project_team1.core.AuthManager
 import bitc.fullstack502.final_project_team1.network.ApiClient
 import bitc.fullstack502.final_project_team1.network.dto.SurveyResultResponse
+import bitc.fullstack502.final_project_team1.ui.BaseActivity
 import bitc.fullstack502.final_project_team1.ui.login.LoginActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +30,9 @@ import java.time.format.DateTimeFormatter
  * - 서버에서 상태별(결재완료/결재대기) 조사 목록 조회
  * - 필터: 전체(null), 결재완료(APPROVED), 결재대기(SENT)
  */
-class TransmissionCompleteActivity : AppCompatActivity() {
+class TransmissionCompleteActivity : BaseActivity() {
+
+    override fun bottomNavSelectedItemId() = R.id.nav_history
 
     // UI
     private lateinit var spinnerFilter: Spinner
@@ -49,6 +53,7 @@ class TransmissionCompleteActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_transmission_complete)
+        initHeader(title = "전송 내역")
 
         initViews()
         setupFilter()
@@ -63,8 +68,10 @@ class TransmissionCompleteActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerCompletedList)
         emptyStateLayout = findViewById(R.id.emptyStateLayout)
         tvTotalCount = findViewById(R.id.tvTotalCount)
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabBack)
-            ?.setOnClickListener { onBackPressed() }
+        findViewById<FloatingActionButton>(R.id.fabBack)?.setOnClickListener {
+            navigateHomeOrFinish()
+        }
+
     }
 
     private fun setupFilter() {

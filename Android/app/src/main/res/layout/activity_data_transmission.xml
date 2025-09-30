@@ -1,119 +1,78 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/background_light_gray">
 
+    <!-- 헤더 -->
+    <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:background="@drawable/toolbar_background"
+            app:menu="@menu/menu_main"
+            app:theme="@style/ThemeOverlay.MyToolbar"
+            app:titleTextColor="@android:color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 본문 컨테이너 (툴바 아래 ~ 탭 위) -->
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:id="@+id/contentContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintBottom_toTopOf="@id/bottomNav"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- ✅ 상단 앱바 -->
-        <com.google.android.material.appbar.AppBarLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:elevation="8dp"
-                app:elevation="8dp">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:background="@drawable/toolbar_background"
-                    android:paddingHorizontal="16dp">
-
-                <!-- 좌측 햄버거 메뉴 -->
-                <ImageView
-                        android:id="@+id/ivHamburger"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_menu_white"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="메뉴"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
-
-                <!-- 중앙 타이틀 -->
-                <TextView
-                        android:id="@+id/tvTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="조사목록"
-                        android:textColor="@android:color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.02"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
-
-                <!-- 우측 로고 + 로그아웃 -->
-                <LinearLayout
-                        android:id="@+id/rightActions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent">
-
-                    <!-- 로고 (메인 이동) -->
-                    <ImageView
-                            android:id="@+id/ivLogo"
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:layout_marginEnd="12dp"
-                            android:src="@drawable/ic_launcher_foreground"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:contentDescription="메인으로 이동" />
-
-                    <!-- 로그아웃 버튼 -->
-                    <TextView
-                            android:id="@+id/tvLogout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="로그아웃"
-                            android:textColor="@android:color/white"
-                            android:textSize="14sp"
-                            android:padding="8dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:clickable="true"
-                            android:focusable="true" />
-                </LinearLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <!-- 정렬 영역 -->
+        <!-- 헤더 영역 (제목 + 정렬) : 위 헤더와 동일 스타일 -->
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="end|center_vertical"
-                android:padding="12dp"
+                android:gravity="center_vertical"
+                android:padding="16dp"
                 android:background="@android:color/white">
 
             <TextView
-                    android:id="@+id/tvSortLabel"
+                    android:id="@+id/tvTotalCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="총 0건"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+
+            <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="정렬:"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:layout_marginEnd="6dp" />
 
-            <Spinner
-                    android:id="@+id/spinnerSort"
+            <com.google.android.material.card.MaterialCardView
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:layout_marginStart="8dp"
-                    android:popupBackground="@android:color/white" />
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="6dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="@color/border_light"
+                    app:strokeWidth="1dp">
+
+                <Spinner
+                        android:id="@+id/spinnerSort"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_margin="2dp"
+                        android:spinnerMode="dropdown"
+                        android:entries="@array/survey_list_sort"
+                        android:popupBackground="@android:color/white" />
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
         <!-- ✅ 여기 RecyclerView 추가 -->
@@ -150,17 +109,34 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- ✅ 플로팅 뒤로가기 버튼 -->
+    <!-- 뒤로가기 FAB (선택) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|start"
             android:layout_margin="16dp"
+            android:clickable="true"
+            android:elevation="10dp"
             android:src="@drawable/ic_arrow_back"
             android:contentDescription="뒤로가기"
             app:fabSize="mini"
             app:backgroundTint="@color/primary_blue"
-            app:tint="@android:color/white" />
+            app:tint="@android:color/white"
+            app:layout_constraintBottom_toTopOf="@id/bottomNav"
+            app:layout_constraintStart_toStartOf="parent" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <!-- 하단 탭(고정) -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNav"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:elevation="8dp"
+            app:menu="@menu/menu_bottom_nav"
+            app:labelVisibilityMode="labeled"
+            app:itemIconSize="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

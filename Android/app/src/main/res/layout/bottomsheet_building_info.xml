@@ -6,18 +6,6 @@
         android:padding="16dp"
         android:background="@android:color/white">
 
-    <TextView
-            android:id="@+id/tvRejectReason"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:includeFontPadding="false"
-            android:padding="0dp"
-            android:text=""
-            android:textColor="#B00020"
-            android:textStyle="bold"
-            android:visibility="visible"
-            android:paddingBottom="4dp" />
-
     <LinearLayout
             android:id="@+id/layoutTempActions"
             android:layout_width="match_parent"
@@ -52,20 +40,36 @@
     </LinearLayout>
 
     <Button
-            android:text=""
-            android:paddingBottom="12dp"
             android:id="@+id/btnStartSurvey"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="조사시작"
+            android:layout_marginTop="8dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+
 
     <!-- ✅ 조사 거절 버튼 -->
     <Button
             android:id="@+id/btnRejectSurvey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="조사 거절"
+            android:text="조사거절"
+            android:textColor="#F65D5D"
             android:layout_marginTop="8dp"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+    <TextView
+            android:id="@+id/tvRejectReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:padding="0dp"
+            android:text=""
+            android:textColor="#B00020"
+            android:textStyle="bold"
+            android:visibility="visible"
+            android:paddingBottom="4dp" />
 
     <!-- 건물/결과 정보 -->
     <ScrollView

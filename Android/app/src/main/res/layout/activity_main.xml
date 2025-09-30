@@ -210,85 +210,176 @@
                     android:id="@+id/shortcutGrid"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginBottom="30dp"
                     app:columnCount="2"
                     app:useDefaultMargins="true"
-                    app:alignmentMode="alignMargins">
+                    app:alignmentMode="alignMargins"
+                    android:clipToPadding="false"
+                    android:clipChildren="false">
 
-                <!-- 1. 조사 예정 -->
-                <com.google.android.material.button.MaterialButton
+                <!-- 1. 조사 예정 (id/텍스트/색 유지) -->
+                <com.google.android.material.card.MaterialCardView
                         android:id="@+id/btnSurveyList"
                         android:layout_width="0dp"
                         android:layout_height="160dp"
                         app:layout_column="0"
                         app:layout_row="0"
                         app:layout_columnWeight="1"
-                        android:backgroundTint="@color/primary_blue_dark"
-                        android:icon="@drawable/ic_list_24"
-                        android:text="조사예정"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="16dp"
-                        app:elevation="4dp"
-                        app:iconGravity="textStart"
-                        app:iconPadding="8dp"/>
+                        app:cardBackgroundColor="#CBDCFF"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="8dp"
+                        app:cardUseCompatPadding="true"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
-                <!-- 2. 카메라 -->
-                <com.google.android.material.button.MaterialButton
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+
+
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="조사예정"
+                                android:textColor="#002566"
+                                android:textStyle="bold"
+                                android:textSize="16sp"/>
+                        <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_list_24"
+                                app:tint="#002566"
+                                android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 2. 카메라 (id/텍스트/색/onClick 유지) -->
+                <com.google.android.material.card.MaterialCardView
                         android:id="@+id/btnMainCamera"
                         android:layout_width="0dp"
                         android:layout_height="160dp"
                         app:layout_column="1"
                         app:layout_row="0"
                         app:layout_columnWeight="1"
-                        android:backgroundTint="@color/primary_blue_light"
-                        android:text="카메라"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="16dp"
-                        app:elevation="4dp"
-                        app:iconGravity="textStart"
-                        app:iconPadding="8dp"
-                        android:onClick="onMainCameraClick"/>
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="8dp"
+                        app:cardUseCompatPadding="true"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:onClick="onMainCameraClick"
+                        android:foreground="?attr/selectableItemBackground">
 
-                <!-- 3. 재조사 -->
-                <com.google.android.material.button.MaterialButton
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="카메라"
+                                android:textColor="#002566"
+                                android:textStyle="bold"
+                                android:textSize="16sp"/>
+
+                        <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:src="@drawable/baseline_camera_alt_24"
+                                app:tint="#002566"
+                                android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 3. 재조사 (id/텍스트/색 유지) -->
+                <com.google.android.material.card.MaterialCardView
                         android:id="@+id/btnReinspectShortcut"
                         android:layout_width="0dp"
                         android:layout_height="160dp"
                         app:layout_column="0"
                         app:layout_row="1"
                         app:layout_columnWeight="1"
-                        android:backgroundTint="@color/primary_blue_light"
-                        android:text="재조사"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="16dp"
-                        app:elevation="4dp"
-                        app:iconGravity="textStart"
-                        app:iconPadding="8dp"/>
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="8dp"
+                        app:cardUseCompatPadding="true"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
-                <!-- 4. 미전송 -->
-                <com.google.android.material.button.MaterialButton
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="재조사"
+                                android:textColor="#002566"
+                                android:textStyle="bold"
+                                android:textSize="16sp"/>
+                        <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_repeat_24"
+                                app:tint="#002566"
+                                android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 4. 미전송 (id/텍스트/색 유지) -->
+                <com.google.android.material.card.MaterialCardView
                         android:id="@+id/btnNotTransmittedShortcut"
                         android:layout_width="0dp"
                         android:layout_height="160dp"
                         app:layout_column="1"
                         app:layout_row="1"
                         app:layout_columnWeight="1"
-                        android:backgroundTint="@color/primary_blue_dark"
-                        android:text="미전송"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="16dp"
-                        app:elevation="4dp"
-                        app:iconGravity="textStart"
-                        app:iconPadding="8dp"/>
+                        app:cardBackgroundColor="#CBDCFF"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="8dp"
+                        app:cardUseCompatPadding="true"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="미전송"
+                                android:textColor="#002566"
+                                android:textStyle="bold"
+                                android:textSize="16sp"/>
+
+                        <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_upload_24"
+                                app:tint="#002566"
+                                android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
             </androidx.gridlayout.widget.GridLayout>
+
 
             <!-- ✅ 조사현황 대시보드 -->
             <com.google.android.material.card.MaterialCardView
@@ -328,7 +419,7 @@
                                 android:id="@+id/tvDetail"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="자세히 보기"
+                                android:text="전송내역 보기 →"
                                 android:textColor="@color/primary_blue"
                                 android:textSize="14sp"
                                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -379,7 +470,7 @@
                             <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="조사 진행"
+                                    android:text="조사 진행 중"
                                     android:textSize="12sp"
                                     android:textColor="@color/text_secondary" />
 

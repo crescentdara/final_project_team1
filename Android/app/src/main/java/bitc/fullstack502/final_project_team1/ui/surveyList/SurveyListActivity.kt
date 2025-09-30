@@ -32,8 +32,12 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import android.location.Location
 import bitc.fullstack502.final_project_team1.network.dto.ReturnTo
 import bitc.fullstack502.final_project_team1.network.dto.EXTRA_RETURN_TO
+import bitc.fullstack502.final_project_team1.network.dto.SurveyListItemDto
+import bitc.fullstack502.final_project_team1.ui.BaseActivity
 
-class SurveyListActivity : AppCompatActivity() {
+class SurveyListActivity : BaseActivity() {
+
+    override fun bottomNavSelectedItemId() = R.id.nav_survey_list
 
     companion object {
         private const val TMAP_PKG_NEW = "com.skt.tmap.ku"
@@ -43,18 +47,21 @@ class SurveyListActivity : AppCompatActivity() {
         private const val REQ_LOC_PERMISSION = 2000
     }
 
-    private val container by lazy { findViewById<LinearLayout>(R.id.listContainer) }
+    // XML id와 정확히 맞추기
+    private val listContainer by lazy { findViewById<LinearLayout>(R.id.listContainer) }
     private val spinner by lazy { findViewById<Spinner>(R.id.spinnerSort) }
+    private val tvTotalCount by lazy { findViewById<TextView>(R.id.tvTotalCount) }
+    private val emptyState by lazy { findViewById<LinearLayout>(R.id.emptyStateLayout) }
 
     private var assignedList: List<AssignedBuilding> = emptyList()
     private var myLat: Double? = null
     private var myLng: Double? = null
 
-    // 여러 날짜 포맷 지원 (DB 스샷 포함)
+    // 날짜 포맷
     private val parsePatterns = listOf(
-        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"), // 2025-09-22 09:36:26
-        DateTimeFormatter.ISO_DATE_TIME,                    // 2025-09-22T09:36:26 (or millis)
-        DateTimeFormatter.ISO_OFFSET_DATE_TIME              // 2025-09-22T09:36:26+09:00
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
+        DateTimeFormatter.ISO_DATE_TIME,
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME
     )
     private val outFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
 
@@ -63,26 +70,22 @@ class SurveyListActivity : AppCompatActivity() {
         for (fmt in parsePatterns) {
             try { return LocalDateTime.parse(dateStr, fmt) } catch (_: Exception) {}
         }
-        // 타임존 포함 문자열 대응
         return try {
-            val zdt = java.time.ZonedDateTime.parse(dateStr)
-            zdt.toLocalDateTime()
-        } catch (_: Exception) {
-            null
-        }
+            java.time.ZonedDateTime.parse(dateStr).toLocalDateTime()
+        } catch (_: Exception) { null }
     }
-
-
-    private fun formatAssignedAt(dateStr: String?): String {
-        val dt = parseDateFlexible(dateStr) ?: return "미정"
-        return outFormatter.format(dt)
-    }
+    private fun formatAssignedAt(dateStr: String?): String =
+        parseDateFlexible(dateStr)?.let(outFormatter::format) ?: "미정"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_survey_list)
+        initHeader(title = "조사예정")
 
-        // 정렬 스피너 리스너
+        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabBack)
+            ?.setOnClickListener { finish() }
+
+        // 정렬 스피너
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p: AdapterView<*>, v: android.view.View?, pos: Int, id: Long) {
                 sortAndBind(pos)
@@ -90,39 +93,17 @@ class SurveyListActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        // 내 위치 (거리순 정렬용)
         loadMyLocation()
+        // ✅ 서버 호출 한 번만: 여기서는 refreshAssigned()만 호출
         refreshAssigned()
-
-        // 목록 불러오기
-        CoroutineScope(Dispatchers.Main).launch {
-            val uid = AuthManager.userId(this@SurveyListActivity)
-            if (uid <= 0) {
-                Toast.makeText(this@SurveyListActivity, "로그인이 필요합니다.", Toast.LENGTH_SHORT).show()
-                return@launch
-            }
-
-            runCatching { ApiClient.service.getAssigned(uid) }
-                .onSuccess { list ->
-                    assignedList = list
-                    bindList(assignedList)                    // 1차 표시
-                    sortAndBind(spinner.selectedItemPosition) // 현재 선택 기준으로 재정렬
-                }
-                .onFailure {
-                    Toast.makeText(this@SurveyListActivity, "목록 조회 실패: ${it.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
     }
 
-    // ▼ 추가
     override fun onResume() {
         super.onResume()
         refreshAssigned()
     }
 
-
-
-    // ▼ 추가
+    /** 서버에서 배정 목록 새로고침 */
     private fun refreshAssigned() {
         CoroutineScope(Dispatchers.Main).launch {
             val uid = AuthManager.userId(this@SurveyListActivity)
@@ -130,89 +111,22 @@ class SurveyListActivity : AppCompatActivity() {
                 Toast.makeText(this@SurveyListActivity, "로그인이 필요합니다.", Toast.LENGTH_SHORT).show()
                 return@launch
             }
-
             runCatching { ApiClient.service.getAssigned(uid) }
                 .onSuccess { list ->
                     assignedList = list
-                    bindList(assignedList)                    // 1차 표시
-                    sortAndBind(spinner.selectedItemPosition) // 현재 선택 기준으로 재정렬
+                    // 현재 스피너 선택 기준으로 정렬/갱신
+                    sortAndBind(spinner.selectedItemPosition)
                 }
                 .onFailure {
                     Toast.makeText(this@SurveyListActivity, "목록 조회 실패: ${it.message}", Toast.LENGTH_SHORT).show()
+                    // 실패 시에도 UI 초기화
+                    assignedList = emptyList()
+                    bindList(assignedList)
                 }
         }
     }
 
-
-    /** ───── 위치 불러오기 ───── */
-    private fun loadMyLocation() {
-        val fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-        val coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-
-        if (fine != PackageManager.PERMISSION_GRANTED && coarse != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                REQ_LOC_PERMISSION
-            )
-            return
-        }
-
-        val fused = LocationServices.getFusedLocationProviderClient(this)
-
-        // 1차: 빠른 lastLocation
-        fused.lastLocation.addOnSuccessListener { loc ->
-            if (loc != null) {
-                myLat = loc.latitude
-                myLng = loc.longitude
-                Log.d("SurveyList", "lastLocation lat=$myLat, lng=$myLng")
-                sortAndBind(spinner.selectedItemPosition)   // ✅ 위치 들어오는 즉시 재정렬
-            } else {
-                // 2차: 한 번만 현재 위치 요청
-                val cts = CancellationTokenSource()
-                fused.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
-                    .addOnSuccessListener { cur ->
-                        if (cur != null) {
-                            myLat = cur.latitude
-                            myLng = cur.longitude
-                            Log.d("SurveyList", "getCurrentLocation lat=$myLat, lng=$myLng")
-                            sortAndBind(spinner.selectedItemPosition)
-                        } else {
-                            Log.w("SurveyList", "getCurrentLocation returned null")
-                            Toast.makeText(this, "내 위치를 가져오지 못했습니다.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("SurveyList", "getCurrentLocation failed: ${e.message}")
-                        Toast.makeText(this, "내 위치 확인 실패: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-            }
-        }.addOnFailureListener { e ->
-            Log.e("SurveyList", "lastLocation failed: ${e.message}")
-            Toast.makeText(this, "내 위치 확인 실패: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-
-    /** 권한 요청 결과 처리 */
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQ_LOC_PERMISSION &&
-            grantResults.isNotEmpty() &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED
-        ) {
-            loadMyLocation()
-        }
-    }
-
-    /** 정렬 + 바인딩 */
+    /** 정렬 후 바인딩 */
     private fun sortAndBind(sortType: Int) {
         val sorted = when (sortType) {
             0 -> assignedList.sortedByDescending { parseDateFlexible(it.assignedAt) } // 최신등록순
@@ -220,9 +134,9 @@ class SurveyListActivity : AppCompatActivity() {
             2 -> {
                 if (myLat != null && myLng != null) {
                     assignedList.sortedBy {
-                        if (it.latitude != null && it.longitude != null) {
+                        if (it.latitude != null && it.longitude != null)
                             distance(myLat!!, myLng!!, it.latitude, it.longitude)
-                        } else Double.MAX_VALUE
+                        else Double.MAX_VALUE
                     }
                 } else assignedList
             }
@@ -231,30 +145,29 @@ class SurveyListActivity : AppCompatActivity() {
         bindList(sorted)
     }
 
-    /** 리스트 바인딩 (LinearLayout에 직접 추가) */
+    /** 리스트 바인딩 (LinearLayout에 직접 row 추가) + 개수/빈상태 갱신 */
     private fun bindList(list: List<AssignedBuilding>) {
-        container.removeAllViews()
+        listContainer.removeAllViews()
         val inf = LayoutInflater.from(this)
 
         list.forEach { item ->
-            val row = inf.inflate(R.layout.item_survey, container, false)
+            val row = inf.inflate(R.layout.item_survey, listContainer, false)
 
             val addrText = item.lotAddress?.takeIf { it.isNotBlank() } ?: "주소 없음"
             row.findViewById<TextView>(R.id.tvAddress).text = addrText
 
-            // 배정일시 표시
             row.findViewById<TextView?>(R.id.tvAssignedAt)?.text =
                 "배정일자: ${formatAssignedAt(item.assignedAt)}"
 
-            // 카드 클릭 → 건물 상세
+            // 상세
             row.setOnClickListener {
                 BuildingInfoBottomSheet.newInstanceForNew(item.id).apply {
                     arguments?.putString(EXTRA_RETURN_TO, ReturnTo.SURVEY_LIST.name)
                 }.show(supportFragmentManager, "buildingInfo")
             }
 
-            // 지도보기
-            row.findViewById<Button>(R.id.btnMap).setOnClickListener {
+            // 지도
+            row.findViewById<Button?>(R.id.btnMap)?.setOnClickListener {
                 val lat = item.latitude
                 val lng = item.longitude
                 if (lat == null || lng == null) {
@@ -266,21 +179,77 @@ class SurveyListActivity : AppCompatActivity() {
             }
 
             // 길찾기
-            row.findViewById<Button>(R.id.btnRoute).setOnClickListener {
+            row.findViewById<Button?>(R.id.btnRoute)?.setOnClickListener {
                 val lat = item.latitude
                 val lng = item.longitude
                 if (lat == null || lng == null) {
                     Toast.makeText(this, "좌표 정보가 없습니다.", Toast.LENGTH_SHORT).show()
                 } else {
-                    startTmapRouteFromMyLocation(
-                        destLat = lat,
-                        destLng = lng,
-                        destName = addrText
-                    )
+                    startTmapRouteFromMyLocation(destLat = lat, destLng = lng, destName = addrText)
                 }
             }
 
-            container.addView(row)
+            listContainer.addView(row)
+        }
+
+        // ✅ 총 개수/빈 상태 갱신 여기서!
+        tvTotalCount.text = "총 ${list.size}건"
+        if (list.isEmpty()) {
+            emptyState.visibility = android.view.View.VISIBLE
+            listContainer.visibility = android.view.View.GONE
+        } else {
+            emptyState.visibility = android.view.View.GONE
+            listContainer.visibility = android.view.View.VISIBLE
+        }
+    }
+
+    /** 위치 불러오기 (거리순 정렬 지원) */
+    private fun loadMyLocation() {
+        val fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        val coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        if (fine != PackageManager.PERMISSION_GRANTED && coarse != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                REQ_LOC_PERMISSION
+            )
+            return
+        }
+
+        val fused = LocationServices.getFusedLocationProviderClient(this)
+
+        fused.lastLocation.addOnSuccessListener { loc ->
+            if (loc != null) {
+                myLat = loc.latitude
+                myLng = loc.longitude
+                sortAndBind(spinner.selectedItemPosition)
+            } else {
+                val cts = CancellationTokenSource()
+                fused.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
+                    .addOnSuccessListener { cur ->
+                        if (cur != null) {
+                            myLat = cur.latitude
+                            myLng = cur.longitude
+                            sortAndBind(spinner.selectedItemPosition)
+                        } else {
+                            Toast.makeText(this, "내 위치를 가져오지 못했습니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "내 위치 확인 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }.addOnFailureListener { e ->
+            Toast.makeText(this, "내 위치 확인 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /** 권한 결과 */
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQ_LOC_PERMISSION && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            loadMyLocation()
         }
     }
 

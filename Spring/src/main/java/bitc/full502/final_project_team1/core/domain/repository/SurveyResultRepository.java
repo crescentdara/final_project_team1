@@ -87,12 +87,14 @@ public interface SurveyResultRepository extends JpaRepository<SurveyResultEntity
 
     // 금일 완료
     @Query("""
-    select count(s) 
-    from SurveyResultEntity s 
-    where s.user.userId = :userId 
-      and s.status = 'SENT' 
-      and s.createdAt >= :todayStart
+select count(s)
+from SurveyResultEntity s
+where s.user.userId = :userId
+  and s.status in ('SENT', 'APPROVED')
+  and s.createdAt >= :todayStart
 """)
+
+
     long countSentToday(@Param("userId") Long userId, @Param("todayStart") LocalDateTime todayStart);
     // 최신 1건 가져오기
     Optional<SurveyResultEntity> findTopByBuilding_IdOrderByIdDesc(Long buildingId);

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import bitc.fullstack502.final_project_team1.MainActivity
@@ -23,10 +24,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import bitc.fullstack502.final_project_team1.network.dto.EXTRA_RETURN_TO
+import bitc.fullstack502.final_project_team1.ui.BaseActivity
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
-class DataTransmissionActivity : AppCompatActivity() {
 
+class DataTransmissionActivity : BaseActivity() {
+
+    override fun bottomNavSelectedItemId() = R.id.nav_not_transmitted
     // UI
     private lateinit var spinnerSort: Spinner
     private lateinit var recyclerView: RecyclerView
@@ -41,7 +46,7 @@ class DataTransmissionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_data_transmission)
-
+        initHeader(title = "미전송")
         initViews()
         setupSort()
         setupRecyclerView()
@@ -67,8 +72,10 @@ class DataTransmissionActivity : AppCompatActivity() {
         spinnerSort = findViewById(R.id.spinnerSort)
         recyclerView = findViewById(R.id.recyclerNotTransmittedList)
         emptyStateLayout = findViewById(R.id.emptyStateLayout)
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabBack)
-            ?.setOnClickListener { onBackPressed() }
+        findViewById<FloatingActionButton>(R.id.fabBack)?.setOnClickListener {
+            navigateHomeOrFinish()
+        }
+
     }
 
     private fun setupSort() {
@@ -160,20 +167,6 @@ class DataTransmissionActivity : AppCompatActivity() {
             emptyStateLayout.visibility = View.GONE
             adapter.notifyDataSetChanged()
         }
-    }
-
-    private fun navigateToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
-    }
-
-    private fun performLogout() {
-        AuthManager.clear(this)
-        Toast.makeText(this, "로그아웃 완료", Toast.LENGTH_SHORT).show()
-        startActivity(Intent(this, LoginActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        })
-        finish()
     }
 
 }

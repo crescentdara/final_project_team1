@@ -30,7 +30,6 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
           ON sr.building_id = a.building_id
          AND sr.user_id     = a.user_id
      WHERE a.user_id = :userId
-       AND a.status  = 1                   -- 배정 상태만
        AND b.latitude  IS NOT NULL
        AND b.longitude IS NOT NULL
        AND sr.id IS NULL                   -- ✅ 조사결과가 전혀 없는 것만
@@ -66,7 +65,6 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
     from UserBuildingAssignmentEntity a
     join a.building b
     where a.user.userId = :userId
-      and a.status = 1
       and not exists (
           select 1
           from SurveyResultEntity sr
@@ -87,7 +85,6 @@ public interface AppAssignmentQueryRepository extends JpaRepository<BuildingEnti
                    MAX(uba.assigned_at) AS max_assigned_at
             FROM user_building_assignment uba
             WHERE uba.user_id = :userId
-              AND uba.status = 1
               AND uba.building_id IN (:buildingIds)
             GROUP BY uba.building_id
         ) t

@@ -26,8 +26,13 @@ import java.time.format.DateTimeFormatter
 import android.view.View
 import bitc.fullstack502.final_project_team1.network.dto.ReturnTo
 import bitc.fullstack502.final_project_team1.network.dto.EXTRA_RETURN_TO
+import bitc.fullstack502.final_project_team1.ui.BaseActivity
+import com.google.android.material.appbar.MaterialToolbar
+import android.widget.TextView
 
-class ReinspectListActivity : AppCompatActivity() {
+class ReinspectListActivity : BaseActivity() {
+
+    override fun bottomNavSelectedItemId() = R.id.nav_reinspect
 
     companion object {
         private const val REQ_LOC_FOR_TMAP = 9120
@@ -49,14 +54,36 @@ class ReinspectListActivity : AppCompatActivity() {
     )
     private val outFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")
 
+    private fun updateHeaderCount(count: Int) {
+        val title = "재조사"
+
+        val ab = supportActionBar
+        if (ab != null) {
+            ab.title = title
+        } else {
+            findViewById<MaterialToolbar>(R.id.toolbar)?.title = title
+        }
+
+        // 헤더의 "총 N건" 텍스트도 함께 갱신 (뷰 없으면 무시)
+        findViewById<TextView>(R.id.tvTotalCount)?.text = "총 ${count}건"
+    }
+
+    // 2) 날짜 파싱 (named args 제거)
     private fun parseDateFlexible(dateStr: String?): LocalDateTime? {
         if (dateStr.isNullOrBlank()) return null
         for (fmt in parsePatterns) {
-            try { return LocalDateTime.parse(dateStr, fmt) } catch (_: Exception) {}
+            try {
+                return LocalDateTime.parse(dateStr, fmt)
+            } catch (_: Exception) { /* 다음 포맷 시도 */ }
         }
-        return try { ZonedDateTime.parse(dateStr).toLocalDateTime() } catch (_: Exception) { null }
+        return try {
+            ZonedDateTime.parse(dateStr).toLocalDateTime()
+        } catch (_: Exception) {
+            null
+        }
     }
 
+    // 3) 날짜 포맷 (named args 제거)
     private fun formatAssignedAt(dateStr: String?): String {
         val dt = parseDateFlexible(dateStr) ?: return "미정"
         return outFormatter.format(dt)
@@ -66,6 +93,10 @@ class ReinspectListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_survey_list)
+        initHeader(title = "재조사")
+
+        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabBack)
+            ?.setOnClickListener { finish() }
 
         spinnerSort = findViewById(R.id.spinnerSort)
         listContainer = findViewById(R.id.listContainer)
@@ -107,6 +138,7 @@ class ReinspectListActivity : AppCompatActivity() {
                     else -> { /* 기본 정렬 유지 */ }
                 }
 
+                updateHeaderCount(items.size)
                 render(items)
 
             } catch (e: Exception) {
@@ -124,12 +156,16 @@ class ReinspectListActivity : AppCompatActivity() {
 
             val tvAddress    = row.findViewById<TextView>(R.id.tvAddress)
             val tvAssignedAt = row.findViewById<TextView?>(R.id.tvAssignedAt)
+            val btnMap       = row.findViewById<Button>(R.id.btnMap)
+            val btnRoute     = row.findViewById<Button>(R.id.btnRoute)
 
-            // ✅ 재조사 목록에서는 배정일자 숨김
+            // ✅ 배지
+            row.findViewById<TextView?>(R.id.tvSurveyBadge)?.apply {
+                text = "반려"
+            }
+
+            // 재조사 목록에서는 배정일자 숨김
             tvAssignedAt?.visibility = View.GONE
-
-            val btnMap   = row.findViewById<Button>(R.id.btnMap)
-            val btnRoute = row.findViewById<Button>(R.id.btnRoute)
 
             val addrText = item.address ?: (item.buildingName ?: "건물 #${item.buildingId}")
             tvAddress.text = addrText

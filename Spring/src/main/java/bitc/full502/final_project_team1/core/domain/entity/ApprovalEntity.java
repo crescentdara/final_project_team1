@@ -49,11 +49,11 @@ public class ApprovalEntity {
     private UserAccountEntity surveyor;           // 조사원id**
 
     /** 결재 대상 '조사결과' */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "survey_result_id",
-            nullable = false,
+    @ManyToOne(fetch = FetchType.LAZY, optional = true) // null 허용
+    @JoinColumn(name = "survey_result_id", nullable = true,
             foreignKey = @ForeignKey(name = "fk_approval_survey_result"))
     private SurveyResultEntity surveyResult;
+
 
 //    @Column(name = "survey_result_id")
 //    private Long surveyResultId;

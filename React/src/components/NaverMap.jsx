@@ -38,10 +38,11 @@ function NaverMap({ latitude = 35.228, longitude = 128.889 }) {
             ref={mapRef}
             style={{
                 width: "100%",
-                minHeight: "250px",   // ✅ 최소 높이 보장
+                height: "300px",       // 부모 높이 꽉 채우기
                 borderRadius: "8px",
-                overflow: "hidden",   // ✅ 지도 깨짐 방지
+                overflow: "hidden",
             }}
+
         />
     );
 }

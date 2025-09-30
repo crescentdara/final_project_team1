@@ -4,42 +4,31 @@ import NaverMap from "../components/NaverMap"; // 지도 컴포넌트
 
 function SurveyList() {
     const [addresses, setAddresses] = useState([]);
-
-    const [emdList, setEmdList] = useState([]); // 읍면동 목록
-    const [selectedEmd, setSelectedEmd] = useState(""); // 선택된 읍면동
+    const [emdList, setEmdList] = useState([]);
+    const [selectedEmd, setSelectedEmd] = useState("");
 
     const [selectedLocation, setSelectedLocation] = useState({
-        latitude: 35.228, // 기본 좌표 (김해 중심)
+        latitude: 35.228,
         longitude: 128.889,
     });
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const [errorMessage, setErrorMessage] = useState(""); // 안내문 메시지
+    const [users, setUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [userKeyword, setUserKeyword] = useState("");
 
-    // ✅ 조사자 관련 상태
-    const [users, setUsers] = useState([]); // 조사자 목록
-    const [selectedUser, setSelectedUser] = useState(null); // 선택된 조사자
-    const [userKeyword, setUserKeyword] = useState(""); // 🔍 조사자 검색어
-
-    // ✅ 건물 선택 상태 (체크박스 다중 선택)
     const [selectedBuildings, setSelectedBuildings] = useState([]);
+    const selectedCount = selectedBuildings.length; // ✅ 선택 개수 계산
 
-    // =============================
-    // 초기 로딩: 읍면동 + 전체 미배정 조사지 + 전체 조사원
-    // =============================
     useEffect(() => {
-        // 읍면동 옵션 불러오기
         axios
             .get("/web/building/eupmyeondong?city=김해시")
             .then((res) => setEmdList(res.data))
             .catch((err) => console.error(err));
 
-        // 전체 미배정 조사지 + 전체 조사원 불러오기
         handleSearch();
     }, []);
 
-    // =============================
-    // 미배정 조사지 + 조사원 조회
-    // =============================
     const handleSearch = () => {
         axios
             .get("/web/building/unassigned", {
@@ -49,47 +38,35 @@ function SurveyList() {
                 setAddresses(res.data.results || []);
                 setUsers(res.data.investigators || []);
             })
-            .catch((err) => console.error("❌ 미배정 조사지 불러오기 실패:", err));
+            .catch((err) => console.error("미배정 조사지 불러오기 실패:", err));
     };
 
-    // =============================
-    // 조사원 검색 (선택한 읍/면/동 내에서만 검색됨)
-    // =============================
     const handleUserSearch = () => {
         axios
             .get("/web/building/unassigned", {
                 params: { region: selectedEmd || "", keyword: userKeyword || "" },
             })
             .then((res) => setUsers(res.data.investigators || []))
-            .catch((err) => console.error("❌ 조사원 검색 실패:", err));
+            .catch((err) => console.error("조사원 검색 실패:", err));
     };
 
-    // =============================
-    // 건물 체크박스 선택 핸들러
-    // =============================
     const handleBuildingCheck = (addr) => {
         const id = addr.id;
         const isChecked = selectedBuildings.includes(id);
-
         let updated;
+
         if (isChecked) {
             updated = selectedBuildings.filter((bid) => bid !== id);
         } else {
             updated = [...selectedBuildings, id];
-            // 마지막 선택된 건물 좌표로 지도 이동
             handleSelect(addr);
         }
         setSelectedBuildings(updated);
     };
 
-    // =============================
-    // 지도에 핑 찍기
-    // =============================
     const handleSelect = (addr) => {
         let query = addr.lotAddress || addr.buildingName;
         if (!query) return;
-
-        console.log("📍 DB 좌표 조회 요청:", query);
 
         axios
             .get("/web/building/coords", { params: { address: query } })
@@ -104,15 +81,11 @@ function SurveyList() {
                     setErrorMessage(`좌표를 찾을 수 없습니다.\n요청한 주소: ${query}`);
                 }
             })
-            .catch((err) => {
-                console.error("DB coords API error:", err);
+            .catch(() => {
                 setErrorMessage("DB에서 좌표를 가져오는 중 오류가 발생했습니다.");
             });
     };
 
-    // =============================
-    // 배정 버튼 클릭
-    // =============================
     const handleAssign = async () => {
         if (!selectedUser) {
             alert("조사자를 선택하세요!");
@@ -128,37 +101,37 @@ function SurveyList() {
                 userId: selectedUser.userId,
                 buildingIds: selectedBuildings,
             });
-            console.log("✅ 배정 완료:", res.data);
-
-            // 성공 후 목록 갱신
             handleSearch();
             setSelectedBuildings([]);
             alert(`총 ${res.data.assignedCount}건이 배정되었습니다.`);
         } catch (err) {
-            console.error("❌ 배정 실패:", err);
+            console.error("배정 실패:", err);
             alert("배정 중 오류가 발생했습니다.");
         }
     };
 
-    // =============================
-    // JSX
-    // =============================
     return (
-        <div className="container mt-4">
-            <h2 className="mb-4">미배정 조사목록</h2>
+        <div
+            className="container-fluid mt-4 p-4 shadow-sm rounded-3"
+            style={{ backgroundColor: "#fff" }}
+        >
+            {/* 타이틀 */}
+            <h3
+                className="fw-bold mb-4"
+                style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
+            >
+                미배정 조사목록
+            </h3>
 
-            {/* 🔎 검색 박스 */}
+            {/* 검색 박스 */}
             <div className="border rounded p-3 mb-4 bg-light shadow-sm">
                 <div className="row g-3 align-items-end">
-                    {/* 시/도 */}
                     <div className="col-md-4">
                         <label className="form-label fw-bold">시/도 구분</label>
                         <select className="form-select" disabled>
                             <option>경상남도 김해시</option>
                         </select>
                     </div>
-
-                    {/* 읍면동 */}
                     <div className="col-md-4">
                         <label className="form-label fw-bold">읍/면/동 구분</label>
                         <select
@@ -166,7 +139,6 @@ function SurveyList() {
                             value={selectedEmd}
                             onChange={(e) => {
                                 setSelectedEmd(e.target.value);
-                                // 읍면동 선택 시 바로 조회 실행
                                 setTimeout(() => handleSearch(), 0);
                             }}
                         >
@@ -178,12 +150,10 @@ function SurveyList() {
                             ))}
                         </select>
                     </div>
-
-                    {/* 조회 버튼 */}
                     <div className="col-md-4">
                         <button
-                            className="btn btn-primary w-100 fw-bold"
-                            style={{ backgroundColor: "#289eff", border: "none" }}
+                            className="btn w-100 fw-bold"
+                            style={{ backgroundColor: "#289eff", border: "none", color: "#fff" }}
                             onClick={handleSearch}
                         >
                             조회
@@ -192,18 +162,27 @@ function SurveyList() {
                 </div>
             </div>
 
-            <div className="row">
-                {/* 왼쪽: 미배정 조사지 목록 */}
-                <div className="col-md-8">
-                    <div className="p-3 border rounded bg-white shadow-sm">
+            <div className="row align-items-stretch">
+                {/* 좌측: 미배정 조사지 목록 */}
+                <div className="col-md-8 d-flex flex-column">
+                    <div
+                        className="p-3 border rounded bg-white shadow-sm d-flex flex-column"
+                        style={{ height: "616px" }}
+                    >
                         <div className="d-flex justify-content-between align-items-center mb-2">
                             <h5 className="mb-0">미배정 조사지 목록</h5>
-                            <small className="text-muted">총 {addresses.length}건</small>
+                            <div className="d-flex align-items-center gap-2">
+                                <span
+                                    className="px-2 py-1 text-muted small"
+                                    title="현재 체크된 항목 수"
+                                >
+                                    선택 {selectedCount}건
+                                </span>
+                                <small className="text-muted">총 {addresses.length}건</small>
+                            </div>
                         </div>
-                        <ul
-                            className="list-group"
-                            style={{ maxHeight: "400px", overflowY: "auto" }}
-                        >
+
+                        <ul className="list-group flex-grow-1" style={{ overflowY: "auto" }}>
                             {addresses.map((addr) => (
                                 <li
                                     key={addr.id}
@@ -214,7 +193,7 @@ function SurveyList() {
                                         type="checkbox"
                                         className="form-check-input me-2"
                                         checked={selectedBuildings.includes(addr.id)}
-                                        onChange={() => handleBuildingCheck(addr)}
+                                        onChange={() => handleBuildingCheck(addr)} // ✅ onChange 유지
                                     />
                                     {addr.lotAddress || addr.buildingName}
                                 </li>
@@ -223,24 +202,29 @@ function SurveyList() {
                     </div>
                 </div>
 
-                {/* 오른쪽: 지도 + 안내문 + 조사원 조회 */}
+                {/* 우측: 지도 + 조사원 조회 */}
                 <div className="col-md-4 d-flex flex-column gap-3">
-                    {/* 지도 */}
-                    <NaverMap
-                        latitude={selectedLocation.latitude}
-                        longitude={selectedLocation.longitude}
-                    />
+                    <div
+                        className="p-3 border rounded bg-white shadow-sm"
+                        style={{ height: "300px" }}
+                    >
+                        <h5 className="mb-3">지도</h5>
+                        <div style={{ height: "220px" }}>
+                            <NaverMap
+                                latitude={selectedLocation.latitude}
+                                longitude={selectedLocation.longitude}
+                            />
+                        </div>
+                        {errorMessage && (
+                            <div className="alert alert-warning mt-2">{errorMessage}</div>
+                        )}
+                    </div>
 
-                    {/* 안내문 */}
-                    {errorMessage && (
-                        <div className="alert alert-warning mt-2">{errorMessage}</div>
-                    )}
-
-                    {/* 조사원 조회 */}
-                    <div className="p-3 border rounded bg-white shadow-sm">
+                    <div
+                        className="p-3 border rounded bg-white shadow-sm d-flex flex-column"
+                        style={{ height: "300px" }}
+                    >
                         <h5 className="mb-3">조사원 조회</h5>
-
-                        {/* 🔎 조사원 검색 */}
                         <div className="input-group mb-3">
                             <input
                                 type="text"
@@ -250,8 +234,8 @@ function SurveyList() {
                                 onChange={(e) => setUserKeyword(e.target.value)}
                             />
                             <button
-                                className="btn btn-primary"
-                                style={{ backgroundColor: "#289eff", border: "none" }}
+                                className="btn"
+                                style={{ backgroundColor: "#289eff", border: "none", color: "#fff" }}
                                 onClick={handleUserSearch}
                             >
                                 검색
@@ -259,8 +243,8 @@ function SurveyList() {
                         </div>
 
                         <ul
-                            className="list-group mb-3"
-                            style={{ maxHeight: "200px", overflowY: "auto" }}
+                            className="list-group mb-3 flex-grow-1"
+                            style={{ overflowY: "auto" }}
                         >
                             {users.map((user) => (
                                 <li
@@ -279,8 +263,13 @@ function SurveyList() {
                         </ul>
 
                         <button
-                            className="btn btn-outline-primary w-100"
-                            style={{ borderColor: "#289eff", color: "#289eff" }}
+                            className="btn w-100 fw-bold mt-auto"
+                            style={{
+                                backgroundColor:
+                                    selectedUser && selectedBuildings.length > 0 ? "#289eff" : "#ccc",
+                                color: "#fff",
+                                border: "none",
+                            }}
                             disabled={!selectedUser || selectedBuildings.length === 0}
                             onClick={handleAssign}
                         >

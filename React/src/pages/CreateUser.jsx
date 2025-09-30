@@ -7,40 +7,37 @@ function CreateUser() {
         username: "",
         password: "",
         empNo: "",
-        preferredRegion: "", // ✅ 선호지역 추가
+        preferredRegion: "",
     });
 
-    const [regions, setRegions] = useState([]); // ✅ 선호지역 리스트
+    const [regions, setRegions] = useState([]);
     const [usernameValid, setUsernameValid] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    // 📌 선호 지역 목록 불러오기
+    // 📌 선호 지역 불러오기
     useEffect(() => {
         axios
             .get("/web/api/users/preferred-regions?city=김해시")
             .then((res) => setRegions(res.data))
-            .catch((err) => console.error("선호지역 불러오기 실패:", err));
+            .catch(() => console.error("선호지역 불러오기 실패"));
     }, []);
 
-    // 입력값 변경 핸들러
     const handleChange = async (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
 
         if (name === "username") {
-            if (value.trim() === "") {
+            if (!value.trim()) {
                 setUsernameValid(null);
                 return;
             }
-
             try {
                 setLoading(true);
                 const res = await axios.get("/web/api/users/check-username", {
                     params: { username: value.trim() },
                 });
                 setUsernameValid(!res.data);
-            } catch (err) {
-                console.error("아이디 중복 확인 실패:", err);
+            } catch {
                 setUsernameValid(null);
             } finally {
                 setLoading(false);
@@ -48,161 +45,207 @@ function CreateUser() {
         }
     };
 
-    // 유효성 검사
-    const isFormValid = () => {
-        return (
-            formData.name.trim() !== "" &&
-            formData.username.trim() !== "" &&
-            formData.password.trim() !== "" &&
-            formData.empNo.trim() !== "" &&
-            formData.preferredRegion.trim() !== "" && // ✅ 필수값
-            usernameValid === true
-        );
-    };
+    const isFormValid = () =>
+        formData.name.trim() &&
+        formData.username.trim() &&
+        formData.password.trim() &&
+        formData.empNo.trim() &&
+        formData.preferredRegion.trim() &&
+        usernameValid === true;
 
-    // 사번 생성 버튼
     const handleGenerateEmpNo = async () => {
         try {
             const res = await axios.get("/web/api/users/generate-empno");
             setFormData({ ...formData, empNo: res.data });
-        } catch (err) {
+        } catch {
             alert("사번 생성 실패");
-            console.error(err);
         }
     };
 
-    // 등록 버튼
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
             await axios.post("/web/api/users", formData);
             alert("등록 성공");
-            console.log("등록된 데이터:", formData);
-        } catch (error) {
+        } catch {
             alert("등록 실패");
-            console.error("등록 오류:", error);
         }
     };
 
-    // 스타일
-    const cardStyle = {
-        maxWidth: "500px",
-        margin: "30px auto",
-        padding: "20px",
-        borderRadius: "12px",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        background: "white",
+    // ---------- 스타일 ----------
+    const wrapperStyle = {
+        marginTop: 20,
+        borderRadius: 16,
+        boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+        background: "#fff",
+        overflow: "hidden",
+    };
+
+    const headerStyle = {
+        padding: "16px 24px",
+        fontWeight: 600,
+        fontSize: 16,
+        borderBottom: "1px solid #eee",
+        background: "#f9fbff",
+        color: "#289eff",
+    };
+
+    const formStyle = {
+        padding: "32px 40px",
+        maxWidth: 600,
+    };
+
+    const labelStyle = {
+        fontSize: 14,
+        fontWeight: 600,
+        marginBottom: 6,
+        color: "#333",
     };
 
     const inputStyle = {
         width: "100%",
-        padding: "8px",
-        marginTop: "5px",
-        marginBottom: "5px",
-        borderRadius: "4px",
-        border: "1px solid #ccc",
+        padding: "12px 14px",
+        marginBottom: 16,
+        borderRadius: 8,
+        border: "1px solid #e5e7eb", // 기본 연한 그레이
+        fontSize: 14,
+        outline: "none",
+        background: "#fafafa",
+        transition: "all 0.2s",
     };
 
-    const buttonStyle = (enabled = true) => ({
-        padding: "10px 20px",
-        borderRadius: "6px",
-        border: "none",
-        marginRight: "10px",
-        cursor: enabled ? "pointer" : "not-allowed",
-        backgroundColor: enabled ? "#289eff" : "#ccc",
-        color: "white",
-        fontWeight: "bold",
+    const smallText = (color) => ({
+        fontSize: 12,
+        color,
+        marginTop: -8,
+        marginBottom: 12,
     });
 
+    const btnBase = {
+        padding: "10px 20px",
+        borderRadius: 8,
+        border: "none",
+        fontWeight: 600,
+        cursor: "pointer",
+        transition: "all 0.2s",
+    };
+
+    const primaryBtn = (enabled) => ({
+        ...btnBase,
+        background: enabled ? "#289eff" : "#bcdcff",
+        color: "#fff",
+        cursor: enabled ? "pointer" : "not-allowed",
+    });
+
+    const secondaryBtn = {
+        ...btnBase,
+        background: "#f1f3f5",
+        color: "#333",
+    };
+
     return (
-        <div style={cardStyle}>
-            <h2 style={{ textAlign: "center", marginBottom: "20px" }}>조사원 신규 등록</h2>
+        <div style={wrapperStyle}>
+            {/* 상단 헤더 */}
+            <div style={headerStyle}>조사원 생성</div>
 
-            <label>이름</label>
-            <input
-                style={inputStyle}
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-            />
+            {/* 폼 */}
+            <form style={formStyle} onSubmit={handleSubmit}>
+                <div>
+                    <div style={labelStyle}>이름 *</div>
+                    <input
+                        style={inputStyle}
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        onFocus={(e) => (e.target.style.border = "1px solid #289eff")}
+                        onBlur={(e) => (e.target.style.border = "1px solid #e5e7eb")}
+                    />
+                </div>
 
-            <label>아이디</label>
-            <input
-                style={inputStyle}
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-            />
-            {loading && <p style={{ color: "gray", fontSize: "13px" }}>아이디 확인 중...</p>}
-            {usernameValid === false && (
-                <p style={{ color: "red", fontSize: "13px" }}>사용 불가능한 아이디 입니다</p>
-            )}
-            {usernameValid === true && (
-                <p style={{ color: "green", fontSize: "13px" }}>사용 가능한 아이디 입니다</p>
-            )}
+                <div>
+                    <div style={labelStyle}>아이디 *</div>
+                    <input
+                        style={inputStyle}
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        onFocus={(e) => (e.target.style.border = "1px solid #289eff")}
+                        onBlur={(e) => (e.target.style.border = "1px solid #e5e7eb")}
+                    />
+                    {loading && <p style={smallText("gray")}>아이디 확인 중...</p>}
+                    {usernameValid === false && (
+                        <p style={smallText("red")}>사용 불가능한 아이디입니다</p>
+                    )}
+                    {usernameValid === true && (
+                        <p style={smallText("green")}>사용 가능한 아이디입니다</p>
+                    )}
+                </div>
 
-            <label>비밀번호</label>
-            <input
-                style={inputStyle}
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-            />
+                <div>
+                    <div style={labelStyle}>비밀번호 *</div>
+                    <input
+                        style={inputStyle}
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        onFocus={(e) => (e.target.style.border = "1px solid #289eff")}
+                        onBlur={(e) => (e.target.style.border = "1px solid #e5e7eb")}
+                    />
+                </div>
 
-            {/* ✅ 선호 지역 선택 */}
-            <label>선호 지역</label>
-            <select
-                style={inputStyle}
-                name="preferredRegion"
-                value={formData.preferredRegion}
-                onChange={handleChange}
-            >
-                <option value="">-- 선택하세요 --</option>
-                {regions.map((r, idx) => (
-                    <option key={idx} value={r}>
-                        {r}
-                    </option>
-                ))}
-            </select>
+                <div>
+                    <div style={labelStyle}>선호 지역 *</div>
+                    <select
+                        style={inputStyle}
+                        name="preferredRegion"
+                        value={formData.preferredRegion}
+                        onChange={handleChange}
+                        onFocus={(e) => (e.target.style.border = "1px solid #289eff")}
+                        onBlur={(e) => (e.target.style.border = "1px solid #e5e7eb")}
+                    >
+                        <option value="">-- 선택하세요 --</option>
+                        {regions.map((r, idx) => (
+                            <option key={idx} value={r}>
+                                {r}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-            <label>사번</label>
-            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                <input
-                    style={{ ...inputStyle, flex: 1 }}
-                    type="text"
-                    name="empNo"
-                    value={formData.empNo}
-                    readOnly
-                />
-                <button
-                    type="button"
-                    style={{
-                        height: "38px",
-                        padding: "0 16px",
-                        fontSize: "14px",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        backgroundColor: "#289eff",
-                        color: "white",
-                        border: "none",
-                    }}
-                    onClick={handleGenerateEmpNo}
-                >
-                    사번 생성
-                </button>
-            </div>
+                <div>
+                    <div style={labelStyle}>사번 *</div>
+                    <div style={{ display: "flex", gap: "10px" }}>
+                        <input
+                            style={{ ...inputStyle, flex: 1, marginBottom: 0 }}
+                            type="text"
+                            name="empNo"
+                            value={formData.empNo}
+                            readOnly
+                        />
+                        <button
+                            type="button"
+                            style={secondaryBtn}
+                            onClick={handleGenerateEmpNo}
+                        >
+                            사번 생성
+                        </button>
+                    </div>
+                </div>
 
-            <div style={{ textAlign: "right", marginTop: "20px" }}>
-                <button
-                    style={buttonStyle(isFormValid())}
-                    onClick={handleSubmit}
-                    disabled={!isFormValid()}
-                >
-                    등록
-                </button>
-            </div>
+                {/* 버튼 */}
+                <div style={{ textAlign: "start", marginTop: 24 }}>
+                    <button
+                        type="submit"
+                        style={primaryBtn(isFormValid())}
+                        disabled={!isFormValid()}
+                    >
+                        등록
+                    </button>
+                </div>
+            </form>
         </div>
     );
 }

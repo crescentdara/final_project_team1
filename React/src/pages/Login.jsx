@@ -17,8 +17,8 @@ export default function Login({ onLogin }) {
             const res = await axios.post("/web/api/auth/login", form, { withCredentials: true });
             if (res.data.success) {
                 console.log("✅ 로그인 성공, 받은 info:", res.data.info);
-                onLogin(res.data.info); // App에 user 상태 전달
-                navigate("/"); // 로그인 성공 후 메인 페이지로 이동
+                onLogin(res.data.info);
+                navigate("/");
             } else {
                 setError(res.data.message);
             }
@@ -28,12 +28,29 @@ export default function Login({ onLogin }) {
     };
 
     return (
-        <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
-            <div className="card p-4 shadow" style={{ width: 360 }}>
-                <h3 className="mb-3">로그인</h3>
+        <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}
+        >
+            <div
+                className="p-4 shadow-sm rounded-3 bg-white"
+                style={{ width: 380 }}
+            >
+                {/* 타이틀 */}
+                <h3
+                    className="fw-bold mb-4"
+                    style={{
+                        borderLeft: "4px solid #6898FF",
+                        paddingLeft: "12px",
+                    }}
+                >
+                    로그인
+                </h3>
+
+                {/* 폼 */}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
-                        <label>아이디</label>
+                        <label className="form-label">아이디</label>
                         <input
                             type="text"
                             className="form-control"
@@ -44,7 +61,7 @@ export default function Login({ onLogin }) {
                         />
                     </div>
                     <div className="mb-3">
-                        <label>비밀번호</label>
+                        <label className="form-label">비밀번호</label>
                         <input
                             type="password"
                             className="form-control"
@@ -54,8 +71,16 @@ export default function Login({ onLogin }) {
                             required
                         />
                     </div>
-                    {error && <p className="text-danger">{error}</p>}
-                    <button type="submit" className="btn btn-primary w-100">로그인</button>
+
+                    {error && <p className="text-danger small">{error}</p>}
+
+                    <button
+                        type="submit"
+                        className="btn w-100"
+                        style={{ backgroundColor: "#6898FF", color: "#fff" }}
+                    >
+                        로그인
+                    </button>
                 </form>
             </div>
         </div>

@@ -59,3 +59,16 @@ body{
     :root{ color:#213547; background-color:#ffffff; }
 }
 
+.custom-badge {
+    display: inline-block;
+    padding: 0.4em 0.75em;   /* 살짝만 키움 */
+    font-size: 0.8rem;       /* 기본보다 약간 큼 */
+    font-weight: 500;
+    border-radius: 10px;
+    color: #fff !important;  /* 글자는 무조건 흰색 */
+    line-height: 1.1;
+}
+
+
+
+

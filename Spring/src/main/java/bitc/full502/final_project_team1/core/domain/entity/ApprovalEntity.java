@@ -51,7 +51,7 @@ public class ApprovalEntity {
     /** 결재 대상 '조사결과' */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "survey_result_id",
-            nullable = false,
+            nullable = true,
             foreignKey = @ForeignKey(name = "fk_approval_survey_result"))
     private SurveyResultEntity surveyResult;
 

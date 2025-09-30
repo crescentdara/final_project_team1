@@ -5,6 +5,7 @@ import bitc.full502.final_project_team1.core.domain.entity.UserAccountEntity;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Image;
+import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.Paths; // 🔧
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -37,7 +37,7 @@ public class PdfGenerator {
             if (!dir.exists()) dir.mkdirs();
 
             String fileName = "report-" + detail.getId() + ".pdf";
-            Path filePath = Paths.get(reportDir, fileName);
+            var filePath = Paths.get(reportDir, fileName);
 
             Document document = new Document(PageSize.A4, 50, 50, 50, 50);
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filePath.toFile()));
@@ -47,9 +47,9 @@ public class PdfGenerator {
             BaseFont bfKorean = BaseFont.createFont("c:/windows/fonts/malgun.ttf",
                 BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font coverTitleFont = new Font(bfKorean, 24, Font.BOLD, Color.BLACK);
-            Font coverSubFont = new Font(bfKorean, 14, Font.NORMAL, Color.DARK_GRAY);
-            Font infoFont = new Font(bfKorean, 12, Font.NORMAL, Color.BLACK);
-            Font sectionFont = new Font(bfKorean, 14, Font.BOLD, Color.BLACK);
+            Font coverSubFont   = new Font(bfKorean, 14, Font.NORMAL, Color.DARK_GRAY);
+            Font infoFont       = new Font(bfKorean, 12, Font.NORMAL, Color.BLACK);
+            Font sectionFont    = new Font(bfKorean, 14, Font.BOLD, Color.BLACK);
 
             PdfContentByte cb = writer.getDirectContent();
 
@@ -120,11 +120,10 @@ public class PdfGenerator {
 
             document.add(table);
 
-            // ------------------ 4. 사진 ------------------
-            addImageIfExists(document, "외부 사진", detail.getExtPhoto());
-            addImageIfExists(document, "외부 편집본", detail.getExtEditPhoto());
-            addImageIfExists(document, "내부 사진", detail.getIntPhoto());
-            addImageIfExists(document, "내부 편집본", detail.getIntEditPhoto());
+            // ------------------ 4. 사진 (4칸 그리드) ------------------
+            document.newPage();
+
+            addPhotoQuad(document, bfKorean, detail); // 🔧 기존 addImageIfExists 4회 호출 대신 4열 테이블로 렌더
 
             // ------------------ 3. 지도 이미지 ------------------
             if (detail.getLatitude() != null && detail.getLongitude() != null) {
@@ -178,25 +177,71 @@ public class PdfGenerator {
         table.addCell(valCell);
     }
 
-    private void addImageIfExists(Document document, String label, String relativePath) throws Exception {
-        if (relativePath == null || relativePath.isBlank()) {
-            document.add(new Paragraph(label + " : 이미지 없음"));
-            return;
+    // 🔧 추가: 상대 경로("/upload/...")를 실제 파일 경로로 변환
+    private File resolveFromRelative(String relativePath) {
+        if (relativePath == null || relativePath.isBlank()) return null;
+        String p = relativePath.replace('\\', '/');
+        if (p.startsWith("/")) p = p.substring(1);
+        if (p.startsWith("upload/")) p = p.substring("upload/".length());
+        return Paths.get(uploadDir).resolve(p).normalize().toFile(); // uploadDir 하위
+    }
+
+    // 🔧 추가: 사진 4칸(라벨 행 + 회색박스 이미지 행)
+    private void addPhotoQuad(Document document, BaseFont bf, ResultDetailDto d) throws Exception {
+        Font labelFont = new Font(bf, 11, Font.BOLD, Color.DARK_GRAY);
+        Font emptyFont = new Font(bf, 10, Font.NORMAL, new Color(120, 120, 120));
+
+        // 요청 명칭 고정: 외부 사진, 외부 사진 수정, 내부 사진, 내부 사진 수정
+        String[][] items = new String[][]{
+            {"외부 사진",      d.getExtPhoto()},
+            {"외부 사진 수정", d.getExtEditPhoto()},
+            {"내부 사진",      d.getIntPhoto()},
+            {"내부 사진 수정", d.getIntEditPhoto()}
+        };
+
+        PdfPTable table = new PdfPTable(4);
+        table.setWidthPercentage(100);
+        table.setWidths(new float[]{1, 1, 1, 1});
+        table.setSpacingBefore(12f);
+        table.setSpacingAfter(10f);
+
+        // 1행: 라벨
+        for (String[] it : items) {
+            PdfPCell c = new PdfPCell(new Phrase(it[0], labelFont));
+            c.setHorizontalAlignment(Element.ALIGN_CENTER);
+            c.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            c.setBorder(Rectangle.NO_BORDER); // 라벨은 외곽선 없음
+            c.setPaddingBottom(4f);
+            table.addCell(c);
         }
 
-        // DB에는 "/upload/..." 형태로 저장 → 실제 경로 변환
-        String normalized = relativePath.startsWith("/") ? relativePath.substring(1) : relativePath;
-        File file = new File(uploadDir, normalized.replace("upload", "")); // uploadDir + /ext/xxx.jpg
+        // 2행: 회색 박스 + 이미지
+        for (String[] it : items) {
+            File file = resolveFromRelative(it[1]);
 
-        if (file.exists()) {
-            document.add(new Paragraph(label));
-            Image img = Image.getInstance(file.getAbsolutePath());
-            img.scaleToFit(400, 300);
-            img.setSpacingAfter(10);
-            document.add(img);
-        } else {
-            document.add(new Paragraph(label + " : 이미지 없음"));
+            PdfPCell box = new PdfPCell();
+            box.setFixedHeight(170f);                      // 박스 높이
+            box.setPadding(6f);
+            box.setBorderWidth(1.2f);
+            box.setBorderColor(new Color(200, 200, 200));  // 회색 테두리
+            box.setBackgroundColor(Color.WHITE);
+            box.setHorizontalAlignment(Element.ALIGN_CENTER);
+            box.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+            if (file != null && file.exists()) {
+                Image img = Image.getInstance(file.getAbsolutePath());
+                img.setAlignment(Image.ALIGN_CENTER);
+                img.scaleToFit(130f, 150f);                // 박스 내에 맞춤
+                box.addElement(img);
+            } else {
+                Paragraph empty = new Paragraph("이미지 없음", emptyFont);
+                empty.setAlignment(Element.ALIGN_CENTER);
+                box.addElement(empty);
+            }
+            table.addCell(box);
         }
+
+        document.add(table);
     }
 
     // ================= 매핑 메서드 =================

@@ -4,4 +4,8 @@
     <style name="AppBottomSheetDialogTheme" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <!-- 필요하면 둥근 모서리/배경 등 커스텀 가능 -->
     </style>
+    <style name="ThemeOverlay.MyToolbar" parent="ThemeOverlay.MaterialComponents.ActionBar">
+        <item name="actionMenuTextColor">@android:color/white</item> <!-- 메뉴 텍스트 -->
+    </style>
+
 </resources>

@@ -46,17 +46,15 @@ function ApprovalFilters({ keyword, setKeyword, sort, setSort, onSearch }) {
   );
 }
 
-
 // utils: 간단 포맷터
 const fmtKo = (v) => {
   if (!v) return "-";
   const d = typeof v === "number" ? new Date(v) : new Date(String(v));
   if (Number.isNaN(d.getTime())) return String(v); // 파싱 실패 시 원문
-  return d.toLocaleString("ko-KR", { year:"numeric", month:"2-digit", day:"2-digit"});
+  return d.toLocaleString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" });
 };
 
 function ApprovalItem({ item, onOpenResult }) {
-
   const submitted = item?.submittedAt ?? item?.createdAt;
 
   return (
@@ -117,6 +115,11 @@ export default function PendingApprovals() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState(null);
 
+  /** 🔒 하드코딩된 결재자 ID (결재자1)
+   *  필요 시 숫자만 변경해서 쓰세요. (예: 관리자 id가 9면 9로)
+   */
+  const HARDCODED_APPROVER_ID = 2; // ★ 변경: 하드코딩 복귀
+
   /** 서버에서 목록 로드 */
   const fetchApprovals = ({ requireKeyword = false } = {}) => {
     setLoading(true);
@@ -157,35 +160,15 @@ export default function PendingApprovals() {
     );
   };
 
-  // -----------------------------
-  // 결재자 ID 추출 유틸
-  // (모달 상세나 리스트 항목에서 안전하게 꺼내기)
-  // -----------------------------
-  const getApproverIdFor = (id) => {
-    // 모달에 열려있는 상세 먼저 확인
-    if (modalItem?.id === id) {
-      return (
-          modalItem?.approver?.userId ??
-          modalItem?.approver?.id ??
-          modalItem?.approverId ??
-          null
-      );
-    }
-    // 리스트 항목에서 보조 추출
-    const row = items.find((r) => r.id === id);
-    return row?.approverId ?? null;
-  };
-
-  /** ✅ 단건 승인 (하드코딩 제거) */
-  const approveOne = async (id, passedApproverId) => {
+  /** ✅ 단건 승인 (항상 결재자1로 전송) */
+  const approveOne = async (id) => {
     try {
-      const finalApproverId = passedApproverId ?? getApproverIdFor(id);
-      const payload = finalApproverId ? { approverId: finalApproverId } : {};
+      // ★ 변경: 동적 추출 대신 하드코딩된 approverId 사용
+      const payload = { approverId: HARDCODED_APPROVER_ID };
 
       const res = await fetch(`/web/api/approval/${id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // 서버가 세션/쿠키를 쓰면 필요: credentials: "include",
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("승인 요청 실패");
@@ -199,19 +182,15 @@ export default function PendingApprovals() {
     }
   };
 
-  /** ✅ 단건 반려 (하드코딩 제거) */
-  const rejectOne = async (id, reason = "사유 없음", passedApproverId) => {
+  /** ✅ 단건 반려 (항상 결재자1로 전송) */
+  const rejectOne = async (id, reason = "사유 없음") => {
     try {
-      const finalApproverId = passedApproverId ?? getApproverIdFor(id);
-      const payload = {
-        ...(finalApproverId ? { approverId: finalApproverId } : {}),
-        rejectReason: reason,
-      };
+      // ★ 변경: 동적 추출 대신 하드코딩된 approverId 사용
+      const payload = { approverId: HARDCODED_APPROVER_ID, rejectReason: reason };
 
       const res = await fetch(`/web/api/approval/${id}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // credentials: "include",
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("반려 요청 실패");
@@ -295,8 +274,8 @@ export default function PendingApprovals() {
             loading={detailLoading}
             error={detailError}
             onClose={() => setModalOpen(false)}
-            onApprove={approveOne}   // 모달이 id만 넘겨도 내부에서 approverId를 찾아서 보냅니다.
-            onReject={rejectOne}
+            onApprove={approveOne}   // ★ 변경: 내부에서 결재자1 ID로 전송
+            onReject={rejectOne}     // ★ 변경: 내부에서 결재자1 ID로 전송
         />
       </div>
   );

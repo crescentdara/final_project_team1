@@ -74,11 +74,11 @@ public class PdfGenerator {
             footerPara.setAlignment(Element.ALIGN_CENTER);
             footerPara.add(new Phrase("조사자: " + detail.getInvestigator(), infoFont));
             footerPara.add(Chunk.NEWLINE);
-            footerPara.add(new Phrase("승인자: " + approver.getName() +
+            footerPara.add(new Phrase("결재자: " + approver.getName() +
                 " (" + approver.getUsername() + ")", infoFont));
             footerPara.add(Chunk.NEWLINE);
             footerPara.add(new Phrase("승인일시: " +
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(LocalDateTime.now()), infoFont));
+                DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now()), infoFont));
 
             ColumnText ct = new ColumnText(cb);
             ct.setSimpleColumn(
@@ -100,7 +100,7 @@ public class PdfGenerator {
             addGrayRow(table, "사례 번호", "M-" + detail.getId(), bfKorean);
             addGrayRow(table, "조사자", detail.getInvestigator(), bfKorean);
             addGrayRow(table, "주소", detail.getAddress(), bfKorean);
-            addGrayRow(table, "승인자", approver.getName() + "(" + approver.getUsername() + ")", bfKorean);
+            addGrayRow(table, "결재자", approver.getName() + "(" + approver.getUsername() + ")", bfKorean);
             addGrayRow(table, "승인일시",
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), bfKorean);
 

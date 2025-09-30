@@ -28,6 +28,8 @@ import bitc.fullstack502.final_project_team1.ui.surveyList.ReinspectListActivity
 import bitc.fullstack502.final_project_team1.ui.surveyList.SurveyListActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.DataTransmissionActivity
 import bitc.fullstack502.final_project_team1.ui.transmission.TransmissionCompleteActivity
+import bitc.fullstack502.final_project_team1.ui.message.MessageInboxActivity
+import bitc.fullstack502.final_project_team1.network.MessageApiClient
 import com.google.android.material.button.MaterialButton
 import java.io.File
 import java.text.SimpleDateFormat
@@ -130,6 +132,14 @@ class MainActivity : AppCompatActivity() {
         findViewById<MaterialButton>(R.id.btnSurveyList)?.setOnClickListener {
             startActivity(Intent(this, SurveyListActivity::class.java))
         }
+
+        // 메시지 버튼 클릭 리스너
+        findViewById<ImageView>(R.id.ivMessage)?.setOnClickListener {
+            startActivity(Intent(this, MessageInboxActivity::class.java))
+        }
+
+        // 미읽음 메시지 카운트 로드
+        loadUnreadMessageCount()
 
 
         // ✅ 사용자 이름 + 사번 표시
@@ -265,5 +275,38 @@ class MainActivity : AppCompatActivity() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
         finish()
+    }
+
+    /**
+     * 미읽음 메시지 개수 로드 및 배지 표시
+     */
+    private fun loadUnreadMessageCount() {
+        val userId = AuthManager.userId(this) ?: return
+        val tvUnreadBadge = findViewById<TextView>(R.id.tvUnreadBadge)
+
+        lifecycleScope.launch {
+            try {
+                val response = MessageApiClient.service.getUnreadCount(userId)
+                if (response.isSuccessful && response.body() != null) {
+                    val count = response.body()!!.unreadCount
+                    if (count > 0) {
+                        tvUnreadBadge.text = if (count > 99) "99+" else count.toString()
+                        tvUnreadBadge.visibility = View.VISIBLE
+                    } else {
+                        tvUnreadBadge.visibility = View.GONE
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // 네트워크 오류 시 배지 숨김
+                tvUnreadBadge.visibility = View.GONE
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 메시지 보관함에서 돌아올 때 배지 최신화
+        loadUnreadMessageCount()
     }
 }

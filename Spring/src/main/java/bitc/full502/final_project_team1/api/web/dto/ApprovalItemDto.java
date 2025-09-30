@@ -4,6 +4,8 @@ package bitc.full502.final_project_team1.api.web.dto;
 import bitc.full502.final_project_team1.core.domain.entity.SurveyResultEntity;
 import lombok.*;
 
+import java.time.format.DateTimeFormatter;
+
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class ApprovalItemDto {
@@ -25,10 +27,15 @@ public class ApprovalItemDto {
     // CHANGED: ResultDetailDto와 동일 필드 추가
     private String extPhoto, extEditPhoto, intPhoto, intEditPhoto;
 
+    private String submittedAt;
+
     // CHANGED: from(SurveyResultEntity)도 상세와 동일 매핑
     public static ApprovalItemDto from(SurveyResultEntity e) {
         var u = e.getUser();
         var b = e.getBuilding();
+        var fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String submitted = (e.getCreatedAt() != null) ? e.getCreatedAt().format(fmt) : null;
+
         return ApprovalItemDto.builder()
                 .id(e.getId())
                 .caseNo("M-" + e.getId())
@@ -50,6 +57,7 @@ public class ApprovalItemDto {
                 .extEditPhoto(e.getExtEditPhoto())
                 .intPhoto(e.getIntPhoto())
                 .intEditPhoto(e.getIntEditPhoto())
+                .submittedAt(submitted)
                 .build();
     }
 }

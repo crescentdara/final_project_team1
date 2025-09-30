@@ -15,6 +15,8 @@ import BuildingUpload from "./pages/BuildingUpload.jsx";
 import MessageTabs from "./pages/MessageTabs.jsx";
 import SurveyIndex from "./pages/SurveyIndex.jsx";
 import ApproverAssignment from "./pages/ApproverAssignment.jsx";
+import SurveyRegister from "./pages/SurveyRegister.jsx";
+import TotalSurveyList from "./pages/TotalSurveyList.jsx";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -51,14 +53,23 @@ function App() {
                 <Route path="/" element={<Dashboard/>} />
 
                 <Route path="/surveyList" element={<SurveyList />} />
-                <Route path="/createSurvey" element={<CreateSurvey />} />
+
+                {/* 기존 단건/다건 라우트 제거 */}
+                {/*<Route path="/createSurvey" element={<CreateSurvey />} />*/}
+                {/*<Route path="/buildingUpload" element={<BuildingUpload />} />*/}
+
+                {/*단건/다건 통합 라우트*/}
+                <Route path="/surveyRegister" element={<SurveyRegister />} />
+                <Route path="/createSurvey" element={<Navigate to="/surveyRegister?tab=single" replace />} />
+                <Route path="/buildingUpload" element={<Navigate to="/surveyRegister?tab=bulk" replace />} />
+
+
                 <Route path="/createUser" element={<CreateUser />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/resultReport" element={<ResultReport />} />
                 <Route path="/users" element={<UserDetail />} />
                 <Route path="/approvals" element={<ApprovalFilters />} />
                 <Route path="/approverAssignment" element={<ApproverAssignment/>} />
-                <Route path="/buildingUpload" element={<BuildingUpload />} />
                 <Route path="/messageTabs" element={<MessageTabs senderId={user?.id} />} />
                 <Route path="/surveyIndex" element={<SurveyIndex />} />
 

@@ -9,10 +9,23 @@ function MessageTabs({ senderId }) {
     const [newMessage, setNewMessage] = useState(null); // 새 메시지 추적
 
     return (
-        <div className="container mt-4">
-            <h2 className="mb-3">메시지 관리</h2>
+        <div
+            className="container-fluid mt-4 p-4 shadow-sm rounded-3"
+            style={{ backgroundColor: "#fff" }}
+        >
+            <h3
+                className="fw-bold mb-4"
+                style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
+            >
+                메시지 관리
+            </h3>
 
-            <Tabs defaultActiveKey="send" id="message-tabs" className="mb-3">
+            <Tabs
+                defaultActiveKey="send"
+                id="message-tabs"
+                className="mb-3 custom-tabs"
+                fill
+            >
                 {/* 메시지 보내기 */}
                 <Tab eventKey="send" title="메시지 보내기">
                     <MessageSend

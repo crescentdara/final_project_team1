@@ -3,32 +3,42 @@ import ReportPdfModal from "../components/modals/ReportPdfModal.jsx";
 import Pagination from "../components/ui/Pagination.jsx";
 
 /** 결과 보고서 필터 영역 */
-function ReportFilters({ keyword, setKeyword, sort, setSort, onSearch }) {
+function ReportFilters({ keyword, setKeyword, sort, setSort, onSearch, total }) {
     return (
-        <div className="d-flex flex-wrap gap-2 align-items-center mb-3">
-            <h3 className="m-0 me-auto">결과 보고서</h3>
-
-            <select
-                className="form-select"
-                style={{ maxWidth: 160 }}
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
+        <div className="d-flex flex-wrap gap-2 align-items-center mb-4 ">
+            <h3
+                className="fw-bold m-0 "
+                style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
             >
-                <option value="latest">최신 생성순</option>
-                <option value="oldest">오래된 순</option>
-            </select>
+                결과 보고서{" "}
+                <span className="text-muted fw-normal" style={{ fontSize: "0.9rem" }}>
+                    (총 {total}개)
+                </span>
+            </h3>
 
-            <div className="input-group" style={{ maxWidth: 360 }}>
-                <input
-                    className="form-control"
-                    placeholder="관리번호 / 조사원 / 주소 검색"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && onSearch()}
-                />
-                <button className="btn btn-outline-secondary" onClick={onSearch}>
-                    검색
-                </button>
+            <div className="ms-auto d-flex gap-2">
+                <select
+                    className="form-select"
+                    style={{ maxWidth: 160 }}
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value)}
+                >
+                    <option value="latest">최신 생성순</option>
+                    <option value="oldest">오래된 순</option>
+                </select>
+
+                <div className="input-group" style={{ maxWidth: 360 }}>
+                    <input
+                        className="form-control"
+                        placeholder="관리번호 / 조사원 / 주소 검색"
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && onSearch()}
+                    />
+                    <button className="btn btn-outline-secondary" onClick={onSearch}>
+                        검색
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -37,7 +47,10 @@ function ReportFilters({ keyword, setKeyword, sort, setSort, onSearch }) {
 /** 결과 보고서 리스트 아이템 */
 function ReportItem({ report, onOpen }) {
     return (
-        <div className="card shadow-sm mb-3 border-0 rounded-3">
+        <div
+            className="card shadow-sm mb-3 border rounded-3"   // ✅ border-0 → border
+            style={{ borderColor: "#dee2e6" }}                // ✅ 연한 회색 테두리
+        >
             <div className="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <div className="fw-semibold">
@@ -45,13 +58,18 @@ function ReportItem({ report, onOpen }) {
                     </div>
                     <div className="text-muted small mt-1">{report.address}</div>
                 </div>
-                <button className="btn btn-primary" onClick={() => onOpen(report.id)}>
+                <button
+                    className="btn btn-sm"
+                    style={{ backgroundColor: "#6898FF", color: "#fff" }}
+                    onClick={() => onOpen(report.id)}
+                >
                     보고서 보기
                 </button>
             </div>
         </div>
     );
 }
+
 
 export default function ResultReport() {
     const [reports, setReports] = useState([]);
@@ -61,7 +79,7 @@ export default function ResultReport() {
     // 📌 페이지네이션 상태
     const [page, setPage] = useState(1); // 1-based
     const [total, setTotal] = useState(0);
-    const size = 10; // ✅ 한 페이지당 개수 (통일)
+    const size = 10;
 
     // 📌 모달 상태
     const [modalOpen, setModalOpen] = useState(false);
@@ -71,7 +89,7 @@ export default function ResultReport() {
         const params = new URLSearchParams({
             keyword: keyword,
             sort: sort,
-            page: page - 1, // 백엔드는 0-based
+            page: page - 1,
             size: size,
         });
 
@@ -81,9 +99,8 @@ export default function ResultReport() {
                 return res.json();
             })
             .then((data) => {
-                // Spring Data Page 응답 가정: { content, totalPages, totalElements ... }
                 setReports(data.content || []);
-                setTotal(data.totalElements || 0); // ✅ totalElements 반영
+                setTotal(data.totalElements || 0);
             })
             .catch((e) => console.error(e));
     };
@@ -99,7 +116,16 @@ export default function ResultReport() {
     };
 
     return (
-        <div className="container py-4">
+        <div
+            className="container-fluid py-4"
+            style={{
+                backgroundColor: "#fff",
+                borderRadius: "16px",
+                padding: "24px",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
+                marginTop: "20px",
+            }}
+        >
             {/* 필터 */}
             <ReportFilters
                 keyword={keyword}
@@ -107,14 +133,15 @@ export default function ResultReport() {
                 sort={sort}
                 setSort={setSort}
                 onSearch={() => {
-                    setPage(1); // 검색 시 페이지 초기화
+                    setPage(1);
                     fetchReports();
                 }}
+                total={total}
             />
 
             {/* 리스트 */}
             {reports.length === 0 ? (
-                <div className="text-center text-muted py-5 border rounded-4">
+                <div className="text-center text-muted py-5 border rounded-4 bg-light">
                     표시할 보고서가 없습니다.
                 </div>
             ) : (
@@ -126,12 +153,12 @@ export default function ResultReport() {
             {/* 페이지네이션 */}
             <Pagination
                 page={page}
-                total={total}      // 전체 데이터 개수
-                size={size}        // 한 페이지당 개수
+                total={total}
+                size={size}
                 onChange={setPage}
-                siblings={1}       // 현재 페이지 양옆 1개씩 표시
-                boundaries={1}     // 처음/끝 경계 1개 유지
-                className="justify-content-center"
+                siblings={1}
+                boundaries={1}
+                className="justify-content-center mt-4"
                 lastAsLabel={false}
             />
 

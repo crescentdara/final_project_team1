@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import Pagination from "../components/ui/Pagination.jsx";
-import BuildingDetailModal from "../components/modals/BuildingDetailModal.jsx";
 import {useNavigate} from "react-router-dom";
+import BuildingDetailPanel from "../components/modals/BuildingDetailPanel.jsx"; // ✅ 패널 그대로 유지
 
 const statusOptions = [
     { value: "ALL",        label: "전체 상태" },
@@ -63,7 +63,8 @@ export default function SurveyIndex() {
 
     const handleEdit = (e, buildingId) => {
         e.stopPropagation();
-        navigate(`/createSurvey?id=${buildingId}`);
+        // ✅ SurveyRegister 탭으로 이동하면서 id 전달
+        navigate(`/surveyRegister?tab=single&id=${buildingId}`);
     };
 
     const handleDelete = async (e, buildingId) => {
@@ -97,99 +98,124 @@ export default function SurveyIndex() {
     };
 
     return (
-        <div className="container py-4">
-            <div className="d-flex flex-wrap gap-2 align-items-center mb-3">
-                <h3 className="m-0 me-auto">조사목록 전체 내역</h3>
-
-                <select
-                    className="form-select" style={{maxWidth:140}}
-                    value={status}
-                    onChange={(e)=>{ setStatus(e.target.value); setPage(1); }}
+        <div className="container-fluid mt-4" style={{display:"flex", gap:"20px", alignItems: "stretch"}}>
+            {/* 왼쪽: 목록 카드 */}
+            <div
+                className="p-4 shadow-sm rounded-3 bg-white"
+                style={{
+                    flex: selectedId ? "0 0 60%" : "1 1 100%",
+                    transition:"flex-basis 0.3s ease",
+                    height: "100%"
+                }}
+            >
+                {/* 제목 */}
+                <h3
+                    className="fw-bold mb-4 d-flex align-items-center"
+                    style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
                 >
-                    {statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
+                    조사목록 전체 내역
+                    <span className="ms-2 text-muted fs-6">(총 {total}개)</span>
+                </h3>
 
-                <div className="input-group" style={{maxWidth:360}}>
-                    <input
-                        className="form-control"
-                        placeholder="주소/조사원 검색"
-                        value={keyword}
-                        onChange={e=>setKeyword(e.target.value)}
-                        onKeyDown={e=>e.key==="Enter" && onSearch()}
-                    />
-                    <button className="btn btn-outline-secondary" onClick={onSearch}>검색</button>
+                {/* 필터/검색 */}
+                <div className="d-flex flex-wrap gap-2 align-items-center mb-3">
+                    <select
+                        className="form-select" style={{maxWidth:140}}
+                        value={status}
+                        onChange={(e)=>{ setStatus(e.target.value); setPage(1); }}
+                    >
+                        {statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </select>
+
+                    <div className="input-group" style={{maxWidth:360}}>
+                        <input
+                            className="form-control"
+                            placeholder="주소/조사원 검색"
+                            value={keyword}
+                            onChange={e=>setKeyword(e.target.value)}
+                            onKeyDown={e=>e.key==="Enter" && onSearch()}
+                        />
+                        <button className="btn btn-outline-secondary" onClick={onSearch}>검색</button>
+                    </div>
                 </div>
+
+                {/* 테이블 */}
+                <div className="table-responsive">
+                    <table className="table align-middle">
+                        <thead>
+                        <tr className="table-light text-center">
+                            <th style={{width:100}}>ID</th>
+                            <th>주소</th>
+                            <th style={{width:140}}>조사원</th>
+                            <th style={{width:120}}>상태</th>
+                            <th style={{width:140}}>관리</th>
+                        </tr>
+                        </thead>
+                        <tbody className="text-center">
+                        {loading ? (
+                            <tr><td colSpan={5} className="text-center text-muted py-5">로딩중…</td></tr>
+                        ) : rows.length===0 ? (
+                            <tr><td colSpan={5} className="text-center text-muted py-5">표시할 데이터가 없습니다.</td></tr>
+                        ) : rows.map(r => {
+                            const approved = isApprovedRow(r);
+                            return (
+                                <tr key={r.buildingId}
+                                    style={{
+                                        cursor:"pointer",
+                                        backgroundColor: selectedId === r.buildingId ? "#f0f6ff" : "transparent"
+                                    }}
+                                    onClick={() =>
+                                        setSelectedId(prev => prev === r.buildingId ? null : r.buildingId)
+                                    }
+                                >
+                                    <td className="fw-semibold">{r.buildingId}</td>
+                                    <td>{r.lotAddress ?? "-"}</td>
+                                    <td>{r.assignedUserName ?? "-"}</td>
+                                    <td>
+                                        <span className={`badge ${statusBadge(r.statusLabel)}`}>
+                                            {(r.statusLabel==="결재 완료" || r.statusLabel?.toUpperCase?.()==="APPROVED") ? "승인" : r.statusLabel}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button
+                                            className="btn btn-sm btn-outline-secondary me-3"
+                                            onClick={(e)=>handleEdit(e, r.buildingId)}
+                                            disabled={approved}
+                                            title={approved ? "승인 건은 수정할 수 없습니다." : undefined}
+                                        >
+                                            수정
+                                        </button>
+                                        <button
+                                            className="btn btn-sm btn-outline-danger"
+                                            disabled={approved || deletingId === r.buildingId}
+                                            onClick={(e)=>handleDelete(e, r.buildingId)}
+                                            title={approved ? "승인 건은 삭제할 수 없습니다." : undefined}
+                                        >
+                                            {deletingId === r.buildingId ? "삭제 중…" : "삭제"}
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                        </tbody>
+                    </table>
+                </div>
+
+                <Pagination
+                    page={page}
+                    total={total}
+                    size={size}
+                    onChange={setPage}
+                    siblings={1}
+                    boundaries={1}
+                    className="justify-content-center"
+                    lastAsLabel={false}
+                />
             </div>
 
-            <div className="table-responsive">
-                <table className="table align-middle">
-                    <thead>
-                    <tr className="table-light text-center">
-                        <th style={{width:100}}>ID</th>
-                        <th>주소</th>
-                        <th style={{width:140}}>조사원</th>
-                        <th style={{width:120}}>상태</th>
-                        <th style={{width:140}}>관리</th>
-                    </tr>
-                    </thead>
-                    <tbody className="text-center">
-                    {loading ? (
-                        <tr><td colSpan={5} className="text-center text-muted py-5">로딩중…</td></tr>
-                    ) : rows.length===0 ? (
-                        <tr><td colSpan={5} className="text-center text-muted py-5">표시할 데이터가 없습니다.</td></tr>
-                    ) : rows.map(r => {
-                        const approved = isApprovedRow(r);
-                        return (
-                            <tr key={r.buildingId}
-                                style={{cursor:"pointer"}}
-                                onClick={()=>setSelectedId(r.buildingId)}
-                            >
-                                <td className="fw-semibold">{r.buildingId}</td>
-                                <td>{r.lotAddress ?? "-"}</td>
-                                <td>{r.assignedUserName ?? "-"}</td>
-                                <td>
-                  <span className={`badge ${statusBadge(r.statusLabel)}`}>
-                    {(r.statusLabel==="결재 완료" || r.statusLabel?.toUpperCase?.()==="APPROVED") ? "승인" : r.statusLabel}
-                  </span>
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-sm btn-outline-secondary me-3"
-                                        onClick={(e)=>handleEdit(e, r.buildingId)}
-                                        disabled={approved}
-                                        title={approved ? "승인 건은 수정할 수 없습니다." : undefined}
-                                    >
-                                        수정
-                                    </button>
-                                    <button
-                                        className="btn btn-sm btn-outline-danger"
-                                        disabled={approved || deletingId === r.buildingId}
-                                        onClick={(e)=>handleDelete(e, r.buildingId)}
-                                        title={approved ? "승인 건은 삭제할 수 없습니다." : undefined}
-                                    >
-                                        {deletingId === r.buildingId ? "삭제 중…" : "삭제"}
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                    </tbody>
-                </table>
-            </div>
-
-            <Pagination
-                page={page}
-                total={total}
-                size={size}
-                onChange={setPage}
-                siblings={1}
-                boundaries={1}
-                className="justify-content-center"
-                lastAsLabel={false}
-            />
-
+            {/* 오른쪽: 상세 패널 (그대로 유지) */}
             {selectedId && (
-                <BuildingDetailModal
+                <BuildingDetailPanel
                     id={selectedId}
                     onClose={() => setSelectedId(null)}
                 />

@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
-function CreateSurvey() {
+function CreateSurvey({ editingId: propId }) {
     const navigate = useNavigate();
     const [sp] = useSearchParams();
-    const editingId = sp.get("id");                     // ← ?id=123 이 있으면 편집모드
+    const queryId = sp.get("id");
+    const editingId = propId || queryId;   // ✅ props 우선, 없으면 query 사용
     const editMode = useMemo(() => Boolean(editingId), [editingId]);
+
     const [saving, setSaving] = useState(false);
     const [loadingPrefill, setLoadingPrefill] = useState(false);
 
@@ -29,7 +31,6 @@ function CreateSurvey() {
     const hasValue = (v) =>
         v !== "" && v !== null && v !== undefined && String(v).trim() !== "";
 
-    // 모든 10개 입력 필수 + 에러 없음
     const requiredAll = [
         "lotAddress",
         "latitude",
@@ -49,11 +50,10 @@ function CreateSurvey() {
         return allFilled && noErrors;
     }, [formData, errors]);
 
-    // 숫자 핸들러 (정수/소수점)
+    // 숫자 핸들러
     const handleNumberChange = (e, allowDecimal = false) => {
         const { name, value } = e.target;
         const regex = allowDecimal ? /^\d*\.?\d*$/ : /^\d*$/;
-
         if (regex.test(value)) {
             setFormData((prev) => ({ ...prev, [name]: value }));
             setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -98,7 +98,7 @@ function CreateSurvey() {
         })();
     }, [editMode, editingId, navigate]);
 
-    // 전송 전 숫자 변환
+    // 숫자 변환
     const toIntOrNull = (s) => (s === "" || s == null ? null : parseInt(s, 10));
     const toFloatOrNull = (s) => (s === "" || s == null ? null : parseFloat(s));
 
@@ -144,62 +144,75 @@ function CreateSurvey() {
     };
 
     // ---------- styles ----------
-    const cardStyle = {
-        maxWidth: 780,
-        margin: "30px auto",
-        padding: "22px",
-        borderRadius: "12px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-        background: "white",
+    const formStyle = {
+        width: "100%",
+        margin: 0,
+        padding: "32px 40px",
     };
 
     const gridStyle = {
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "14px 16px",
+        gap: "20px 24px",
     };
 
     const gridStyleMobile = {
         display: "grid",
         gridTemplateColumns: "1fr",
-        gap: "12px",
+        gap: "16px",
     };
 
-    const labelStyle = { fontSize: 14, fontWeight: 600, marginBottom: 4 };
+    const sectionTitle = {
+        marginTop: 20,
+        marginBottom: 12,
+        fontSize: 17,
+        fontWeight: 700,
+        borderBottom: "2px solid #f0f0f0",
+        paddingBottom: 6,
+        color: "#333",
+    };
+
+    const labelStyle = { fontSize: 14, fontWeight: 600, marginBottom: 6 };
     const inputBase = {
         width: "100%",
-        padding: "10px 12px",
-        borderRadius: 8,
-        border: "1px solid #ccd0d5",
+        padding: "12px 14px",
+        borderRadius: 10,
+        border: "1px solid #d0d7de",
         outline: "none",
+        fontSize: 14,
     };
     const errorText = { color: "#d93025", fontSize: 12, marginTop: 4 };
-    const footerStyle = { marginTop: 18, display: "flex", justifyContent: "flex-end", gap: 10 };
+    const footerStyle = {
+        marginTop: 32,
+        display: "flex",
+        justifyContent: "flex-end",
+        gap: 12,
+    };
     const btn = (enabled, variant = "primary") => ({
-        padding: "10px 16px",
-        borderRadius: 8,
+        minWidth: 100,
+        padding: "12px 20px",
+        borderRadius: 10,
         border: "none",
         cursor: enabled ? "pointer" : "not-allowed",
-        fontWeight: 700,
+        fontWeight: 600,
+        fontSize: 15,
         background:
-            variant === "secondary" ? (enabled ? "#6c757d" : "#a6acb1") : enabled ? "#289eff" : "#bcdcff",
+            variant === "secondary"
+                ? enabled
+                    ? "#6c757d"
+                    : "#a6acb1"
+                : enabled
+                    ? "#289eff"
+                    : "#bcdcff",
         color: "white",
     });
 
-    // 반응형: 간단히 윈도우 폭 기준으로 컬럼수 전환
     const twoCols = typeof window !== "undefined" ? window.innerWidth >= 720 : true;
     const fieldWrap = twoCols ? gridStyle : gridStyleMobile;
 
     return (
-        <form onSubmit={handleSubmit} style={cardStyle}>
-            <h2 style={{ textAlign: "center", marginBottom: 6 }}>
-                {editMode ? "조사목록 수정" : "조사목록 생성"}
-            </h2>
-            <p style={{ textAlign: "center", color: "#666", marginBottom: 18 }}>
-                {loadingPrefill ? "기존 데이터를 불러오는 중…" : "모든 항목은 필수입니다."}
-            </p>
-
-            <div style={{ marginBottom: 8, fontWeight: 700, fontSize: 15 }}>위치 정보</div>
+        <form onSubmit={handleSubmit} style={formStyle}>
+            <div style={sectionTitle}>위치 정보</div>
             <div style={fieldWrap}>
                 {/* lotAddress */}
                 <div>
@@ -214,7 +227,6 @@ function CreateSurvey() {
                     />
                     {errors.lotAddress && <div style={errorText}>{errors.lotAddress}</div>}
                 </div>
-
                 {/* latitude */}
                 <div>
                     <div style={labelStyle}>위도 *</div>
@@ -228,7 +240,6 @@ function CreateSurvey() {
                     />
                     {errors.latitude && <div style={errorText}>{errors.latitude}</div>}
                 </div>
-
                 {/* longitude */}
                 <div>
                     <div style={labelStyle}>경도 *</div>
@@ -244,7 +255,7 @@ function CreateSurvey() {
                 </div>
             </div>
 
-            <div style={{ marginTop: 18, marginBottom: 8, fontWeight: 700, fontSize: 15 }}>건물 정보</div>
+            <div style={sectionTitle}>건물 정보</div>
             <div style={fieldWrap}>
                 {/* buildingName */}
                 <div>
@@ -259,7 +270,6 @@ function CreateSurvey() {
                     />
                     {errors.buildingName && <div style={errorText}>{errors.buildingName}</div>}
                 </div>
-
                 {/* mainUseName */}
                 <div>
                     <div style={labelStyle}>주용도 *</div>
@@ -273,7 +283,6 @@ function CreateSurvey() {
                     />
                     {errors.mainUseName && <div style={errorText}>{errors.mainUseName}</div>}
                 </div>
-
                 {/* structureName */}
                 <div>
                     <div style={labelStyle}>구조명 *</div>
@@ -287,7 +296,6 @@ function CreateSurvey() {
                     />
                     {errors.structureName && <div style={errorText}>{errors.structureName}</div>}
                 </div>
-
                 {/* groundFloors */}
                 <div>
                     <div style={labelStyle}>지상층수 *</div>
@@ -301,7 +309,6 @@ function CreateSurvey() {
                     />
                     {errors.groundFloors && <div style={errorText}>{errors.groundFloors}</div>}
                 </div>
-
                 {/* basementFloors */}
                 <div>
                     <div style={labelStyle}>지하층수 *</div>
@@ -317,7 +324,7 @@ function CreateSurvey() {
                 </div>
             </div>
 
-            <div style={{ marginTop: 18, marginBottom: 8, fontWeight: 700, fontSize: 15 }}>면적 정보</div>
+            <div style={sectionTitle}>면적 정보</div>
             <div style={fieldWrap}>
                 {/* landArea */}
                 <div>
@@ -332,7 +339,6 @@ function CreateSurvey() {
                     />
                     {errors.landArea && <div style={errorText}>{errors.landArea}</div>}
                 </div>
-
                 {/* buildingArea */}
                 <div>
                     <div style={labelStyle}>건축면적(㎡) *</div>
@@ -356,8 +362,12 @@ function CreateSurvey() {
                 >
                     취소
                 </button>
-                <button type="submit" style={btn(isFormValid && !saving)} disabled={!isFormValid || saving}>
-                    {saving ? (editMode ? "수정 중…" : "저장 중…") : (editMode ? "수정 저장" : "저장")}
+                <button
+                    type="submit"
+                    style={btn(isFormValid && !saving)}
+                    disabled={!isFormValid || saving}
+                >
+                    {saving ? (editMode ? "수정 중…" : "저장 중…") : editMode ? "수정 저장" : "저장"}
                 </button>
             </div>
         </form>

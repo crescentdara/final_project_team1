@@ -1,7 +1,7 @@
 // src/pages/PendingApprovals.jsx
 import { useEffect, useState } from "react";
-import SurveyResultModal from "../components/modals/SurveyResultModal.jsx";
 import Pagination from "../components/ui/Pagination.jsx";
+import SurveyResultPanel from "../components/modals/SurveyResultPanel.jsx";
 
 /** 상태 배지 */
 function StatusBadge({ status }) {
@@ -17,11 +17,16 @@ function StatusBadge({ status }) {
 
 function ApprovalFilters({ keyword, setKeyword, sort, setSort, onSearch }) {
     return (
-        <div className="d-flex flex-wrap gap-2 align-items-center mb-3">
-            <h3 className="m-0 me-auto">결재 대기 중</h3>
+        <div className="d-flex flex-wrap gap-2 mb-3 align-items-center">
+            <h3
+                className="fw-bold m-0 d-flex align-items-center"
+                style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
+            >
+                결재 대기 중
+            </h3>
 
             <select
-                className="form-select"
+                className="form-select ms-auto"
                 style={{ maxWidth: 160 }}
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
@@ -48,7 +53,11 @@ function ApprovalFilters({ keyword, setKeyword, sort, setSort, onSearch }) {
 
 function ApprovalItem({ item, onOpenResult }) {
     return (
-        <div className="border rounded-4 p-3 d-flex align-items-center justify-content-between mb-3">
+        <div
+            className="border rounded-4 p-3 d-flex align-items-center justify-content-between mb-3 bg-white shadow-sm"
+            style={{ cursor: "pointer", transition: "all 0.2s" }}
+            onClick={() => onOpenResult(item.id)}
+        >
             <div>
                 <div className="fw-semibold">
                     {item.caseNo} · {item.investigator} · {item.address}
@@ -59,18 +68,9 @@ function ApprovalItem({ item, onOpenResult }) {
                     <span>우선순위 {item.priority}</span>
                     <span>·</span>
                     <span>
-            상태 <StatusBadge status={item.status} />
-          </span>
+                        상태 <StatusBadge status={item.status} />
+                    </span>
                 </div>
-            </div>
-
-            <div className="d-flex gap-2">
-                <button
-                    className="btn btn-outline-secondary"
-                    onClick={() => onOpenResult(item.id)}
-                >
-                    조사 결과
-                </button>
             </div>
         </div>
     );
@@ -80,7 +80,10 @@ function SkeletonList({ rows = 5 }) {
     return (
         <>
             {Array.from({ length: rows }).map((_, i) => (
-                <div key={i} className="border rounded-4 p-3 mb-3 placeholder-glow">
+                <div
+                    key={i}
+                    className="border rounded-4 p-3 mb-3 placeholder-glow bg-white shadow-sm"
+                >
                     <span className="placeholder col-7 me-2" />
                     <span className="placeholder col-3" />
                     <div className="mt-2">
@@ -107,9 +110,9 @@ export default function PendingApprovals() {
     const [total, setTotal] = useState(0);
     const pageSize = 10;
 
-    // 모달
-    const [modalOpen, setModalOpen] = useState(false);
-    const [modalItem, setModalItem] = useState(null);
+    // 패널
+    const [selectedId, setSelectedId] = useState(null);
+    const [detailItem, setDetailItem] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
     const [detailError, setDetailError] = useState(null);
 
@@ -165,7 +168,7 @@ export default function PendingApprovals() {
 
             alert("결재가 승인되었습니다.");
             updateStatusLocal([id], "APPROVED");
-            setModalOpen(false);
+            setSelectedId(null);
         } catch (e) {
             console.error(e);
             alert("승인 중 오류 발생");
@@ -184,19 +187,22 @@ export default function PendingApprovals() {
 
             alert("결재가 반려되었습니다.");
             updateStatusLocal([id], "REJECTED");
-            setModalOpen(false);
+            setSelectedId(null);
         } catch (e) {
             console.error(e);
             alert("반려 중 오류 발생");
         }
     };
 
-    /** 상세 모달 열기 */
+    /** 상세 패널 열기 (토글 지원) */
     const openResult = async (id) => {
-        setModalOpen(true);
+        setSelectedId((prev) => (prev === id ? null : id));
+
+        if (selectedId === id) return; // 같은 항목 재클릭 → 닫기
+
         setDetailLoading(true);
         setDetailError(null);
-        setModalItem(null);
+        setDetailItem(null);
 
         try {
             const res = await fetch(`/web/api/approvals/${id}`, {
@@ -204,7 +210,7 @@ export default function PendingApprovals() {
             });
             if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
             const detail = await res.json();
-            setModalItem(detail);
+            setDetailItem(detail);
         } catch (e) {
             console.error(e);
             setDetailError(e.message);
@@ -219,50 +225,61 @@ export default function PendingApprovals() {
     };
 
     return (
-        <div className="container py-4">
-            <ApprovalFilters
-                keyword={keyword}
-                setKeyword={setKeyword}
-                sort={sort}
-                setSort={setSort}
-                onSearch={onSearch}
-            />
+        <div
+            className="container-fluid py-4"
+            style={{ display: "flex", gap: "20px", alignItems: "stretch" }}
+        >
+            {/* 왼쪽: 리스트 카드 */}
+            <div
+                className="p-4 shadow-sm rounded-3 bg-white"
+                style={{
+                    flex: selectedId ? "0 0 60%" : "1 1 100%",
+                    transition: "flex-basis 0.3s ease",
+                }}
+            >
+                <ApprovalFilters
+                    keyword={keyword}
+                    setKeyword={setKeyword}
+                    sort={sort}
+                    setSort={setSort}
+                    onSearch={onSearch}
+                />
 
-            {/* 리스트 */}
-            {loading ? (
-                <SkeletonList rows={5} />
-            ) : items.length === 0 ? (
-                <div className="text-center text-muted py-5 border rounded-4">
-                    표시할 결재 문서가 없습니다.
-                </div>
-            ) : (
-                items.map((it) => (
-                    <ApprovalItem key={it.id} item={it} onOpenResult={openResult} />
-                ))
-            )}
+                {loading ? (
+                    <SkeletonList rows={5} />
+                ) : items.length === 0 ? (
+                    <div className="text-center text-muted py-5 border rounded-4 bg-light">
+                        표시할 결재 문서가 없습니다.
+                    </div>
+                ) : (
+                    items.map((it) => (
+                        <ApprovalItem key={it.id} item={it} onOpenResult={openResult} />
+                    ))
+                )}
 
-            {/* 페이지네이션 */}
-            <Pagination
-                page={page}
-                total={total}
-                pageSize={pageSize}
-                size={pageSize}
-                onChange={setPage}
-                siblings={1}
-                boundaries={1}
-                className="justify-content-center"
-                lastAsLabel={false}
-            />
+                <Pagination
+                    page={page}
+                    total={total}
+                    pageSize={pageSize}
+                    size={pageSize}
+                    onChange={setPage}
+                    siblings={1}
+                    boundaries={1}
+                    className="justify-content-center mt-3"
+                    lastAsLabel={false}
+                />
+            </div>
 
-            {/* 조사 결과 모달 */}
-            <SurveyResultModal
-                open={modalOpen}
-                item={modalItem}
+            {/* 오른쪽: 상세 패널 */}
+            <SurveyResultPanel
+                id={selectedId}
+                item={detailItem}
                 loading={detailLoading}
                 error={detailError}
-                onClose={() => setModalOpen(false)}
+                onClose={() => setSelectedId(null)}
                 onApprove={approveOne}
                 onReject={rejectOne}
+                open={Boolean(selectedId)}
             />
         </div>
     );

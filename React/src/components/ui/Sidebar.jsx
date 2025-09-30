@@ -24,13 +24,17 @@ export default function Sidebar(){
                 <Item to="/" label="Dashboard"/>
                 <Item to="/surveyList" label="미배정 조사지 목록"/>
                 <Item to="/surveyIndex" label="전체 조사지 리스트"/>
-                <Item to="/createSurvey" label="조사지 생성"/>
+
+                {/*<Item to="/createSurvey" label="조사지 생성"/>*/}
+                {/*<Item to="/buildingUpload" label="다건 등록"/>*/}
+                <Item to="/surveyRegister" label="조사지 등록" />
+
                 <Item to="/createUser" label="조사원 생성"/>
                 <Item to="/users" label="조사원 상세정보"/>
                 <Item to="/approvals" label="결재 대기"/>
                 <Item to="/resultReport" label="결재 완료"/>
                 <Item to="/approverAssignment" label="결재자 배정"/>
-                <Item to="/buildingUpload" label="다건 등록"/>
+
                 <Item to="/messageTabs" label="메시지 전송"/>
                 <div className="nav-sep" />
                 <Item to="/login" label="로그인"/>

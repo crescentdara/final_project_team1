@@ -37,6 +37,8 @@ class DataTransmissionActivity : BaseActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyStateLayout: LinearLayout
     private lateinit var adapter: NotTransmittedListAdapter
+
+    private lateinit var tvTotalCount: TextView
     private val allDataList    = mutableListOf<SurveyListItemDto>()
     private val sortedDataList = mutableListOf<SurveyListItemDto>()
 
@@ -72,6 +74,7 @@ class DataTransmissionActivity : BaseActivity() {
         spinnerSort = findViewById(R.id.spinnerSort)
         recyclerView = findViewById(R.id.recyclerNotTransmittedList)
         emptyStateLayout = findViewById(R.id.emptyStateLayout)
+        tvTotalCount = findViewById(R.id.tvTotalCount)
         findViewById<FloatingActionButton>(R.id.fabBack)?.setOnClickListener {
             navigateHomeOrFinish()
         }
@@ -157,8 +160,18 @@ class DataTransmissionActivity : BaseActivity() {
     }
 
 
-    /** UI 갱신 */
+    // ✅ 정렬/필터 결과에 따라 현재 보이는 목록 개수를 표시
+    private fun updateCount() {
+        // 정렬 결과 리스트 기준으로 표기 (필터/정렬 반영)
+        tvTotalCount.text = "총 ${sortedDataList.size}건"
+        // 만약 서버 totalElements를 쓰고 싶으면 아래처럼:
+        // tvTotalCount.text = "총 ${allDataList.size}건"
+    }
+
     private fun updateUI() {
+        // ✅ 먼저 카운트 갱신
+        updateCount()
+
         if (sortedDataList.isEmpty()) {
             recyclerView.visibility = View.GONE
             emptyStateLayout.visibility = View.VISIBLE

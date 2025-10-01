@@ -34,6 +34,18 @@ const codeText = {
     floor: (v) => ({ 1: "양호", 2: "보통", 3: "불량" }[v] ?? "-"),
 };
 
+
+// ✅ 서버 베이스 URL
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+
+// ✅ 상대 경로를 절대 URL로 보정
+const toImageUrl = (v) => {
+    if (!v) return null;
+    if (/^https?:\/\//i.test(v)) return v; // 이미 절대경로
+    if (v.startsWith("/")) return API_BASE + v; // "/upload/..." 형태
+    return `${API_BASE}/upload/${v}`; // "파일명"만 온 경우
+};
+
 export default function SurveyResultPanel({
                                               id,
                                               item,
@@ -123,6 +135,40 @@ export default function SurveyResultPanel({
                         </tbody>
                     </table>
 
+                    {/*/!* 사진 미리보기 *!/*/}
+                    {/*<div className="row g-3">*/}
+                    {/*    {[*/}
+                    {/*        { key: "extPhoto", title: "외부 사진" },*/}
+                    {/*        { key: "extEditPhoto", title: "외부 편집" },*/}
+                    {/*        { key: "intPhoto", title: "내부 사진" },*/}
+                    {/*        { key: "intEditPhoto", title: "내부 편집" },*/}
+                    {/*    ].map(({ key, title }) => (*/}
+                    {/*        <div className="col-md-6" key={key}>*/}
+                    {/*            <div className="border rounded p-2 h-100">*/}
+                    {/*                <div className="small text-muted mb-2">{title}</div>*/}
+                    {/*                {item[key] ? (*/}
+                    {/*                    <img*/}
+                    {/*                        src={item[key]}*/}
+                    {/*                        alt={title}*/}
+                    {/*                        className="img-fluid rounded"*/}
+                    {/*                        style={{*/}
+                    {/*                            objectFit: "cover",*/}
+                    {/*                            width: "100%",*/}
+                    {/*                            height: 200,*/}
+                    {/*                        }}*/}
+                    {/*                        onError={(e) => {*/}
+                    {/*                            e.currentTarget.style.opacity = 0.4;*/}
+                    {/*                            e.currentTarget.alt = "이미지 없음";*/}
+                    {/*                        }}*/}
+                    {/*                    />*/}
+                    {/*                ) : (*/}
+                    {/*                    <div className="text-muted small">이미지 없음</div>*/}
+                    {/*                )}*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*    ))}*/}
+                    {/*</div>*/}
+
                     {/* 사진 미리보기 */}
                     <div className="row g-3">
                         {[
@@ -130,31 +176,31 @@ export default function SurveyResultPanel({
                             { key: "extEditPhoto", title: "외부 편집" },
                             { key: "intPhoto", title: "내부 사진" },
                             { key: "intEditPhoto", title: "내부 편집" },
-                        ].map(({ key, title }) => (
-                            <div className="col-md-6" key={key}>
-                                <div className="border rounded p-2 h-100">
-                                    <div className="small text-muted mb-2">{title}</div>
-                                    {item[key] ? (
-                                        <img
-                                            src={item[key]}
-                                            alt={title}
-                                            className="img-fluid rounded"
-                                            style={{
-                                                objectFit: "cover",
-                                                width: "100%",
-                                                height: 200,
-                                            }}
-                                            onError={(e) => {
-                                                e.currentTarget.style.opacity = 0.4;
-                                                e.currentTarget.alt = "이미지 없음";
-                                            }}
-                                        />
-                                    ) : (
-                                        <div className="text-muted small">이미지 없음</div>
-                                    )}
+                        ].map(({ key, title }) => {
+                            const url = toImageUrl(item?.[key]);
+                            return (
+                                <div className="col-md-3" key={key}>
+                                    <div className="border rounded p-2 h-100">
+                                        <div className="small text-muted mb-2">{title}</div>
+                                        {url ? (
+                                            <img
+                                                src={url}
+                                                alt={title}
+                                                className="img-fluid rounded"
+                                                style={{ objectFit: "cover", width: "100%", height: 180 }}
+                                                onError={(e) => {
+                                                    e.currentTarget.style.opacity = 0.4;
+                                                    e.currentTarget.alt = "이미지 없음";
+                                                    e.currentTarget.removeAttribute("src");
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="text-muted small">이미지 없음</div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* 버튼 */}

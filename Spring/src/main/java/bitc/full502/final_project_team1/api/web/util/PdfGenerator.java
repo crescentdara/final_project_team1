@@ -45,7 +45,7 @@ public class PdfGenerator {
 
             // ✅ 한글 폰트
             BaseFont bfKorean = BaseFont.createFont("c:/windows/fonts/malgun.ttf",
-                BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                    BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font coverTitleFont = new Font(bfKorean, 24, Font.BOLD, Color.BLACK);
             Font coverSubFont   = new Font(bfKorean, 14, Font.NORMAL, Color.DARK_GRAY);
             Font infoFont       = new Font(bfKorean, 12, Font.NORMAL, Color.BLACK);
@@ -55,19 +55,19 @@ public class PdfGenerator {
 
             // ------------------ 1. 표지 ------------------
             ColumnText.showTextAligned(
-                cb, Element.ALIGN_CENTER,
-                new Phrase("건축물 현장조사 보고서", coverTitleFont),
-                document.getPageSize().getWidth() / 2,
-                document.getPageSize().getHeight() / 2 + 60,
-                0
+                    cb, Element.ALIGN_CENTER,
+                    new Phrase("건축물 현장조사 보고서", coverTitleFont),
+                    document.getPageSize().getWidth() / 2,
+                    document.getPageSize().getHeight() / 2 + 60,
+                    0
             );
 
             ColumnText.showTextAligned(
-                cb, Element.ALIGN_CENTER,
-                new Phrase("사례 번호: M-" + detail.getId(), coverSubFont),
-                document.getPageSize().getWidth() / 2,
-                document.getPageSize().getHeight() / 2 + 30,
-                0
+                    cb, Element.ALIGN_CENTER,
+                    new Phrase("사례 번호: M-" + detail.getId(), coverSubFont),
+                    document.getPageSize().getWidth() / 2,
+                    document.getPageSize().getHeight() / 2 + 30,
+                    0
             );
 
             Paragraph footerPara = new Paragraph();
@@ -75,17 +75,17 @@ public class PdfGenerator {
             footerPara.add(new Phrase("조사자: " + detail.getInvestigator(), infoFont));
             footerPara.add(Chunk.NEWLINE);
             footerPara.add(new Phrase("결재자: " + approver.getName() +
-                " (" + approver.getUsername() + ")", infoFont));
+                    " (" + approver.getUsername() + ")", infoFont));
             footerPara.add(Chunk.NEWLINE);
             footerPara.add(new Phrase("승인일시: " +
-                DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now()), infoFont));
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now()), infoFont));
 
             ColumnText ct = new ColumnText(cb);
             ct.setSimpleColumn(
-                document.getPageSize().getWidth() / 2 - 200,
-                document.getPageSize().getHeight() / 2 - 80,
-                document.getPageSize().getWidth() / 2 + 200,
-                document.getPageSize().getHeight() / 2 - 10
+                    document.getPageSize().getWidth() / 2 - 200,
+                    document.getPageSize().getHeight() / 2 - 80,
+                    document.getPageSize().getWidth() / 2 + 200,
+                    document.getPageSize().getHeight() / 2 - 10
             );
             ct.addElement(footerPara);
             ct.go();
@@ -102,7 +102,7 @@ public class PdfGenerator {
             addGrayRow(table, "주소", detail.getAddress(), bfKorean);
             addGrayRow(table, "결재자", approver.getName() + "(" + approver.getUsername() + ")", bfKorean);
             addGrayRow(table, "승인일시",
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), bfKorean);
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), bfKorean);
 
             addGrayRow(table, "조사 가능 여부", mapPossible(detail.getPossible()), bfKorean);
             addGrayRow(table, "행정 목적 활용", mapAdminUse(detail.getAdminUse()), bfKorean);
@@ -129,9 +129,9 @@ public class PdfGenerator {
             if (detail.getLatitude() != null && detail.getLongitude() != null) {
                 try {
                     String mapUrl = String.format(
-                        "https://static-maps.yandex.ru/1.x/?ll=%f,%f&z=16&size=600,400&l=map&pt=%f,%f,pm2rdm",
-                        detail.getLongitude(), detail.getLatitude(),
-                        detail.getLongitude(), detail.getLatitude()
+                            "https://static-maps.yandex.ru/1.x/?ll=%f,%f&z=16&size=600,400&l=map&pt=%f,%f,pm2rdm",
+                            detail.getLongitude(), detail.getLatitude(),
+                            detail.getLongitude(), detail.getLatitude()
                     );
 
                     Image mapImg = Image.getInstance(new URL(mapUrl));
@@ -148,7 +148,8 @@ public class PdfGenerator {
             }
 
             document.close();
-            return filePath.toString();
+//            return filePath.toString();
+            return fileName;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -169,7 +170,7 @@ public class PdfGenerator {
         keyCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
         PdfPCell valCell = new PdfPCell(new Phrase(
-            (value == null || value.isBlank()) ? "-" : value, valFont));
+                (value == null || value.isBlank()) ? "-" : value, valFont));
         valCell.setBackgroundColor(Color.WHITE);
         valCell.setPadding(10);
 
@@ -193,10 +194,10 @@ public class PdfGenerator {
 
         // 요청 명칭 고정: 외부 사진, 외부 사진 수정, 내부 사진, 내부 사진 수정
         String[][] items = new String[][]{
-            {"외부 사진",      d.getExtPhoto()},
-            {"외부 사진 수정", d.getExtEditPhoto()},
-            {"내부 사진",      d.getIntPhoto()},
-            {"내부 사진 수정", d.getIntEditPhoto()}
+                {"외부 사진",      d.getExtPhoto()},
+                {"외부 사진 수정", d.getExtEditPhoto()},
+                {"내부 사진",      d.getIntPhoto()},
+                {"내부 사진 수정", d.getIntEditPhoto()}
         };
 
         PdfPTable table = new PdfPTable(4);

@@ -4,6 +4,8 @@ import bitc.full502.final_project_team1.api.web.dto.ReportListDto;
 import bitc.full502.final_project_team1.core.domain.entity.ReportEntity;
 import bitc.full502.final_project_team1.core.service.ReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.*;
@@ -13,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,6 +26,9 @@ import java.util.List;
 public class ReportController {
 
     private final ReportService reportService;
+
+    @Value("${file.report-dir}")
+    private String reportDir;
 
     /** 📌 전체/검색 보고서 조회 */
     @GetMapping
@@ -79,7 +86,11 @@ public class ReportController {
         var report = reportService.getReportById(id)
                 .orElseThrow(() -> new IllegalArgumentException("보고서를 찾을 수 없습니다. id=" + id));
 
-        File file = new File(report.getPdfPath());
+//        File file = new File(report.getPdfPath());
+
+        Path filePath = Paths.get(reportDir, report.getPdfPath());
+        File file = filePath.toFile();
+
         if (!file.exists()) {
             return ResponseEntity.notFound().build();
         }

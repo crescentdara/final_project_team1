@@ -32,10 +32,9 @@ public class DashboardServiceImpl implements DashboardService {
         // 3) survey_result 기준 상태별 카운트
         long waiting   = surveyResultRepo.countByStatus("SENT");      // 결재 대기
         long approved  = surveyResultRepo.countByStatus("APPROVED");  // 결재 완료
-        long rejected  = surveyResultRepo.countByStatus("REJECTED");  // 반려
 
         // 4) 조사 진행 중 = 배정 - (SENT + APPROVED + REJECTED)
-        long inProgress = assigned - (waiting + approved + rejected);
+        long inProgress = assigned - (waiting + approved);
 
         // 5) 진행률 = 결재 완료 / 배정
         double progressRate = 0.0;

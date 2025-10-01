@@ -42,6 +42,16 @@ class MainActivity : BaseActivity() {
     private var camOutputUri: Uri? = null
     private var camOutputFile: File? = null
 
+    private lateinit var tvProgress: TextView
+    private lateinit var tvTotalCount: TextView
+    private lateinit var tvTodayCount: TextView
+    private lateinit var tvBarInProgress: TextView
+    private lateinit var tvBarWaiting: TextView
+    private lateinit var tvBarApproved: TextView
+    private lateinit var barInProgress: View
+    private lateinit var barWaiting: View
+    private lateinit var barApproved: View
+
     // 풀해상도 저장용 카메라 실행 런처
     private val takePicture = registerForActivityResult(
         ActivityResultContracts.TakePicture()
@@ -121,7 +131,6 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 로그인 체크
         if (!AuthManager.isLoggedIn(this) || AuthManager.isExpired(this)) {
             gotoLoginAndFinish()
             return
@@ -130,100 +139,93 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.activity_main)
         initHeader(title = "부동산 실태조사")
 
-        // 조사예정
+        // 버튼 이동 (기존 그대로)
         findViewById<View>(R.id.btnSurveyList)?.setOnClickListener {
             startActivity(Intent(this, SurveyListActivity::class.java))
         }
-
-// 재조사
         findViewById<View>(R.id.btnReinspectShortcut)?.setOnClickListener {
             startActivity(Intent(this, ReinspectListActivity::class.java))
         }
-
-// 미전송
         findViewById<View>(R.id.btnNotTransmittedShortcut)?.setOnClickListener {
             startActivity(Intent(this, DataTransmissionActivity::class.java))
         }
 
-
-        // ✅ 사용자 이름 + 사번 표시
-        // 사용자 정보
+        // 사용자 정보 표시
         val userName = AuthManager.name(this) ?: "조사원"
         val empNo = AuthManager.empNo(this) ?: "-"
+        findViewById<TextView>(R.id.tvUserName).text = "${userName} 님"
+        findViewById<TextView>(R.id.tvEmpNo).text = "사번 : $empNo"
 
-        val tvUserName = findViewById<TextView>(R.id.tvUserName)
-        val tvEmpNo = findViewById<TextView>(R.id.tvEmpNo)
-        val tvProgress = findViewById<TextView>(R.id.tvProgress)
-        val tvTotalCount = findViewById<TextView>(R.id.tvTotalCount)
-        val tvTodayCount = findViewById<TextView>(R.id.tvTodayCount)
+        // ⬇️ 통계 뷰 바인딩 (멤버 변수에 담음)
+        tvProgress      = findViewById(R.id.tvProgress)
+        tvTotalCount    = findViewById(R.id.tvTotalCount)
+        tvTodayCount    = findViewById(R.id.tvTodayCount)
+        tvBarInProgress = findViewById(R.id.tvInProgressCount)
+        tvBarWaiting    = findViewById(R.id.tvWaitingCount)
+        tvBarApproved   = findViewById(R.id.tvApprovedCount)
+        barInProgress   = findViewById(R.id.barInProgress)
+        barWaiting      = findViewById(R.id.barWaiting)
+        barApproved     = findViewById(R.id.barApproved)
 
-        // 조사 현황 뷰 (캡슐 그래프 + 숫자)
-        val barInProgress = findViewById<View>(R.id.barInProgress)
-        val barWaiting = findViewById<View>(R.id.barWaiting)
-        val barApproved = findViewById<View>(R.id.barApproved)
+        // 첫 진입 시 로드
+        loadDashboardStats()
 
-        // 배경 캡슐 (고정 높이) → 필요시 애니메이션/효과용으로 접근 가능
-        val barInProgressBg = findViewById<View>(R.id.barInProgressBg)
-        val barWaitingBg = findViewById<View>(R.id.barWaitingBg)
-        val barApprovedBg = findViewById<View>(R.id.barApprovedBg)
+        // 자세히 보기
+        findViewById<TextView>(R.id.tvDetail)?.setOnClickListener {
+            startActivity(Intent(this, TransmissionCompleteActivity::class.java))
+        }
 
-        val tvBarInProgress = findViewById<TextView>(R.id.tvInProgressCount)
-        val tvBarWaiting = findViewById<TextView>(R.id.tvWaitingCount)
-        val tvBarApproved = findViewById<TextView>(R.id.tvApprovedCount)
+        Toast.makeText(this, "${userName}님, 환영합니다!", Toast.LENGTH_SHORT).show()
+    }
 
-        tvUserName.text = "${userName} 님"
-        tvEmpNo.text = "사번 : $empNo"
-
+    private fun loadDashboardStats() {
         val userId = AuthManager.userId(this) ?: -1L
-        val token = AuthManager.token(this) ?: ""
+        val token  = AuthManager.token(this) ?: ""
+        if (userId <= 0L || token.isBlank()) return
 
-        // 대시보드 데이터 불러오기
         lifecycleScope.launch {
             try {
-                val stats: DashboardStatsResponse = ApiClient.service.getDashboardStats(
-                    userId, token
-                )
+                val stats: DashboardStatsResponse =
+                    ApiClient.service.getDashboardStats(userId, token)
 
-                // 활동 현황
-                tvProgress.text = "${stats.progressRate}%"
-                tvTotalCount.text = stats.total.toString()
-                tvTodayCount.text = stats.todayComplete.toString()
-
-                // 조사 현황 값 반영
+                // 숫자 갱신
+                tvProgress.text      = "${stats.progressRate}%"
+                tvTotalCount.text    = stats.total.toString()
+                tvTodayCount.text    = stats.todayComplete.toString()
                 tvBarInProgress.text = "${stats.inProgress}건"
-                tvBarWaiting.text = "${stats.waitingApproval}건"
-                tvBarApproved.text = "${stats.approved}건"
+                tvBarWaiting.text    = "${stats.waitingApproval}건"
+                tvBarApproved.text   = "${stats.approved}건"
 
-                // 막대 비율 적용 (최대값 대비 비율)
-                val maxValue = maxOf(stats.inProgress, stats.waitingApproval, stats.approved, 1)
-                val maxHeightPx = resources.getDimensionPixelSize(
-                    R.dimen.dashboard_bar_max_height
-                ) // 예: 100dp 정의
+                // 막대 높이 갱신
+                val maxValue   = maxOf(stats.inProgress, stats.waitingApproval, stats.approved, 1)
+                val maxHeight  = resources.getDimensionPixelSize(R.dimen.dashboard_bar_max_height)
 
                 fun setBarHeight(bar: View, value: Long) {
                     val ratio = if (maxValue > 0) value.toFloat() / maxValue else 0f
-                    val params = bar.layoutParams
-                    params.height = (maxHeightPx * ratio).toInt()
-                    bar.layoutParams = params
+                    val lp = bar.layoutParams
+                    lp.height = (maxHeight * ratio).toInt().coerceAtLeast(1)
+                    bar.layoutParams = lp
                 }
 
                 setBarHeight(barInProgress, stats.inProgress)
-                setBarHeight(barWaiting, stats.waitingApproval)
-                setBarHeight(barApproved, stats.approved)
+                setBarHeight(barWaiting,   stats.waitingApproval)
+                setBarHeight(barApproved,  stats.approved)
 
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(this@MainActivity, "대시보드 데이터 불러오기 실패", Toast.LENGTH_SHORT).show()
             }
         }
+    }
 
-        // 자세히 보기 클릭 -> 조사 내역 조회 페이지 이동
-        findViewById<TextView>(R.id.tvDetail)?.setOnClickListener {
-            startActivity(Intent(this, TransmissionCompleteActivity::class.java))
-        }
+    override fun onResume() {
+        super.onResume()
+        loadDashboardStats()   // ✅ 항상 갱신
+    }
 
-        // 환영 메시지
-        Toast.makeText(this, "${userName}님, 환영합니다!", Toast.LENGTH_SHORT).show()
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        loadDashboardStats()   // ✅ singleTop/clearTop로 재진입 시 갱신
     }
 
 

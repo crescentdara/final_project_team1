@@ -68,7 +68,7 @@ function BuildingUpload() {
             <div style={sectionTitle}>
                 엑셀 업로드로 건물 등록
                 <a
-                    href="/template/building_upload_template.xlsx"
+                    href="/template/excel_template.xlsx"
                     download
                     style={{
                         marginLeft: "10px",

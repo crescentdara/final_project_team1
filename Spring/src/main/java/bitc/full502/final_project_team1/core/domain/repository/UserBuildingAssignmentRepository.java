@@ -87,6 +87,26 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
     Long   getApprovalId();
   }
 
+//  @Query(value = """
+//      SELECT
+//        b.id                         AS id,
+//        b.lot_address                AS lotAddress,
+//        b.road_address               AS roadAddress,
+//        b.building_name              AS buildingName,
+//        uba.user_id                  AS assignedUserId,
+//        COALESCE(u.name, u.username) AS assignedName,
+//        u.username                   AS assignedUsername,
+//        uba.approval_id              AS approvalId
+//      FROM user_building_assignment uba
+//      JOIN building b          ON b.id = uba.building_id
+//      LEFT JOIN user_account u ON u.user_id = uba.user_id
+//      WHERE uba.user_id IS NOT NULL
+//        AND uba.approval_id IS NULL
+//        AND (:emd IS NULL OR b.lot_address LIKE CONCAT('%', :emd, '%'))
+//      ORDER BY b.id DESC
+//      """, nativeQuery = true)
+//  List<PendingApprovalRow> findAssignedWithoutApprover(@Param("emd") String eupMyeonDong);
+
   @Query(value = """
       SELECT
         b.id                         AS id,
@@ -100,12 +120,15 @@ public interface UserBuildingAssignmentRepository extends JpaRepository<UserBuil
       FROM user_building_assignment uba
       JOIN building b          ON b.id = uba.building_id
       LEFT JOIN user_account u ON u.user_id = uba.user_id
+      LEFT JOIN survey_result sr ON sr.building_id = b.id AND sr.user_id = uba.user_id
       WHERE uba.user_id IS NOT NULL
         AND uba.approval_id IS NULL
         AND (:emd IS NULL OR b.lot_address LIKE CONCAT('%', :emd, '%'))
+        AND (sr.status IS NULL OR sr.status <> 'APPROVED')
       ORDER BY b.id DESC
       """, nativeQuery = true)
   List<PendingApprovalRow> findAssignedWithoutApprover(@Param("emd") String eupMyeonDong);
+
 
   /** 네이티브: building_id 기준 일괄 삭제 */
   @Modifying(clearAutomatically = true, flushAutomatically = true)

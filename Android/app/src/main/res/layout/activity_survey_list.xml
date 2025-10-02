@@ -10,7 +10,8 @@
     <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="65dp"
+            android:paddingTop="5dp"
             android:background="@drawable/toolbar_background"
             app:menu="@menu/menu_main"
             app:theme="@style/ThemeOverlay.MyToolbar"

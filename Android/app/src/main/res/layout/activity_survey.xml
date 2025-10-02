@@ -8,14 +8,14 @@
     <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="65dp"
+            android:paddingTop="5dp"
             android:layout_gravity="top"
             android:background="@drawable/toolbar_background"
             app:title="조사결과 입력"
             app:titleTextColor="@android:color/white"
             app:menu="@menu/menu_main"
-            app:theme="@style/ThemeOverlay.MyToolbar"
-            app:navigationIcon="@drawable/ic_arrow_back" />
+            app:theme="@style/ThemeOverlay.MyToolbar" />
 
 
     <!-- 본문: 박스(카드)들이 들어가는 영역 -->

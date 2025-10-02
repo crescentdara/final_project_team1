@@ -10,7 +10,8 @@
     <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="65dp"
+            android:paddingTop="5dp"
             android:background="@drawable/toolbar_background"
             app:menu="@menu/menu_main"
             app:theme="@style/ThemeOverlay.MyToolbar"
@@ -41,12 +42,14 @@
                     android:id="@+id/cardSurveyor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginBottom="16dp"
                     android:backgroundTint="@android:color/white"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="6dp"
                     app:strokeColor="#E8E8E8"
                     app:strokeWidth="1dp">
+
+
 
                 <LinearLayout
                         android:layout_width="match_parent"
@@ -54,16 +57,15 @@
                         android:orientation="vertical"
                         android:padding="20dp">
 
-                    <!-- 상단 제목 -->
                     <TextView
-                            android:id="@+id/tvCardTitle"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="활동현황"
+                            android:layout_marginBottom="10dp"
                             android:textColor="@color/text_primary"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="16dp" />
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
 
                     <!-- 조사원 정보 -->
                     <LinearLayout
@@ -99,7 +101,7 @@
                                     android:layout_height="wrap_content"
                                     android:text="조사원 이름"
                                     android:textColor="@color/text_primary"
-                                    android:textSize="18sp"
+                                    android:textSize="17sp"
                                     android:textStyle="bold" />
 
                             <TextView
@@ -109,7 +111,8 @@
                                     android:layout_marginTop="4dp"
                                     android:text="사번 : -"
                                     android:textColor="@color/text_secondary"
-                                    android:textSize="14sp" />
+                                    android:textSize="12sp" />
+
                         </LinearLayout>
                     </LinearLayout>
 
@@ -210,9 +213,8 @@
                     android:id="@+id/shortcutGrid"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="30dp"
+                    android:layout_marginBottom="16dp"
                     app:columnCount="2"
-                    app:useDefaultMargins="true"
                     app:alignmentMode="alignMargins"
                     android:clipToPadding="false"
                     android:clipChildren="false">
@@ -221,13 +223,13 @@
                 <com.google.android.material.card.MaterialCardView
                         android:id="@+id/btnSurveyList"
                         android:layout_width="0dp"
-                        android:layout_height="160dp"
+                        android:layout_height="100dp"
                         app:layout_column="0"
                         app:layout_row="0"
                         app:layout_columnWeight="1"
                         app:cardBackgroundColor="#CBDCFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="0dp"
                         app:cardUseCompatPadding="true"
                         android:clickable="true"
                         android:focusable="true"
@@ -238,7 +240,7 @@
                             android:layout_height="match_parent"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:padding="16dp">
+                            android:padding="0dp">
 
 
 
@@ -262,13 +264,13 @@
                 <com.google.android.material.card.MaterialCardView
                         android:id="@+id/btnMainCamera"
                         android:layout_width="0dp"
-                        android:layout_height="160dp"
+                        android:layout_height="100dp"
                         app:layout_column="1"
                         app:layout_row="0"
                         app:layout_columnWeight="1"
                         app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="0dp"
                         app:cardUseCompatPadding="true"
                         android:clickable="true"
                         android:focusable="true"
@@ -280,7 +282,7 @@
                             android:layout_height="match_parent"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:padding="16dp">
+                            android:padding="0dp">
 
                         <TextView
                                 android:layout_width="wrap_content"
@@ -303,13 +305,13 @@
                 <com.google.android.material.card.MaterialCardView
                         android:id="@+id/btnReinspectShortcut"
                         android:layout_width="0dp"
-                        android:layout_height="160dp"
+                        android:layout_height="100dp"
                         app:layout_column="0"
                         app:layout_row="1"
                         app:layout_columnWeight="1"
                         app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="0dp"
                         app:cardUseCompatPadding="true"
                         android:clickable="true"
                         android:focusable="true"
@@ -320,7 +322,7 @@
                             android:layout_height="match_parent"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:padding="16dp">
+                            android:padding="0dp">
 
                         <TextView
                                 android:layout_width="wrap_content"
@@ -342,13 +344,13 @@
                 <com.google.android.material.card.MaterialCardView
                         android:id="@+id/btnNotTransmittedShortcut"
                         android:layout_width="0dp"
-                        android:layout_height="160dp"
+                        android:layout_height="100dp"
                         app:layout_column="1"
                         app:layout_row="1"
                         app:layout_columnWeight="1"
                         app:cardBackgroundColor="#CBDCFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="8dp"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="0dp"
                         app:cardUseCompatPadding="true"
                         android:clickable="true"
                         android:focusable="true"
@@ -359,7 +361,7 @@
                             android:layout_height="match_parent"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:padding="16dp">
+                            android:padding="0dp">
 
                         <TextView
                                 android:layout_width="wrap_content"

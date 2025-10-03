@@ -14,7 +14,7 @@ function MessageTabs({ senderId }) {
             style={{ backgroundColor: "#fff" }}
         >
             <h3
-                className="fw-bold mb-4"
+                className="fw-bold mt-2 mb-5"
                 style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
             >
                 메시지 관리

@@ -2,7 +2,6 @@ import "../../styles/theme.css";
 import "../../styles/layout.css";
 import Sidebar from "./Sidebar.jsx";
 import axios from "axios";
-import Dashboard from "../../pages/Dashboard.jsx";
 import {Outlet} from "react-router-dom";
 
 export default function MainLayout({ user, onLogout }){

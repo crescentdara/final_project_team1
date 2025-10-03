@@ -50,40 +50,53 @@ function MessageSent({ senderId, newMessage }) {
 
     return (
         <div>
-            <h4 className="mb-3">보낸 메시지함</h4>
+            <h4 className="p-3">보낸 메시지함</h4>
 
-            {/* 검색 영역 */}
-            <div className="d-flex gap-2 mb-3">
-                <Form.Select
+            {/* 🔍 검색영역 */}
+            <div className="d-flex flex-wrap gap-2 align-items-center justify-content-end mb-3">
+                <select
+                    className="form-select"
+                    style={{ maxWidth: 120, height: 40 }}
                     value={receiverId}
                     onChange={(e) => setReceiverId(e.target.value)}
-                    style={{ width: "120px", fontSize: "14px" }}
                 >
-                    <option value="">전체 조사원</option>
-                    {receivers.map((r) => (
-                        <option key={r.userId} value={r.userId}>
-                            {r.name} (ID: {r.userId})
-                        </option>
-                    ))}
-                </Form.Select>
+                    <option value="all">전체</option>
+                    <option value="name">이름</option>
+                    <option value="username">아이디</option>
+                    <option value="empNo">사번</option>
+                </select>
 
-                <Form.Control
-                    type="text"
-                    placeholder="메시지 내용 검색"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                    style={{ width: "300px", fontSize: "14px" }}
-                />
-
-                <Button variant="secondary" onClick={handleSearch}>
-                    검색
-                </Button>
+                <div className="input-group input-group-sm" style={{ maxWidth: 300, height: 40 }}>
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="조사원 검색"
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                    />
+                    <button className="btn btn-outline-secondary" onClick={handleSearch}>검색</button>
+                </div>
             </div>
 
             {/* 메시지 리스트 */}
-            <Table striped bordered hover>
+            <Table
+                striped
+                bordered
+                hover
+                className="align-middle"
+                style={{ tableLayout: "fixed", width: "100%"}}
+            >
+                {/* 각 컬럼 폭 지정(원하는 값으로 조절 가능) */}
+                <colgroup>
+                    <col style={{ width: "75px" }}/>  {/* 수신자 */}
+                    <col style={{ width: "100px" }} />  {/* 제목 */}
+                    <col style={{ width: "100px" }}/>
+                    <col style={{ width: "90px" }} />  {/* 보낸 날짜 */}
+                    <col style={{ width: "90px" }} />  {/* 읽음 여부 */}
+                </colgroup>
+
                 <thead>
-                <tr>
+                <tr className="text-center" >
                     <th>수신자</th>
                     <th>제목</th>
                     <th>내용</th>
@@ -91,17 +104,37 @@ function MessageSent({ senderId, newMessage }) {
                     <th>읽음 여부</th>
                 </tr>
                 </thead>
-                <tbody>
+
+                <tbody className="text-center">
                 {messages.length > 0 ? (
                     messages.map((msg) => (
                         <tr key={msg.messageId}>
                             <td>{msg.receiverName || "전체"}</td>
-                            <td>{msg.title}</td>
-                            <td>{msg.content}</td>
+
+                            {/* 제목: 줄바꿈 없이 가로 스크롤로 모두 보이기 */}
                             <td>
-                                {msg.sentAt
-                                    ? new Date(msg.sentAt).toLocaleString()
-                                    : "-"}
+                                <div
+                                    className="text-truncate"
+                                    style={{ maxWidth: "100%" }}
+                                    title={msg.title} // 호버 시 전체 툴팁
+                                >
+                                    {msg.title}
+                                </div>
+                            </td>
+
+                            {/* 내용: 넘치면 말줄임표 */}
+                            <td>
+                                <div
+                                    className="text-truncate"
+                                    style={{ maxWidth: "100%" }}
+                                    title={msg.content} // 호버 시 전체 내용
+                                >
+                                    {msg.content}
+                                </div>
+                            </td>
+
+                            <td className="text-truncate">
+                                {msg.sentAt ? new Date(msg.sentAt).toLocaleDateString() : "-"}
                             </td>
                             <td>{msg.readFlag ? "읽음" : "안읽음"}</td>
                         </tr>
@@ -115,6 +148,7 @@ function MessageSent({ senderId, newMessage }) {
                 )}
                 </tbody>
             </Table>
+
         </div>
     );
 }

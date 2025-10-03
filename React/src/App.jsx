@@ -5,18 +5,14 @@ import axios from "axios";
 import MainLayout from "./components/ui/MainLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import SurveyList from "./pages/SurveyList.jsx";
-import CreateSurvey from "./pages/CreateSurvey.jsx";
 import CreateUser from "./pages/CreateUser.jsx";
 import ApprovalFilters from "./pages/ApprovalFilters.jsx";
 import ResultReport from "./pages/ResultReport.jsx";
 import UserDetail from "./pages/UserDetail.jsx";
 import Login from "./pages/Login.jsx";
-import BuildingUpload from "./pages/BuildingUpload.jsx";
-import MessageTabs from "./pages/MessageTabs.jsx";
 import SurveyIndex from "./pages/SurveyIndex.jsx";
 import ApproverAssignment from "./pages/ApproverAssignment.jsx";
 import SurveyRegister from "./pages/SurveyRegister.jsx";
-import TotalSurveyList from "./pages/TotalSurveyList.jsx";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -65,12 +61,15 @@ function App() {
 
 
                 <Route path="/createUser" element={<CreateUser />} />
-                <Route path="/dashboard" element={<Dashboard />} />
+                {/*<Route path="/" element={<Dashboard senderId={user?.id} />} />*/}
+                {/*<Route path="/dashboard" element={<Dashboard senderId={user?.id} />} />*/}
+                <Route path="/" element={<Dashboard senderId={(user?.userId ?? user?.id) ?? null} />} />
+                <Route path="/dashboard" element={<Dashboard senderId={(user?.userId ?? user?.id) ?? null} />} />
                 <Route path="/resultReport" element={<ResultReport />} />
                 <Route path="/users" element={<UserDetail />} />
                 <Route path="/approvals" element={<ApprovalFilters />} />
                 <Route path="/approverAssignment" element={<ApproverAssignment/>} />
-                <Route path="/messageTabs" element={<MessageTabs senderId={user?.id} />} />
+                {/*<Route path="/messageTabs" element={<MessageTabs senderId={user?.id} />} />*/}
                 <Route path="/surveyIndex" element={<SurveyIndex />} />
 
                 {/* 권한 예시 */}

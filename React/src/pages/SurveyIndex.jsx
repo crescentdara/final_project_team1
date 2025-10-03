@@ -167,7 +167,7 @@ export default function SurveyIndex() {
 
                 <thead>
                 <tr className="table-light text-center">
-                  <th className="text-nowrap">ID</th>
+                  <th className="text-nowrap">No</th>
                   <th className="text-nowrap">주소</th>
                   <th className="text-nowrap">조사원</th>
                   <th className="text-nowrap">상태</th>

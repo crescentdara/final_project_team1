@@ -74,7 +74,7 @@ function App() {
                 <Route path="/surveyIndex" element={<SurveyIndex />} />
 
                 {/* 권한 예시 */}
-                <Route path="/admin-only" element={user?.role === "ADMIN" ? <Dashboard /> : <Navigate to="/login" />} />
+                <Route path="/admin-only" element={user?.role === "ADMIN" ? <Dashboard /> : <Navigate to="/login" />}  senderId={user?.id}/>
                 <Route path="/login" element={<Login onLogin={handleLogin} />} />
             </Route>
         </Routes>

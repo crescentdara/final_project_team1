@@ -48,6 +48,7 @@ export default function UserEditForm({ detail, onSave}) {
     return (
         <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
+                <hr />
                 <Form.Label>이름</Form.Label>
                 <Form.Control
                     type="text"

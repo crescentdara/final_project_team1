@@ -237,7 +237,7 @@ function CreateSurvey({ editingId: propId }) {
             : fieldWrapAuto;
 
     return (
-        <form onSubmit={handleSubmit} style={{formStyle, height: "100%" }}>
+        <form onSubmit={handleSubmit} style={{formStyle, height: "100%", alignItems: "stretch" }}>
             {/* 위치 정보 */}
             <div style={sectionTitleCompact}>위치 정보</div>
             <div style={fieldWrapLocation}>

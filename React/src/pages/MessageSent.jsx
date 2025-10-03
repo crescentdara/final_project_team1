@@ -57,7 +57,7 @@ function MessageSent({ senderId, newMessage }) {
                 <Form.Select
                     value={receiverId}
                     onChange={(e) => setReceiverId(e.target.value)}
-                    style={{ maxWidth: "200px" }}
+                    style={{ width: "120px", fontSize: "14px" }}
                 >
                     <option value="">전체 조사원</option>
                     {receivers.map((r) => (
@@ -72,7 +72,7 @@ function MessageSent({ senderId, newMessage }) {
                     placeholder="메시지 내용 검색"
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
-                    style={{ maxWidth: "250px" }}
+                    style={{ width: "300px", fontSize: "14px" }}
                 />
 
                 <Button variant="secondary" onClick={handleSearch}>

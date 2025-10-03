@@ -64,7 +64,7 @@ function MessageSend({ senderId, onMessageSent }) {
 
     return (
         <div>
-            <h4 className="mb-3">메시지 보내기</h4>
+            <h4 className="p-3">메시지 보내기</h4>
 
             {successMsg && <Alert variant="success">{successMsg}</Alert>}
             {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}

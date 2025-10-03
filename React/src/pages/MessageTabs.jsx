@@ -10,7 +10,7 @@ function MessageTabs({ senderId }) {
 
     return (
         <div
-            className="container-fluid mt-4 p-4 shadow-sm rounded-3"
+            className="container-fluid shadow-sm rounded-3"
             style={{ backgroundColor: "#fff" }}
         >
             <h3

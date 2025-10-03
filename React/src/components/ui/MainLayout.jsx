@@ -1,17 +1,11 @@
 import "../../styles/theme.css";
 import "../../styles/layout.css";
 import Sidebar from "./Sidebar.jsx";
-import {Outlet} from "react-router-dom";
-import Logo from "../../assets/GimHappy.png";
 import axios from "axios";
+import Dashboard from "../../pages/Dashboard.jsx";
+import {Outlet} from "react-router-dom";
 
 export default function MainLayout({ user, onLogout }){
-
-    const roleText = (role) => {
-        if (role === "ADMIN") return "관리자";
-        if (role === "APPROVER") return "결재자";
-        return role || "Guest";
-    };
 
     const handleLogout = async () => {
         try{
@@ -25,17 +19,16 @@ export default function MainLayout({ user, onLogout }){
             <Sidebar user={user} onLogout={onLogout}/>
             <main className="main">
                 {/* 사용자 상태/로그아웃 (사이드바 최하단) */}
-                <div className="user-footer">
-                    <div className="avatar" />
-                    <div style={{display:"flex",flexDirection:"column"}}>
-                        <span className="name">{user ? user.name : "로그인이 필요합니다"}</span>
-                        <span className="role">{roleText(user?.role)}</span>
+                <div className="user-footer justify-content-between" style={{height:50}}>
+                    <div className="d-flex flex-row align-items-center">
+                        <div className="d-inline-block avatar" />
+                        <span className="name ms-2">{user ? user.name : "로그인이 필요합니다"}</span>
                     </div>
                     {user && (
-                        <button className="logout" onClick={handleLogout}>로그아웃</button>
+                        <button className="logout" onClick={handleLogout} style={{height:30}}>로그아웃</button>
                     )}
                 </div>
-                <section>
+                <section style={{height:"88vh"}}>
                     <Outlet />
                 </section>
             </main>

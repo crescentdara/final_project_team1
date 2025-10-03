@@ -69,7 +69,7 @@ function Dashboard({ senderId }) {
         <section
             style={{
                 width: "100%",
-                height: "100%",
+                height: "90vh",
                 margin: "16px auto",
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
@@ -85,7 +85,7 @@ function Dashboard({ senderId }) {
                     background: "#fff",
                     boxShadow: "0 10px 30px rgba(16,24,40,0.06)",
                     minWidth: 400,
-                    height: "100%",
+                    height: "87.5vh",
                     display: "flex",
                     flexDirection: "column",
                 }}
@@ -245,7 +245,7 @@ function Dashboard({ senderId }) {
                     background: "#fff",
                     boxShadow: "0 10px 30px rgba(16,24,40,0.06)",
                     minWidth: 400,
-                    height: "100%",
+                    height: "87.5vh",
                     overflow: "auto",
                 }}
             >
@@ -312,7 +312,7 @@ function BarCapsule({ title, valuePct, heightPct, colorFill, colorBg, compactTex
             <div
                 style={{
                     width: 100,
-                    height: 400,
+                    height: 350,
                     borderRadius: 24,
                     background: colorBg,
                     overflow: "hidden",

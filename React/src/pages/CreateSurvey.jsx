@@ -6,7 +6,7 @@ function CreateSurvey({ editingId: propId }) {
     const navigate = useNavigate();
     const [sp] = useSearchParams();
     const queryId = sp.get("id");
-    const editingId = propId || queryId;   // ✅ props 우선, 없으면 query 사용
+    const editingId = propId || queryId; // ✅ props 우선, 없으면 query 사용
     const editMode = useMemo(() => Boolean(editingId), [editingId]);
 
     const [saving, setSaving] = useState(false);
@@ -83,10 +83,13 @@ function CreateSurvey({ editingId: propId }) {
                     buildingName: data?.buildingName ?? "",
                     mainUseName: data?.mainUseName ?? "",
                     structureName: data?.structureName ?? "",
-                    groundFloors: data?.groundFloors != null ? String(data.groundFloors) : "",
-                    basementFloors: data?.basementFloors != null ? String(data.basementFloors) : "",
+                    groundFloors:
+                        data?.groundFloors != null ? String(data.groundFloors) : "",
+                    basementFloors:
+                        data?.basementFloors != null ? String(data.basementFloors) : "",
                     landArea: data?.landArea != null ? String(data.landArea) : "",
-                    buildingArea: data?.buildingArea != null ? String(data.buildingArea) : "",
+                    buildingArea:
+                        data?.buildingArea != null ? String(data.buildingArea) : "",
                 });
             } catch (e) {
                 console.error(e);
@@ -136,66 +139,62 @@ function CreateSurvey({ editingId: propId }) {
             navigate("/", { replace: true });
         } catch (error) {
             console.error("저장 중 오류 발생:", error);
-            const msg = error?.response?.data?.message || error?.message || "저장 실패";
+            const msg =
+                error?.response?.data?.message || error?.message || "저장 실패";
             alert(msg);
         } finally {
             setSaving(false);
         }
     };
 
-    // ---------- styles ----------
+    // ---------- compact styles & responsive grid ----------
+    const borderColorBase = "#d0d7de";
+
     const formStyle = {
         width: "100%",
+        height: parent,
         margin: 0,
-        padding: "32px 40px",
     };
 
-    const gridStyle = {
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "20px 24px",
-    };
-
-    const gridStyleMobile = {
-        display: "grid",
-        gridTemplateColumns: "1fr",
-        gap: "16px",
-    };
-
-    const sectionTitle = {
-        marginTop: 20,
-        marginBottom: 12,
-        fontSize: 17,
+    // 섹션 타이틀 간격 축소
+    const sectionTitleCompact = {
+        marginTop: 14,
+        marginBottom: 8,
+        fontSize: 16,
         fontWeight: 700,
         borderBottom: "2px solid #f0f0f0",
         paddingBottom: 6,
         color: "#333",
     };
 
-    const labelStyle = { fontSize: 14, fontWeight: 600, marginBottom: 6 };
-    const inputBase = {
+    // 더 작은 입력/라벨
+    const labelSm = { fontSize: 13, fontWeight: 600, marginBottom: 4 };
+    const inputSm = {
         width: "100%",
-        padding: "12px 14px",
-        borderRadius: 10,
-        border: "1px solid #d0d7de",
+        padding: "8px 10px",
+        borderRadius: 8,
+        border: `1px solid ${borderColorBase}`,
         outline: "none",
-        fontSize: 14,
+        fontSize: 13,
+        lineHeight: "1.2",
+        height: 36,
     };
     const errorText = { color: "#d93025", fontSize: 12, marginTop: 4 };
+
     const footerStyle = {
-        marginTop: 32,
+        marginTop: 24,
         display: "flex",
         justifyContent: "flex-end",
-        gap: 12,
+        gap: 10,
     };
     const btn = (enabled, variant = "primary") => ({
-        minWidth: 100,
-        padding: "12px 20px",
+        minWidth: 92,
+        padding: "10px 16px",
         borderRadius: 10,
         border: "none",
         cursor: enabled ? "pointer" : "not-allowed",
         fontWeight: 600,
-        fontSize: 15,
+        fontSize: 14,
         background:
             variant === "secondary"
                 ? enabled
@@ -207,31 +206,68 @@ function CreateSurvey({ editingId: propId }) {
         color: "white",
     });
 
-    const twoCols = typeof window !== "undefined" ? window.innerWidth >= 720 : true;
-    const fieldWrap = twoCols ? gridStyle : gridStyleMobile;
+    // 반응형: 화면 폭 감지
+    const [vw, setVw] = useState(
+        typeof window !== "undefined" ? window.innerWidth : 1920
+    );
+    useEffect(() => {
+        const onResize = () => setVw(window.innerWidth);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, []);
+    const colCount = vw >= 1200 ? 3 : vw >= 720 ? 2 : 1;
+
+    const fieldWrapAuto =
+        colCount === 1
+            ? { display: "grid", gridTemplateColumns: "1fr", gap: "12px" }
+            : {
+                display: "grid",
+                gridTemplateColumns: `repeat(${colCount}, 1fr)`,
+                gap: colCount >= 3 ? "12px 16px" : "16px 20px",
+            };
+
+    // 위치정보 전용: "번지주소 2fr + 위도 1fr + 경도 1fr" (넓을 때)
+    const fieldWrapLocation =
+        colCount >= 3
+            ? {
+                display: "grid",
+                gridTemplateColumns: "1.5fr 1fr 1fr",
+                gap: "12px 16px",
+            }
+            : fieldWrapAuto;
 
     return (
-        <form onSubmit={handleSubmit} style={formStyle}>
-            <div style={sectionTitle}>위치 정보</div>
-            <div style={fieldWrap}>
+        <form onSubmit={handleSubmit} style={{formStyle, height: "100%" }}>
+            {/* 위치 정보 */}
+            <div style={sectionTitleCompact}>위치 정보</div>
+            <div style={fieldWrapLocation}>
                 {/* lotAddress */}
                 <div>
-                    <div style={labelStyle}>번지주소 *</div>
+                    <div style={labelSm}>번지주소</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.lotAddress ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.lotAddress ? "#d93025" : borderColorBase,
+                        }}
                         type="text"
                         name="lotAddress"
                         placeholder="예) 경상남도 김해시 ..."
                         value={formData.lotAddress}
                         onChange={handleTextChange}
                     />
-                    {errors.lotAddress && <div style={errorText}>{errors.lotAddress}</div>}
+                    {errors.lotAddress && (
+                        <div style={errorText}>{errors.lotAddress}</div>
+                    )}
                 </div>
+
                 {/* latitude */}
                 <div>
-                    <div style={labelStyle}>위도 *</div>
+                    <div style={labelSm}>위도</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.latitude ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.latitude ? "#d93025" : borderColorBase,
+                        }}
                         type="text"
                         name="latitude"
                         placeholder="예) 35.123456"
@@ -240,11 +276,15 @@ function CreateSurvey({ editingId: propId }) {
                     />
                     {errors.latitude && <div style={errorText}>{errors.latitude}</div>}
                 </div>
+
                 {/* longitude */}
                 <div>
-                    <div style={labelStyle}>경도 *</div>
+                    <div style={labelSm}>경도</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.longitude ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.longitude ? "#d93025" : borderColorBase,
+                        }}
                         type="text"
                         name="longitude"
                         placeholder="예) 128.123456"
@@ -255,82 +295,118 @@ function CreateSurvey({ editingId: propId }) {
                 </div>
             </div>
 
-            <div style={sectionTitle}>건물 정보</div>
-            <div style={fieldWrap}>
+            {/* 건물 정보 */}
+            <div style={sectionTitleCompact}>건물 정보</div>
+            <div style={fieldWrapAuto}>
                 {/* buildingName */}
                 <div>
-                    <div style={labelStyle}>건물명 *</div>
+                    <div style={labelSm}>건물명</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.buildingName ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.buildingName ? "#d93025" : borderColorBase,
+                        }}
                         type="text"
                         name="buildingName"
                         placeholder="예) 인수타워"
                         value={formData.buildingName}
                         onChange={handleTextChange}
                     />
-                    {errors.buildingName && <div style={errorText}>{errors.buildingName}</div>}
+                    {errors.buildingName && (
+                        <div style={errorText}>{errors.buildingName}</div>
+                    )}
                 </div>
+
                 {/* mainUseName */}
                 <div>
-                    <div style={labelStyle}>주용도 *</div>
+                    <div style={labelSm}>주용도</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.mainUseName ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.mainUseName ? "#d93025" : borderColorBase,
+                        }}
                         type="text"
                         name="mainUseName"
                         placeholder="예) 업무시설"
                         value={formData.mainUseName}
                         onChange={handleTextChange}
                     />
-                    {errors.mainUseName && <div style={errorText}>{errors.mainUseName}</div>}
+                    {errors.mainUseName && (
+                        <div style={errorText}>{errors.mainUseName}</div>
+                    )}
                 </div>
+
                 {/* structureName */}
                 <div>
-                    <div style={labelStyle}>구조명 *</div>
+                    <div style={labelSm}>구조명</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.structureName ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.structureName ? "#d93025" : borderColorBase,
+                        }}
                         type="text"
                         name="structureName"
                         placeholder="예) 철근콘크리트구조"
                         value={formData.structureName}
                         onChange={handleTextChange}
                     />
-                    {errors.structureName && <div style={errorText}>{errors.structureName}</div>}
+                    {errors.structureName && (
+                        <div style={errorText}>{errors.structureName}</div>
+                    )}
                 </div>
+
                 {/* groundFloors */}
                 <div>
-                    <div style={labelStyle}>지상층수 *</div>
+                    <div style={labelSm}>지상층수</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.groundFloors ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.groundFloors ? "#d93025" : borderColorBase,
+                        }}
                         type="text"
                         name="groundFloors"
                         placeholder="예) 10"
                         value={formData.groundFloors}
                         onChange={(e) => handleNumberChange(e, false)}
                     />
-                    {errors.groundFloors && <div style={errorText}>{errors.groundFloors}</div>}
+                    {errors.groundFloors && (
+                        <div style={errorText}>{errors.groundFloors}</div>
+                    )}
                 </div>
+
                 {/* basementFloors */}
                 <div>
-                    <div style={labelStyle}>지하층수 *</div>
+                    <div style={labelSm}>지하층수</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.basementFloors ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.basementFloors
+                                ? "#d93025"
+                                : borderColorBase,
+                        }}
                         type="text"
                         name="basementFloors"
                         placeholder="예) 2"
                         value={formData.basementFloors}
                         onChange={(e) => handleNumberChange(e, false)}
                     />
-                    {errors.basementFloors && <div style={errorText}>{errors.basementFloors}</div>}
+                    {errors.basementFloors && (
+                        <div style={errorText}>{errors.basementFloors}</div>
+                    )}
                 </div>
             </div>
 
-            <div style={sectionTitle}>면적 정보</div>
-            <div style={fieldWrap}>
+            {/* 면적 정보 */}
+            <div style={sectionTitleCompact}>면적 정보</div>
+            <div style={fieldWrapAuto}>
                 {/* landArea */}
                 <div>
-                    <div style={labelStyle}>대지면적(㎡) *</div>
+                    <div style={labelSm}>대지면적(㎡)</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.landArea ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.landArea ? "#d93025" : borderColorBase,
+                        }}
                         type="text"
                         name="landArea"
                         placeholder="예) 1234.56"
@@ -339,21 +415,28 @@ function CreateSurvey({ editingId: propId }) {
                     />
                     {errors.landArea && <div style={errorText}>{errors.landArea}</div>}
                 </div>
+
                 {/* buildingArea */}
                 <div>
-                    <div style={labelStyle}>건축면적(㎡) *</div>
+                    <div style={labelSm}>건축면적(㎡)</div>
                     <input
-                        style={{ ...inputBase, borderColor: errors.buildingArea ? "#d93025" : inputBase.border }}
+                        style={{
+                            ...inputSm,
+                            borderColor: errors.buildingArea ? "#d93025" : borderColorBase,
+                        }}
                         type="text"
                         name="buildingArea"
                         placeholder="예) 789.01"
                         value={formData.buildingArea}
                         onChange={(e) => handleNumberChange(e, true)}
                     />
-                    {errors.buildingArea && <div style={errorText}>{errors.buildingArea}</div>}
+                    {errors.buildingArea && (
+                        <div style={errorText}>{errors.buildingArea}</div>
+                    )}
                 </div>
             </div>
 
+            {/* 액션 */}
             <div style={footerStyle}>
                 <button
                     type="button"

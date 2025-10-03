@@ -120,7 +120,7 @@ export default function SurveyIndex() {
             }}
         >
           {/* 헤더 영역: 고정 */}
-          <div className="p-4">
+          <div className="p-3">
             <h3
                 className="fw-bold mb-3 d-flex align-items-center"
                 style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}

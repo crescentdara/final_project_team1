@@ -25,17 +25,22 @@ export default function MainLayout({ user, onLogout }){
             <Sidebar user={user} onLogout={onLogout}/>
             <main className="main">
                 {/* 사용자 상태/로그아웃 (사이드바 최하단) */}
-                <div className="user-footer">
-                    <div className="avatar" />
-                    <div style={{display:"flex",flexDirection:"column"}}>
-                        <span className="name">{user ? user.name : "로그인이 필요합니다"}</span>
-                        <span className="role">{roleText(user?.role)}</span>
+                <div className="user-footer justify-content-between" style={{ height: 50}}>
+                    <div >
+                        <div className="d-inline-block avatar" />
+                        <span className="name ms-3">{user ? user.name : "로그인이 필요합니다"}</span>
                     </div>
-                    {user && (
-                        <button className="logout" onClick={handleLogout}>로그아웃</button>
-                    )}
+
+                    <div>
+
+                        <div style={{display:"flex" }} className="justify-content-end">
+                        </div>
+                        {user && (
+                            <button className="logout" onClick={handleLogout} style={{ height: 30, textSize: 20}}>로그아웃</button>
+                        )}
+                    </div>
                 </div>
-                <section>
+                <section style={{ height: "87vh"}}>
                     <Outlet />
                 </section>
             </main>

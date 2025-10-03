@@ -30,7 +30,7 @@ export default function Login({ onLogin }) {
     return (
         <div
             className="d-flex justify-content-center align-items-center"
-            style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}
+            style={{ minHeight: "100vh" }}
         >
             <div
                 className="p-4 shadow-sm rounded-3 bg-white"

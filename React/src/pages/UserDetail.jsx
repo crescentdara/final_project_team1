@@ -225,7 +225,7 @@ export default function UserDetail() {
                         <option value="empNo">사번</option>
                     </select>
 
-                    <div className="input-group input-group-sm" style={{ maxWidth: 300, height: 40 }}>
+                    <div className="input-group input-group-sm" style={{ maxWidth: 320, height: 40 }}>
                         <input
                             type="text"
                             className="form-control"

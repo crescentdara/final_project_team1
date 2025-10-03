@@ -140,7 +140,7 @@ export default function SurveyIndex() {
                 {statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
 
-              <div className="input-group input-group-sm" style={{ maxWidth: 300, height: 40 }}>
+              <div className="input-group input-group-sm" style={{ maxWidth: 320, height: 40 }}>
                 <input
                     className="form-control"
                     placeholder="주소 / 조사원 검색"

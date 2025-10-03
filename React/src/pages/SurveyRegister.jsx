@@ -31,12 +31,12 @@ function SurveyRegister() {
             {/* 상단 탭 */}
             <div
                 style={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    background: "#fff",
-                    borderRadius: "16px 16px 0 0",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-                    marginTop: "20px",
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  background: "#fff",
+                  borderRadius: "16px 16px 0 0",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                  marginTop: "20px",
                 }}
             >
                 <div

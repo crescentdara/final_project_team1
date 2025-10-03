@@ -133,17 +133,17 @@ export default function SurveyIndex() {
             <div className="d-flex flex-wrap gap-2 align-items-center justify-content-end">
               <select
                   className="form-select form-select-sm"
-                  style={{ maxWidth: 140 }}
+                  style={{ maxWidth: 120, height: 40 }}
                   value={status}
                   onChange={(e)=>{ setStatus(e.target.value); setPage(1); }}
               >
                 {statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
 
-              <div className="input-group input-group-sm" style={{ maxWidth: 300 }}>
+              <div className="input-group input-group-sm" style={{ maxWidth: 300, height: 40 }}>
                 <input
                     className="form-control"
-                    placeholder="주소/조사원 검색"
+                    placeholder="주소 / 조사원 검색"
                     value={keyword}
                     onChange={e=>setKeyword(e.target.value)}
                     onKeyDown={e=>e.key==="Enter" && onSearch()}
@@ -153,9 +153,7 @@ export default function SurveyIndex() {
             </div>
           </div>
 
-          {/* ✅ 목록 스크롤 영역: 카드 안에서만 세로 스크롤 발생 */}
-          {/* ✅ 목록 스크롤 영역: 카드 안에서만 세로 스크롤 */}
-          <div className="flex-grow-1 overflow-hidden" style={{ minHeight: 0 }}>
+          <div className="flex-grow-1 " style={{ minHeight: 0 }}>
             <div className="table-responsive px-4">
               {/* table-layout: fixed 로 칼럼 너비 고정 → ellipsis 동작 안정화 */}
               <table className="table align-middle mb-0" style={{ tableLayout: "fixed" }}>
@@ -231,7 +229,7 @@ export default function SurveyIndex() {
 
 
           {/* ✅ 빨간 박스: 페이지네이션 - 카드 하단 고정 영역 */}
-          <div className="p-2 border-top">
+          <div className="p-2">
             <Pagination
                 page={page}
                 total={total}

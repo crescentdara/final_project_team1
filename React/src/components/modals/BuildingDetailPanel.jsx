@@ -55,7 +55,6 @@ export default function BuildingDetailPanel({ id, onClose }) {
                 padding: visible ? "20px" : "0",
                 overflowY: "auto",
                 transition: "all 0.3s ease",
-                marginBottom: "20px",
                 borderRadius: "12px 12px",
             }}
         >

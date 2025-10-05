@@ -207,8 +207,8 @@ export default function UserDetail() {
         <div className="container-fluid mt-4 p-0" style={wrapperStyle}>
             {/* LEFT: 표 리스트 */}
             <div ref={leftCardRef} className="p-4 shadow-sm rounded-3 bg-white" style={leftStyle}>
-                <h3 className="fw-bold mb-4" style={{ borderLeft: "4px solid #6898FF", paddingLeft: 12 }}>
-                    조사원 목록 <small className="text-muted" style={{ fontSize: 14 }}>({totalElements}명)</small>
+                <h3 className="fw-bold mb-2" style={{ borderLeft: "4px solid #6898FF", paddingLeft: 12 }}>
+                    조사원 상세정보 <small className="text-muted" style={{ fontSize: 14 }}>({totalElements}명)</small>
                 </h3>
 
                 {/* 검색영역 */}

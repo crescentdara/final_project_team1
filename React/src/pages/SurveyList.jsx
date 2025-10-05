@@ -398,10 +398,10 @@ function SurveyList() {
         >
             {/* 타이틀 */}
             <h3
-                className="fw-bold mb-4"
+                className="fw-bold mb-3"
                 style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
             >
-                미배정 조사목록
+                미배정 조사지 목록
             </h3>
 
             {/* 두 컬럼 레이아웃: 좌(필터+리스트) / 우(큰 지도) */}

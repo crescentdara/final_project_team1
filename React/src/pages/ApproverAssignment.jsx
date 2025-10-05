@@ -152,7 +152,7 @@ function ApproverAssignment() {
     return (
         <div className="container-fluid mt-4 px-4">
             {/* 타이틀 */}
-            <h2 className="mb-4">결재자 미배정 조사목록</h2>
+            <h2 className="mb-4">결재자 배정</h2>
 
             {/* 검색 박스 */}
             <div className="border rounded p-3 mb-4 bg-light shadow-sm">

@@ -120,27 +120,27 @@ export default function SurveyIndex() {
             }}
         >
           {/* 헤더 영역: 고정 */}
-          <div className="p-3">
+          <div className="p-4">
             <h3
-                className="fw-bold mb-3 d-flex align-items-center"
+                className="fw-bold mb-2 d-flex align-items-center"
                 style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
             >
-              조사목록 전체 내역
+              전체 조사지 리스트
               <span className="ms-2 text-muted fs-6">(총 {total}개)</span>
             </h3>
 
             {/* 필터/검색: 고정 */}
             <div className="d-flex flex-wrap gap-2 align-items-center justify-content-end">
               <select
-                  className="form-select form-select-sm"
-                  style={{ maxWidth: 120, height: 40 }}
+                  className="form-select"
+                  style={{ maxWidth: 130, height: 40 }}
                   value={status}
                   onChange={(e)=>{ setStatus(e.target.value); setPage(1); }}
               >
                 {statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
 
-              <div className="input-group input-group-sm" style={{ maxWidth: 320, height: 40 }}>
+              <div className="input-group" style={{ maxWidth: 320, height: 40 }}>
                 <input
                     className="form-control"
                     placeholder="주소 / 조사원 검색"
@@ -213,9 +213,9 @@ export default function SurveyIndex() {
                             <td className="text-nowrap py-2">
                               <span className={`badge ${statusBadge(r.statusLabel)}`}>
                               {(r.statusLabel === "결재 완료" ||
-                                r.statusLabel?.toUpperCase?.() === "APPROVED")
-                                ? "승인"
-                                : r.statusLabel}
+                                  r.statusLabel?.toUpperCase?.() === "APPROVED")
+                                  ? "승인"
+                                  : r.statusLabel}
                               </span>
                             </td>
                           </tr>

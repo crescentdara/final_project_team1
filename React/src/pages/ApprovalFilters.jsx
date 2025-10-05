@@ -19,40 +19,40 @@ function StatusBadge({ status }) {
 function ApprovalFilters({ keyword, setKeyword, sort, setSort, onSearch }) {
     return (
         <div className="w-100 align-items-center mb-3">
-            <h3
-                className="fw-bold mb-3"
-                style={{ borderLeft: "4px solid #6898FF", paddingLeft: 12 }}
-            >
-                결재 대기 중
-            </h3>
+        <h3
+            className="fw-bold "
+            style={{ borderLeft: "4px solid #6898FF", paddingLeft: 12 }}
+        >
+            결재 대기
+        </h3>
 
-            {/* 오른쪽 정렬 */}
-            <div className="ms-auto d-flex align-items-center gap-2 justify-content-end">
-                <select
-                    className="form-select"
-                    style={{ maxWidth: 130 }}
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                >
-                    <option value="latest">최신 접수순</option>
-                    <option value="oldest">오래된 순</option>
-                </select>
+    {/* 오른쪽 정렬 */}
+    <div className="ms-auto d-flex align-items-center gap-2 justify-content-end">
+        <select
+            className="form-select"
+            style={{ maxWidth: 130, height: 40  }}
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+        >
+            <option value="latest">최신 접수순</option>
+            <option value="oldest">오래된 순</option>
+        </select>
 
-                <div className="input-group" style={{ maxWidth: 320 }}>
-                    <input
-                        className="form-control"
-                        placeholder="관리번호 / 조사원 / 주소 검색"
-                        value={keyword}
-                        onChange={(e) => setKeyword(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && onSearch()}
-                    />
-                    <button className="btn btn-outline-secondary" onClick={onSearch}>
-                        검색
-                    </button>
-                </div>
-            </div>
+        <div className="input-group" style={{ maxWidth: 320, height: 40  }}>
+            <input
+                className="form-control"
+                placeholder="관리번호 / 조사원 / 주소 검색"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && onSearch()}
+            />
+            <button className="btn btn-outline-secondary" onClick={onSearch}>
+                검색
+            </button>
         </div>
-    );
+    </div>
+</div>
+);
 }
 
 function ApprovalItem({ item, onOpenResult }) {

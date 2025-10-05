@@ -7,8 +7,9 @@ function ApproverAssignment() {
     // 좌측 목록(조사원 배정 O + 결재자 미배정)
     const [addresses, setAddresses] = useState([]);
 
-    const [emdList, setEmdList] = useState([]); // 읍면동 목록
-    const [selectedEmd, setSelectedEmd] = useState(""); // 선택된 읍면동
+    // 읍/면/동
+    const [emdList, setEmdList] = useState([]);
+    const [selectedEmd, setSelectedEmd] = useState("");
 
     // 지도 상태
     const [selectedLocation, setSelectedLocation] = useState({
@@ -17,7 +18,7 @@ function ApproverAssignment() {
     });
     const [errorMessage, setErrorMessage] = useState("");
 
-    // 결재자(Approver) 검색/선택
+    // 결재자(Approver)
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [userKeyword, setUserKeyword] = useState("");
@@ -26,28 +27,21 @@ function ApproverAssignment() {
     const [selectedBuildings, setSelectedBuildings] = useState([]);
     const selectedCount = selectedBuildings.length;
 
-    // -------------------------
     // 초기 로딩
-    // -------------------------
     useEffect(() => {
         axios
             .get("/web/building/eupmyeondong?city=김해시")
             .then((res) => setEmdList(res.data))
             .catch((err) => console.error(err));
 
-        // 1) 결재자 미배정 목록 불러오기
-        handleSearch();
-
-        // 2) 기본 결재자 후보(approver) 불러오기
+        handleSearch(); // 결재자 미배정 목록
         axios
             .get("/web/api/approver/search", { params: { keyword: "" } })
             .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
             .catch((err) => console.error("결재자 목록 로딩 실패:", err));
     }, []);
 
-    // -------------------------
-    // 목록 조회 (서버가 이미 필터링된 데이터를 내려줌)
-    // -------------------------
+    // 결재자 미배정 목록
     const handleSearch = () => {
         axios
             .get("/web/building/pending-approval")
@@ -55,18 +49,17 @@ function ApproverAssignment() {
             .catch((err) => console.error("목록 로딩 실패:", err));
     };
 
+    // 읍/면/동 필터 조회
     const handleSearchEMD = () => {
         axios
             .get("/web/building/pending-approval", {
                 params: { eupMyeonDong: selectedEmd || "" },
             })
-            .then((res) => setAddresses(res.data))
+            .then((res) => setAddresses(Array.isArray(res.data) ? res.data : []))
             .catch((err) => console.error(err));
     };
 
-    // -------------------------
-    // 결재자(Approver) 검색
-    // -------------------------
+    // 결재자 검색
     const handleUserSearch = () => {
         axios
             .get("/web/api/approver/search", { params: { keyword: userKeyword } })
@@ -74,9 +67,7 @@ function ApproverAssignment() {
             .catch((err) => console.error("결재자 검색 실패:", err));
     };
 
-    // -------------------------
-    // 체크박스 토글 + 지도 이동
-    // -------------------------
+    // 체크 + 지도 이동
     const handleBuildingCheck = (row) => {
         const id = row.id;
         const checked = selectedBuildings.includes(id);
@@ -85,12 +76,10 @@ function ApproverAssignment() {
             : [...selectedBuildings, id];
         setSelectedBuildings(next);
 
-        if (!checked) {
-            handleLocate(row);
-        }
+        if (!checked) handleLocate(row);
     };
 
-    // 주소 → 좌표 조회하여 지도 이동
+    // 주소 → 좌표
     const handleLocate = (row) => {
         const query = row.lotAddress || row.buildingName;
         if (!query) return;
@@ -111,9 +100,7 @@ function ApproverAssignment() {
             });
     };
 
-    // -------------------------
     // 결재자 배정
-    // -------------------------
     const handleAssign = async () => {
         if (!selectedUser) {
             alert("결재자를 선택하세요!");
@@ -129,7 +116,6 @@ function ApproverAssignment() {
                 userId: selectedUser.userId ?? selectedUser.id,
                 buildingIds: selectedBuildings,
             });
-            // 성공 후 목록 갱신 및 선택 초기화
             await handleSearch();
             setSelectedBuildings([]);
             alert(`총 ${data?.assignedCount ?? selectedBuildings.length}건이 배정되었습니다.`);
@@ -139,7 +125,7 @@ function ApproverAssignment() {
         }
     };
 
-    // 파란 상자에 표시할 ‘조사원 이름’ (없으면 대시)
+    // 파란 상자에 표기할 ‘조사원 이름’
     const renderResearcherBadge = (addr) => {
         const name =
             addr?.assignedName ??
@@ -150,182 +136,178 @@ function ApproverAssignment() {
     };
 
     return (
-        <div className="container-fluid mt-4 px-4">
-            {/* 타이틀 */}
-            <h2 className="mb-4">결재자 배정</h2>
+        <>
+            {/* 로컬 스타일: 배지/리스트 느낌 보정 */}
+            <style>{`
+        .pill-blue {
+          min-width: 150px;
+          text-align: center;
+          border: 1px solid #289eff;
+          color: #289eff;
+          font-weight: 500;
+          border-radius: .375rem;
+        }
+        .list-fixed {
+          height: 520px;
+        }
+      `}</style>
 
-            {/* 검색 박스 */}
-            <div className="border rounded p-3 mb-4 bg-light shadow-sm">
-                <div className="row g-3 align-items-end">
-                    {/* 시/도 */}
-                    <div className="col-md-4">
-                        <label className="form-label fw-bold">시/도 구분</label>
-                        <select className="form-select" disabled>
-                            <option>경상남도 김해시</option>
-                        </select>
-                    </div>
+            <div className="container-fluid mt-4 p-4 shadow-sm rounded-3" style={{ backgroundColor: "#fff" }}>
+                {/* 타이틀 (미배정 페이지와 동일 톤) */}
+                <h3 className="fw-bold mb-3" style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}>
+                    결재자 배정
+                </h3>
 
-                    {/* 읍면동 */}
-                    <div className="col-md-4">
-                        <label className="form-label fw-bold">읍/면/동 구분</label>
-                        <select
-                            className="form-select"
-                            value={selectedEmd}
-                            onChange={(e) => setSelectedEmd(e.target.value)}
-                        >
-                            <option value="">전체</option>
-                            {emdList.map((emd, idx) => (
-                                <option key={idx} value={emd}>
-                                    {emd}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                {/* 두 컬럼 레이아웃: 좌(필터+리스트) / 우(큰 지도 + 결재자 조회) */}
+                <div className="row g-3">
+                    {/* ===================== 좌측 컬럼 ===================== */}
+                    <div className="col-lg-7 d-flex flex-column">
+                        {/* 상단 슬림 필터 바 (읍/면/동 + 조회) */}
+                        <div className="border rounded p-2 bg-light shadow-sm mb-2">
+                            <div className="d-flex align-items-center flex-nowrap">
+                                <div className="input-group input-group-sm" style={{ minWidth: 300 }}>
+                                    <span className="input-group-text fw-semibold">읍/면/동</span>
+                                    <select
+                                        className="form-select form-select-sm"
+                                        value={selectedEmd}
+                                        onChange={(e) => {
+                                            setSelectedEmd(e.target.value);
+                                            // 선택 즉시 조회하려면 아래 한 줄 유지
+                                            setTimeout(() => handleSearchEMD(), 0);
+                                        }}
+                                    >
+                                        <option value="">전체</option>
+                                        {emdList.map((emd, idx) => (
+                                            <option key={idx} value={emd}>
+                                                {emd}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                    {/* 조회 버튼 */}
-                    <div className="col-md-4">
-                        <button
-                            className="btn w-100 fw-bold"
-                            style={{ backgroundColor: "#289eff", border: "none", color: "#fff" }}
-                            onClick={handleSearchEMD}
-                        >
-                            조회
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div className="row align-items-stretch">
-                {/* 좌측: 결재자 미배정 목록 */}
-                <div className="col-md-8 d-flex flex-column">
-                    <div
-                        className="p-3 border rounded bg-white shadow-sm d-flex flex-column"
-                        style={{ height: "616px" }}
-                    >
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                            <h5 className="mb-0">결재자 미배정 조사지 목록</h5>
-                            <div className="d-flex align-items-center gap-2">
-                <span
-                    className="px-2 py-1 text-muted small"
-                    title="현재 체크된 항목 수"
-                >
-                  선택 {selectedCount}건
-                </span>
-                                <small className="text-muted">총 {addresses.length}건</small>
+                                <button
+                                    className="btn btn-sm fw-bold ms-2"
+                                    style={{ backgroundColor: "#289eff", border: "none", color: "#fff", minWidth: 80 }}
+                                    onClick={handleSearchEMD}
+                                >
+                                    조회
+                                </button>
                             </div>
                         </div>
 
-                        <ul className="list-group flex-grow-1" style={{ overflowY: "auto" }}>
-                            {addresses.length === 0 ? (
-                                <li className="list-group-item text-center text-muted py-4">
-                                    해당 목록이 없습니다.
-                                </li>
-                            ) : (
-                                addresses.map((addr) => (
-                                    <li
-                                        key={addr.id}
-                                        className="list-group-item d-flex align-items-center"
-                                        style={{ cursor: "pointer" }}
-                                        onClick={() => handleBuildingCheck(addr)}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            className="form-check-input me-2"
-                                            checked={selectedBuildings.includes(addr.id)}
-                                            onChange={() => handleBuildingCheck(addr)}
-                                        />
-                                        <span className="text-truncate">
-                      {addr.lotAddress || addr.buildingName || `#${addr.id}`}
-                    </span>
-                                        <span
-                                            className="ms-auto px-2 py-1 border rounded"
-                                            style={{
-                                                minWidth: 150,
-                                                textAlign: "center",
-                                                borderColor: "#289eff",
-                                                color: "#289eff",
-                                                fontWeight: "500",
-                                            }}
-                                        >
-                      {renderResearcherBadge(addr)}
-                    </span>
+                        {/* 결재자 미배정 조사지 목록 */}
+                        <div className="p-3 border rounded bg-white shadow-sm d-flex flex-column list-fixed">
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                <h5 className="mb-0">결재자 미배정 조사지 목록</h5>
+                                <div className="d-flex align-items-center gap-2">
+                                    <span className="px-2 py-1 text-muted small">선택 {selectedCount}건</span>
+                                    <small className="text-muted">총 {addresses.length}건</small>
+                                </div>
+                            </div>
+
+                            <ul className="list-group flex-grow-1 overflow-auto">
+                                {addresses.length === 0 ? (
+                                    <li className="list-group-item text-center text-muted py-4">
+                                        해당 목록이 없습니다.
                                     </li>
-                                ))
-                            )}
-                        </ul>
-                    </div>
-                </div>
+                                ) : (
+                                    addresses.map((addr) => {
+                                        const checked = selectedBuildings.includes(addr.id);
+                                        return (
+                                            <li
+                                                key={addr.id}
+                                                className="list-group-item d-flex align-items-center"
+                                                style={{ cursor: "pointer" }}
+                                                onClick={() => handleBuildingCheck(addr)}
+                                                title={addr.lotAddress || addr.buildingName || `#${addr.id}`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input me-2"
+                                                    checked={checked}
+                                                    onChange={(e) => {
+                                                        e.stopPropagation();
+                                                        handleBuildingCheck(addr);
+                                                    }}
+                                                />
+                                                <span className="text-truncate">{addr.lotAddress || addr.buildingName || `#${addr.id}`}</span>
 
-                {/* 우측: 지도 + 결재자 조회 */}
-                <div className="col-md-4 d-flex flex-column gap-3">
-                    <div
-                        className="p-3 border rounded bg-white shadow-sm"
-                        style={{ height: "300px" }}
-                    >
-                        <h5 className="mb-3">지도</h5>
-                        <div style={{ height: "220px", width: "100%" }}>
-                            <NaverMap
-                                latitude={selectedLocation.latitude}
-                                longitude={selectedLocation.longitude}
-                            />
+                                                {/* 우측 파란 라벨: 이미 배정된 조사원 이름 */}
+                                                <span className="ms-auto px-2 py-1 pill-blue">
+                          {renderResearcherBadge(addr)}
+                        </span>
+                                            </li>
+                                        );
+                                    })
+                                )}
+                            </ul>
                         </div>
-                        {errorMessage && <div className="alert alert-warning mt-2">{errorMessage}</div>}
                     </div>
 
-                    <div
-                        className="p-3 border rounded bg-white shadow-sm d-flex flex-column"
-                        style={{ height: "300px" }}
-                    >
-                        <h5 className="mb-3">결재자 조회</h5>
-                        <div className="input-group mb-3">
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder="이름 또는 아이디 입력"
-                                value={userKeyword}
-                                onChange={(e) => setUserKeyword(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && handleUserSearch()}
-                            />
+                    {/* ===================== 우측 컬럼 ===================== */}
+                    <div className="col-lg-5">
+                        {/* 큰 지도 (상단 고정 느낌) */}
+                        <div className="p-3 border rounded bg-white shadow-sm position-sticky" style={{ top: "12px" }}>
+                            <div style={{ height: 300, borderRadius: "12px", overflow: "hidden" }}>
+                                <NaverMap latitude={selectedLocation.latitude} longitude={selectedLocation.longitude} />
+                            </div>
+                            {errorMessage && <div className="alert alert-warning mt-2 mb-0">{errorMessage}</div>}
+                        </div>
+
+                        {/* 결재자 조회/배정 카드 (작게) */}
+                        <div className="p-2 border rounded bg-white shadow-sm d-flex flex-column mt-2" style={{ height: 240, overflow: "hidden" }}>
+                            <div className="d-flex align-items-center justify-content-between gap-2 mb-2 flex-nowrap">
+                                <h5 className="m-0">결재자 조회</h5>
+                                <div className="input-group input-group-sm" style={{ maxWidth: 280, flex: "0 0 auto" }}>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="이름 또는 아이디 입력"
+                                        value={userKeyword}
+                                        onChange={(e) => setUserKeyword(e.target.value)}
+                                        onKeyDown={(e) => e.key === "Enter" && handleUserSearch()}
+                                    />
+                                    <button
+                                        className="btn"
+                                        style={{ backgroundColor: "#289eff", border: "none", color: "#fff" }}
+                                        onClick={handleUserSearch}
+                                    >
+                                        검색
+                                    </button>
+                                </div>
+                            </div>
+
+                            <ul className="list-group mb-2 flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
+                                {users.map((u) => (
+                                    <li key={u.userId ?? u.id} className="list-group-item d-flex align-items-center py-1">
+                                        <input
+                                            type="radio"
+                                            name="approverSelect"
+                                            className="form-check-input me-2"
+                                            onChange={() => setSelectedUser(u)}
+                                        />
+                                        {u.name} {u.username ? `(${u.username})` : ""}
+                                    </li>
+                                ))}
+                            </ul>
+
                             <button
-                                className="btn"
-                                style={{ backgroundColor: "#289eff", border: "none", color: "#fff" }}
-                                onClick={handleUserSearch}
+                                className="btn btn-sm w-100 fw-bold mt-auto"
+                                style={{
+                                    backgroundColor: selectedUser && selectedBuildings.length > 0 ? "#289eff" : "#ccc",
+                                    color: "#fff",
+                                    border: "none",
+                                }}
+                                disabled={!selectedUser || selectedBuildings.length === 0}
+                                onClick={handleAssign}
                             >
-                                검색
+                                배정
                             </button>
                         </div>
-
-                        <ul className="list-group mb-3 flex-grow-1" style={{ overflowY: "auto" }}>
-                            {users.map((u) => (
-                                <li key={u.userId ?? u.id} className="list-group-item d-flex align-items-center">
-                                    <input
-                                        type="radio"
-                                        name="approverSelect"
-                                        className="form-check-input me-2"
-                                        onChange={() => setSelectedUser(u)}
-                                    />
-                                    {u.name} {u.username ? `(${u.username})` : ""}
-                                </li>
-                            ))}
-                        </ul>
-
-                        <button
-                            className="btn w-100 fw-bold mt-auto"
-                            style={{
-                                backgroundColor:
-                                    selectedUser && selectedBuildings.length > 0 ? "#289eff" : "#ccc",
-                                border: "none",
-                                color: "#fff",
-                            }}
-                            disabled={!selectedUser || selectedBuildings.length === 0}
-                            onClick={handleAssign}
-                        >
-                            배정
-                        </button>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 

@@ -246,21 +246,21 @@ export default function PendingApprovals() {
         transition: "flex-basis 0.3s ease",
         display: "flex",
         flexDirection: "column",
-        minHeight: minH, // ✅ 화면 하단까지(스크롤 리스너 없음)
+        height: "100%"
+        // minHeight: minH, // ✅ 화면 하단까지(스크롤 리스너 없음)
     };
     const listScroll = {
         flex: 1,
         minHeight: 0,
-        overflow: "auto", // ✅ 목록만 스크롤
     };
 
     return (
         <div
-            className="container-fluid py-4 p-0"
-            style={{ display: "flex", gap: 20, alignItems: "stretch" }}
+            className="container-fluid pt-4 p-0 me-1"
+            style={{ display: "flex", alignItems: "stretch", height: "100%" }}
         >
             {/* 왼쪽: 리스트 카드 */}
-            <div ref={cardRef} className="p-4 shadow-sm rounded-3 bg-white" style={leftCardStyle}>
+            <div ref={cardRef} className="p-4 pb-0 shadow-sm rounded-3 bg-white" style={leftCardStyle}>
                 <ApprovalFilters
                     keyword={keyword}
                     setKeyword={setKeyword}

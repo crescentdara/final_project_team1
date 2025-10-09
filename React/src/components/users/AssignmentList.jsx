@@ -6,14 +6,16 @@ export default function AssignmentList({ loading, items = [] }) {
         <div className="table-responsive">
           <table className="table table-sm table-striped">
             <thead className="table-light">
-            <tr><th style={{width:140}}>Building ID</th><th>지번주소</th></tr>
+            <tr className="text-center">
+              <th style={{width:80}}>ID</th>
+              <th>지번주소</th></tr>
             </thead>
             <tbody>
             {loading ? (
                 <tr><td colSpan={2}>불러오는 중…</td></tr>
             ) : items.length ? (
                 items.map(it => (
-                    <tr key={it.buildingId}>
+                    <tr className="text-center" key={it.buildingId}>
                       <td>{it.buildingId}</td>
                       <td>{it.lotAddress}</td>
                     </tr>

@@ -55,7 +55,6 @@ export default function BuildingDetailPanel({ id, onClose }) {
                 padding: visible ? "20px" : "0",
                 overflowY: "auto",
                 transition: "all 0.3s ease",
-                marginBottom: "20px",
                 borderRadius: "12px 12px",
             }}
         >
@@ -70,7 +69,7 @@ export default function BuildingDetailPanel({ id, onClose }) {
                 <p className="text-danger">데이터를 불러오지 못했습니다.</p>
             ) : (
                 <>
-                    <h6>위치</h6>
+                    {/*<h6>위치</h6>*/}
                     <div id={`map-${id}`} style={{ width: "100%", height: "300px" }}></div>
                     <hr />
 

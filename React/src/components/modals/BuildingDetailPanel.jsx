@@ -1,7 +1,7 @@
 /* global naver */
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-export default function BuildingDetailPanel({ id, onClose }) {
+export default function BuildingDetailPanel({id, onClose, onEdit, onDelete, isApproved, deleting}) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [visible, setVisible] = useState(true); // ✅ 애니메이션용 상태
@@ -70,22 +70,82 @@ export default function BuildingDetailPanel({ id, onClose }) {
             ) : (
                 <>
                     {/*<h6>위치</h6>*/}
-                    <div id={`map-${id}`} style={{ width: "100%", height: "300px" }}></div>
-                    <hr />
+                    <div id={`map-${id}`} style={{width: "100%", height: "300px"}}></div>
+                    <hr/>
 
                     <table className="table table-sm">
                         <tbody>
-                        <tr><th>ID</th><td>{data.id}</td></tr>
-                        <tr><th>지번주소</th><td>{data.lotAddress ?? "-"}</td></tr>
-                        <tr><th>건물명</th><td>{data.buildingName ?? "-"}</td></tr>
-                        <tr><th>주용도</th><td>{data.mainUseName ?? "-"}</td></tr>
-                        <tr><th>구조</th><td>{data.structureName ?? "-"}</td></tr>
-                        <tr><th>지상층수</th><td>{data.groundFloors ?? "-"}</td></tr>
-                        <tr><th>지하층수</th><td>{data.basementFloors ?? "-"}</td></tr>
-                        <tr><th>대지면적</th><td>{data.landArea ? `${data.landArea}㎡` : "-"}</td></tr>
-                        <tr><th>건축면적</th><td>{data.buildingArea ? `${data.buildingArea}㎡` : "-"}</td></tr>
+                        <tr>
+                            <th>ID</th>
+                            <td>{data.id}</td>
+                        </tr>
+                        <tr>
+                            <th>지번주소</th>
+                            <td>{data.lotAddress ?? "-"}</td>
+                        </tr>
+                        <tr>
+                            <th>건물명</th>
+                            <td>{data.buildingName ?? "-"}</td>
+                        </tr>
+                        <tr>
+                            <th>주용도</th>
+                            <td>{data.mainUseName ?? "-"}</td>
+                        </tr>
+                        <tr>
+                            <th>구조</th>
+                            <td>{data.structureName ?? "-"}</td>
+                        </tr>
+                        <tr>
+                            <th>지상층수</th>
+                            <td>{data.groundFloors ?? "-"}</td>
+                        </tr>
+                        <tr>
+                            <th>지하층수</th>
+                            <td>{data.basementFloors ?? "-"}</td>
+                        </tr>
+                        <tr>
+                            <th>대지면적</th>
+                            <td>{data.landArea ? `${data.landArea}㎡` : "-"}</td>
+                        </tr>
+                        <tr>
+                            <th>건축면적</th>
+                            <td>{data.buildingArea ? `${data.buildingArea}㎡` : "-"}</td>
+                        </tr>
                         </tbody>
                     </table>
+                    {/* ✅ 우측 하단 고정 버튼 바 */}
+                    <div
+                        className="position-sticky"
+                        style={{
+                            bottom: 0,
+                            background: "#fff",
+                            borderTop: "1px solid #e5e7eb",
+                            paddingTop: 12,
+                            paddingBottom: 12,
+                            marginTop: 12,
+                            zIndex: 2
+                        }}
+                    >
+                        <div className="d-flex justify-content-end gap-2">
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={onEdit}
+                            >
+                                수정
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-danger"
+                                onClick={onDelete}
+                                disabled={deleting || isApproved}
+                                title={isApproved ? "승인(결재 완료) 상태는 삭제할 수 없습니다." : ""}
+                            >
+                                {deleting ? "삭제 중…" : "삭제"}
+                            </button>
+                        </div>
+                    </div>
+
                 </>
             )}
         </div>

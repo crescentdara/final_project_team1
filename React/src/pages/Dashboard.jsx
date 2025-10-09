@@ -240,7 +240,7 @@ function Dashboard({ senderId }) {
             {/* ===== 우측: 메시지(탭) ===== */}
             <div
                 style={{
-                    padding: 16,
+                    padding: 26,
                     borderRadius: 14,
                     background: "#fff",
                     boxShadow: "0 10px 30px rgba(16,24,40,0.06)",

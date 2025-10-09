@@ -175,15 +175,24 @@ export default function UserDetail() {
     }, []);
 
     // ---------- styles ----------
-    const wrapperStyle = { display: "flex", gap: 20, alignItems: "stretch" }; // ★ stretch
+    const wrapperStyle = {
+           display: "flex",
+           gap: 20,
+           alignItems: "stretch",
+           flexWrap: "nowrap",
+           marginTop: 16,
+           height: "calc(100vh - 110px)",
+           overflow: "hidden"
+};
     const leftStyle = {
-        flex: selectedUserId ? "0 0 62%" : "1 1 100%",
-        transition: "flex-basis 0.3s ease",
-        display: "flex",
-        flexDirection: "column",
-        minHeight: leftMinH, // ★ 뷰포트 바닥까지
+            flex: "1 1 auto",       // 남은 공간 전부
+           minWidth: 500,          // ★ 최소 너비 500
+           display: "flex",
+           flexDirection: "column",
+           height: "100%",         // wrapper와 동일 높이
+           minHeight: 0            // 내부 스크롤용
     };
-    const panelSticky = { position: "sticky", top: 16 };
+    const panelSticky = { position: "sticky", top: 0 };
     const theadSticky = { position: "sticky", top: 0, background: "#fff", zIndex: 1 };
 
     // ★ 표 컨테이너를 flex로 → 남은 공간을 채우고 내부만 스크롤
@@ -204,7 +213,7 @@ export default function UserDetail() {
     };
 
     return (
-        <div className="container-fluid mt-4 p-0" style={wrapperStyle}>
+        <div className="container-fluid p-0" style={wrapperStyle}>
             {/* LEFT: 표 리스트 */}
             <div ref={leftCardRef} className="p-4 shadow-sm rounded-3 bg-white" style={leftStyle}>
                 <h3 className="fw-bold mb-2" style={{ borderLeft: "4px solid #6898FF", paddingLeft: 12 }}>
@@ -313,8 +322,8 @@ export default function UserDetail() {
 
             {/* RIGHT: 상세 패널 (스티키 고정) */}
             {selectedUserId && (
-                <div style={{ flex: "0 0 38%" }}>
-                    <div style={panelSticky}>
+                <div style={{ flex: "0 0 400px", minWidth: 400, height: "100%" }}>
+                    <div style={{panelSticky, top: 0}}>
                         <UserDetailPanel
                             isOpen={!!selectedUserId}
                             closing={closing}

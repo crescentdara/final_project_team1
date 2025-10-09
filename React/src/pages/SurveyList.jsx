@@ -279,7 +279,7 @@
 //
 // export default SurveyList;
 
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
 import NaverMap from "../components/NaverMap"; // 지도 컴포넌트
 
@@ -313,7 +313,7 @@ function SurveyList() {
     const handleSearch = () => {
         axios
             .get("/web/building/unassigned", {
-                params: { region: selectedEmd || "" },
+                params: {region: selectedEmd || ""},
             })
             .then((res) => {
                 setAddresses(res.data.results || []);
@@ -325,7 +325,7 @@ function SurveyList() {
     const handleUserSearch = () => {
         axios
             .get("/web/building/unassigned", {
-                params: { region: selectedEmd || "", keyword: userKeyword || "" },
+                params: {region: selectedEmd || "", keyword: userKeyword || ""},
             })
             .then((res) => setUsers(res.data.investigators || []))
             .catch((err) => console.error("조사원 검색 실패:", err));
@@ -350,7 +350,7 @@ function SurveyList() {
         if (!query) return;
 
         axios
-            .get("/web/building/coords", { params: { address: query } })
+            .get("/web/building/coords", {params: {address: query}})
             .then((res) => {
                 if (res.data && res.data.latitude && res.data.longitude) {
                     setSelectedLocation({
@@ -393,26 +393,35 @@ function SurveyList() {
 
     return (
         <div
-            className="container-fluid mt-4 p-4 shadow-sm rounded-3"
-            style={{ backgroundColor: "#fff" }}
+            className="container-fluid p-4 shadow-sm rounded-3"
+            style={{
+                backgroundColor: "#fff",
+                marginTop: 16,
+                height: "calc(100vh - 110px)",   // 헤더/알림영역 높이에 맞춰 조정
+                overflow: "hidden"               // 바깥쪽 스크롤 금지
+            }}
         >
             {/* 타이틀 */}
             <h3
                 className="fw-bold mb-3"
-                style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
+                style={{borderLeft: "4px solid #6898FF", paddingLeft: "12px"}}
             >
                 미배정 조사지 목록
             </h3>
 
-            {/* 두 컬럼 레이아웃: 좌(필터+리스트) / 우(큰 지도) */}
-            <div className="row g-3">
+            {/* 두 컬럼 레이아웃 (랩 금지, 같은 높이) */}
+            <div
+                className="d-flex flex-nowrap gap-3 align-items-stretch"
+                style={{height: "100%", }}
+            >
                 {/* ===================== 좌측 컬럼 ===================== */}
-                <div className="col-lg-7 d-flex flex-column">
+                <div className="d-flex flex-column"
+                     style={{ flex: "0 0 65%", minWidth: 500, height: "100%" }}>
                     {/* 필터 카드 (드롭다운 + 조회 버튼) */}
                     <div className="border rounded p-2 bg-light shadow-sm mb-2 ">
                         <div className="d-flex align-items-center flex-nowrap">
                             {/* 라벨 + 셀렉트는 한 덩어리 */}
-                            <div className="input-group input-group-sm" style={{ minWidth: 300 }}>
+                            <div className="input-group input-group-sm" style={{minWidth: 300}}>
                                 <span className="input-group-text fw-semibold">읍/면/동</span>
                                 <select
                                     className="form-select form-select-sm"
@@ -450,12 +459,10 @@ function SurveyList() {
                     </div>
 
 
-
-
                     {/* 미배정 조사지 목록 */}
                     <div
-                        className="p-3 border rounded bg-white shadow-sm d-flex flex-column"
-                        style={{ height: "520px" }}
+                        className="p-3 border rounded bg-white shadow-sm d-flex flex-column mb-5"
+                        style={{ flex: 1, minHeight: 0 }}
                     >
                         <div className="d-flex justify-content-between align-items-center mb-2">
                             <h5 className="mb-0">미배정 조사지 목록</h5>
@@ -465,12 +472,12 @@ function SurveyList() {
                             </div>
                         </div>
 
-                        <ul className="list-group flex-grow-1" style={{ overflowY: "auto" }}>
+                        <ul className="list-group flex-grow-1" style={{ overflowY: "auto", minHeight: 0 }}>
                             {addresses.map((addr) => (
                                 <li
                                     key={addr.id}
                                     className="list-group-item d-flex align-items-center"
-                                    style={{ cursor: "pointer" }}
+                                    style={{cursor: "pointer"}}
                                 >
                                     <input
                                         type="checkbox"
@@ -486,13 +493,14 @@ function SurveyList() {
                 </div>
 
                 {/* ===================== 우측 컬럼(큰 지도) ===================== */}
-                <div className="col-lg-5">
+                <div className="d-flex flex-column"
+                     style={{ flex: "0 0 35%", minWidth: 400, height: "100%", paddingRight: "12px" }}>
                     <div
-                        className="p-3 border rounded bg-white shadow-sm position-sticky"
-                        style={{ top: "12px", height: "auto" }} // 큰 지도 영역
+                        className="p-3 border rounded bg-white shadow-sm d-flex flex-column"
+                        style={{ flex: 1, minHeight: 0, maxHeight: 300 }} // 큰 지도 영역
                     >
                         {/*<h4 className="mb-3">지도</h4>*/}
-                        <div style={{ height: "100%", borderRadius: "12px", overflow: "hidden" }}>
+                        <div style={{height: "100%", borderRadius: "12px", overflow: "hidden"}}>
                             <NaverMap
                                 latitude={selectedLocation.latitude}
                                 longitude={selectedLocation.longitude}
@@ -505,15 +513,15 @@ function SurveyList() {
                     </div>
                     {/* 조사원 조회/배정 */}
                     <div
-                        className="p-2 border rounded bg-white shadow-sm d-flex flex-column mt-2"
-                        style={{ height: 240, overflow: "hidden" }}   // 높이 축소 + 바깥쪽 스크롤 방지
+                        className="p-3 border rounded bg-white shadow-sm d-flex flex-column mt-3"
+                        style={{ flex: "0 0 240px", overflow: "hidden" }}
                     >
                         {/* 헤더: 좌(제목) / 우(검색 인풋+버튼) 한 줄 */}
-                        <div className="d-flex align-items-center justify-content-between gap-2 mb-2 flex-nowrap">
+                        <div className="d-flex align-items-center justify-content-between gap-2 mb-3 flex-nowrap">
                             <h5 className="m-0">조사원 조회</h5>
 
                             {/* 검색 UI: 작게(input-group-sm), 우측에 고정폭 */}
-                            <div className="input-group input-group-sm" style={{ maxWidth: 280, flex: "0 0 auto" }}>
+                            <div className="input-group input-group-sm" style={{maxWidth: 230, flex: "0 0 auto"}}>
                                 <input
                                     type="text"
                                     className="form-control"
@@ -523,7 +531,7 @@ function SurveyList() {
                                 />
                                 <button
                                     className="btn"
-                                    style={{ backgroundColor: "#289eff", border: "none", color: "#fff" }}
+                                    style={{backgroundColor: "#289eff", border: "none", color: "#fff"}}
                                     onClick={handleUserSearch}
                                 >
                                     검색
@@ -532,7 +540,7 @@ function SurveyList() {
                         </div>
 
                         {/* 리스트: 남는 공간만 차지하고, 내부 스크롤 */}
-                        <ul className="list-group mb-2 flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
+                        <ul className="list-group mb-3 flex-grow-1" style={{ minHeight: 0, overflowY: "auto" }}>
                             {users.map((user) => (
                                 <li
                                     key={user.userId}
@@ -551,7 +559,7 @@ function SurveyList() {
 
                         {/* 배정 버튼: 작게(btn-sm), 하단 고정 */}
                         <button
-                            className="btn btn-sm w-100 fw-bold mt-auto"
+                            className="btn btn-sm w-100 fw-bold"
                             style={{
                                 backgroundColor: selectedUser && selectedBuildings.length > 0 ? "#289eff" : "#ccc",
                                 color: "#fff",

@@ -52,7 +52,7 @@ function ReportFilters({ keyword, setKeyword, sort, setSort, onSearch, total }) 
                     style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}
                 >
                     결재 완료 {" "}
-                    <span className="text-muted fw-normal" style={{ fontSize: "0.9rem" }}>
+                    <span className="ms-2 text-muted fs-6" style={{ fontSize: "0.9rem" }}>
                     (총 {total}개)
                 </span>
                 </h3>

@@ -1,5 +1,5 @@
 // src/pages/ApproverAssignment.jsx
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
 import NaverMap from "../components/NaverMap";
 
@@ -36,7 +36,7 @@ function ApproverAssignment() {
 
         handleSearch(); // 결재자 미배정 목록
         axios
-            .get("/web/api/approver/search", { params: { keyword: "" } })
+            .get("/web/api/approver/search", {params: {keyword: ""}})
             .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
             .catch((err) => console.error("결재자 목록 로딩 실패:", err));
     }, []);
@@ -53,7 +53,7 @@ function ApproverAssignment() {
     const handleSearchEMD = () => {
         axios
             .get("/web/building/pending-approval", {
-                params: { eupMyeonDong: selectedEmd || "" },
+                params: {eupMyeonDong: selectedEmd || ""},
             })
             .then((res) => setAddresses(Array.isArray(res.data) ? res.data : []))
             .catch((err) => console.error(err));
@@ -62,7 +62,7 @@ function ApproverAssignment() {
     // 결재자 검색
     const handleUserSearch = () => {
         axios
-            .get("/web/api/approver/search", { params: { keyword: userKeyword } })
+            .get("/web/api/approver/search", {params: {keyword: userKeyword}})
             .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
             .catch((err) => console.error("결재자 검색 실패:", err));
     };
@@ -85,10 +85,10 @@ function ApproverAssignment() {
         if (!query) return;
 
         axios
-            .get("/web/building/coords", { params: { address: query } })
-            .then(({ data }) => {
+            .get("/web/building/coords", {params: {address: query}})
+            .then(({data}) => {
                 if (data?.latitude && data?.longitude) {
-                    setSelectedLocation({ latitude: data.latitude, longitude: data.longitude });
+                    setSelectedLocation({latitude: data.latitude, longitude: data.longitude});
                     setErrorMessage("");
                 } else {
                     setErrorMessage(`좌표를 찾을 수 없습니다.\n요청한 주소: ${query}`);
@@ -112,7 +112,7 @@ function ApproverAssignment() {
         }
 
         try {
-            const { data } = await axios.post("/web/api/approver/assign", {
+            const {data} = await axios.post("/web/api/approver/assign", {
                 userId: selectedUser.userId ?? selectedUser.id,
                 buildingIds: selectedBuildings,
             });
@@ -152,20 +152,32 @@ function ApproverAssignment() {
         }
       `}</style>
 
-            <div className="container-fluid mt-4 p-4 shadow-sm rounded-3" style={{ backgroundColor: "#fff" }}>
+            <div
+                className="container-fluid p-4 shadow-sm rounded-3"
+                style={{
+                    backgroundColor: "#fff",
+                    marginTop: 16,
+                    height: "calc(100vh - 110px)",
+                    overflow: "hidden"
+
+                }}>
                 {/* 타이틀 (미배정 페이지와 동일 톤) */}
-                <h3 className="fw-bold mb-3" style={{ borderLeft: "4px solid #6898FF", paddingLeft: "12px" }}>
+                <h3 className="fw-bold mb-3" style={{borderLeft: "4px solid #6898FF", paddingLeft: "12px"}}>
                     결재자 배정
                 </h3>
 
                 {/* 두 컬럼 레이아웃: 좌(필터+리스트) / 우(큰 지도 + 결재자 조회) */}
-                <div className="row g-3">
+                <div className="d-flex flex-nowrap align-items-stretch"
+                     style={{ height: "100%", gap: 20 }}
+                >
                     {/* ===================== 좌측 컬럼 ===================== */}
-                    <div className="col-lg-7 d-flex flex-column">
+                    <div className="d-flex flex-column"
+                         style={{ flex: "1 1 auto", minWidth: 500, height: "100%", minHeight: 0 }}
+                    >
                         {/* 상단 슬림 필터 바 (읍/면/동 + 조회) */}
                         <div className="border rounded p-2 bg-light shadow-sm mb-2">
                             <div className="d-flex align-items-center flex-nowrap">
-                                <div className="input-group input-group-sm" style={{ minWidth: 300 }}>
+                                <div className="input-group input-group-sm" style={{minWidth: 300}}>
                                     <span className="input-group-text fw-semibold">읍/면/동</span>
                                     <select
                                         className="form-select form-select-sm"
@@ -187,7 +199,7 @@ function ApproverAssignment() {
 
                                 <button
                                     className="btn btn-sm fw-bold ms-2"
-                                    style={{ backgroundColor: "#289eff", border: "none", color: "#fff", minWidth: 80 }}
+                                    style={{backgroundColor: "#289eff", border: "none", color: "#fff", minWidth: 80}}
                                     onClick={handleSearchEMD}
                                 >
                                     조회
@@ -196,7 +208,9 @@ function ApproverAssignment() {
                         </div>
 
                         {/* 결재자 미배정 조사지 목록 */}
-                        <div className="p-3 border rounded bg-white shadow-sm d-flex flex-column list-fixed">
+                        <div className="p-3 border rounded bg-white shadow-sm d-flex flex-column mb-5"
+                             style={{ flex: 1, minHeight: 0 }}
+                        >
                             <div className="d-flex justify-content-between align-items-center mb-2">
                                 <h5 className="mb-0">결재자 미배정 조사지 목록</h5>
                                 <div className="d-flex align-items-center gap-2">
@@ -205,7 +219,8 @@ function ApproverAssignment() {
                                 </div>
                             </div>
 
-                            <ul className="list-group flex-grow-1 overflow-auto">
+                            <ul className="list-group flex-grow-1"
+                                style={{ overflowY: "auto", minHeight: 0 }}>
                                 {addresses.length === 0 ? (
                                     <li className="list-group-item text-center text-muted py-4">
                                         해당 목록이 없습니다.
@@ -217,7 +232,7 @@ function ApproverAssignment() {
                                             <li
                                                 key={addr.id}
                                                 className="list-group-item d-flex align-items-center"
-                                                style={{ cursor: "pointer" }}
+                                                style={{cursor: "pointer"}}
                                                 onClick={() => handleBuildingCheck(addr)}
                                                 title={addr.lotAddress || addr.buildingName || `#${addr.id}`}
                                             >
@@ -230,7 +245,8 @@ function ApproverAssignment() {
                                                         handleBuildingCheck(addr);
                                                     }}
                                                 />
-                                                <span className="text-truncate">{addr.lotAddress || addr.buildingName || `#${addr.id}`}</span>
+                                                <span
+                                                    className="text-truncate">{addr.lotAddress || addr.buildingName || `#${addr.id}`}</span>
 
                                                 {/* 우측 파란 라벨: 이미 배정된 조사원 이름 */}
                                                 <span className="ms-auto px-2 py-1 pill-blue">
@@ -245,20 +261,26 @@ function ApproverAssignment() {
                     </div>
 
                     {/* ===================== 우측 컬럼 ===================== */}
-                    <div className="col-lg-5">
+                    <div className="d-flex flex-column"
+                         style={{ flex: "0 0 400px", minWidth: 400, }}
+                    >
                         {/* 큰 지도 (상단 고정 느낌) */}
-                        <div className="p-3 border rounded bg-white shadow-sm position-sticky" style={{ top: "12px" }}>
-                            <div style={{ height: 300, borderRadius: "12px", overflow: "hidden" }}>
-                                <NaverMap latitude={selectedLocation.latitude} longitude={selectedLocation.longitude} />
+                        <div
+                           className="p-3 border rounded bg-white shadow-sm d-flex flex-column"
+                           style={{ flex: 1, position: "sticky", top: 0, maxHeight: "330px" }}
+                         >
+                           <div style={{ borderRadius: 12, overflow: "hidden" }}>
+                                <NaverMap latitude={selectedLocation.latitude} longitude={selectedLocation.longitude}/>
                             </div>
                             {errorMessage && <div className="alert alert-warning mt-2 mb-0">{errorMessage}</div>}
                         </div>
 
                         {/* 결재자 조회/배정 카드 (작게) */}
-                        <div className="p-2 border rounded bg-white shadow-sm d-flex flex-column mt-2" style={{ height: 240, overflow: "hidden" }}>
-                            <div className="d-flex align-items-center justify-content-between gap-2 mb-2 flex-nowrap">
+                        <div className="p-3 border rounded bg-white shadow-sm d-flex flex-column mt-3"
+                             style={{ overflow: "hidden"}}>
+                            <div className="d-flex align-items-center justify-content-between gap-2 mb-3 flex-nowrap">
                                 <h5 className="m-0">결재자 조회</h5>
-                                <div className="input-group input-group-sm" style={{ maxWidth: 280, flex: "0 0 auto" }}>
+                                <div className="input-group input-group-sm" style={{maxWidth: 230, flex: "0 0 auto"}}>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -269,7 +291,7 @@ function ApproverAssignment() {
                                     />
                                     <button
                                         className="btn"
-                                        style={{ backgroundColor: "#289eff", border: "none", color: "#fff" }}
+                                        style={{backgroundColor: "#289eff", border: "none", color: "#fff"}}
                                         onClick={handleUserSearch}
                                     >
                                         검색
@@ -277,9 +299,10 @@ function ApproverAssignment() {
                                 </div>
                             </div>
 
-                            <ul className="list-group mb-2 flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
+                            <ul className="list-group mb-2 flex-grow-1 overflow-auto" style={{minHeight: 0}}>
                                 {users.map((u) => (
-                                    <li key={u.userId ?? u.id} className="list-group-item d-flex align-items-center py-1">
+                                    <li key={u.userId ?? u.id}
+                                        className="list-group-item d-flex align-items-center py-1">
                                         <input
                                             type="radio"
                                             name="approverSelect"
